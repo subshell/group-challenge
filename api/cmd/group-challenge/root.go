@@ -6,6 +6,7 @@ import (
 	"group-challenge/pkg/group-challenge/db"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -13,19 +14,25 @@ import (
 var appConfig config.ApplicationConfig
 
 func init() {
+	// env
 	viper.AutomaticEnv()
+	viper.SetEnvPrefix("GC")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	// config file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config")
 
-	viper.SetDefault("serverConfig.apiPort", 8081)
-	viper.SetDefault("serverConfig.staticFilesPort", 8080)
-	viper.SetDefault("serverConfig.staticFilesDir", "./static")
-
-	viper.SetDefault("dbConfig.User", "")
-	viper.SetDefault("dbConfig.Password", "")
-	viper.SetDefault("dbConfig.Database", "postgres")
+	// config defaults
+	viper.SetDefault("server.port", 8080)
+	viper.SetDefault("server.staticFilesDir", "./static")
+	viper.SetDefault("db.User", "")
+	viper.SetDefault("db.Password", "")
+	viper.SetDefault("db.Database", "postgres")
+	viper.SetDefault("db.Host", "localhost:5432")
+	viper.SetDefault("db.PoolSize", 50)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -43,6 +50,8 @@ func init() {
 }
 
 func main() {
-	db.Connect(appConfig.DB)
-	api.RunServer(appConfig.Server)
+	con := db.Connect(appConfig.DB)
+	defer con.Close()
+	db.InitDB(con)
+	api.RunServer(appConfig.Server, con)
 }

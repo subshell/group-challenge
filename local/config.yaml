@@ -5,5 +5,5 @@ db:
   user: postgres
   password: postgres
   database: group_challenge
-  host: "localhost:5432"
+  host: "postgres:5432"
   poolSize: 50

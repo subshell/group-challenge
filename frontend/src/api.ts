@@ -1,47 +1,148 @@
-import { Party, PartyItem } from './party/party-data';
+import { useQuery } from 'react-query';
+import { PartyResponse, PartySubmissionFormData, PartySubmissionResponse, UserSession } from './api-models';
+import { PartyFormData } from './party/PartyForm';
+import { useSession } from './user/session';
 
-// for local tests
-const events: Party[] = [
-  {
-    id: '123',
-    name: 'test',
-    description: 'this is a description',
-    category: 'photo',
-    startDate: new Date(),
-    endDate: new Date(),
-    items: [
-      {
-        id: '#1',
-        url: 'https://dummyimage.com/1520x1200',
+// constants
+
+const API_CUSTOM = {
+  SECURE: false,
+  HOST: 'localhost:8080',
+  PATH: '/_api/v1',
+};
+
+const API_AUTO = {
+  SECURE: window.location.protocol.startsWith('https'),
+  HOST: window.location.host,
+  PATH: '/_api/v1',
+};
+
+// determine api config dynamically
+const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
+const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
+const AUTH_URL = `${API_URL}/auth`;
+
+export const getImageUrl = (imageId: string) => `${API_URL}/images/${imageId}`;
+
+export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
+
+// api hooks
+
+export class RequestError extends Error {
+  constructor(public readonly status: number) {
+    super(status + '');
+  }
+}
+
+function useCreateApiHook<T>(queryKey: string[], url: string = `${API_URL}/${queryKey.join('/')}`) {
+  const [session] = useSession();
+
+  return useQuery<T>(queryKey, async () => {
+    const res = await fetch(url, {
+      headers: {
+        'X-AuthToken': session?.token || '',
       },
-      {
-        id: '#2',
-        url: 'https://dummyimage.com/1720x1200',
-      },
-      {
-        id: '#3',
-        url: 'https://dummyimage.com/1920x1200',
-      },
-    ],
-  },
-];
+    });
 
-export function getParty(id: string): Party {
-  return events[0];
+    if (res.status === 401 || res.status === 403) {
+      throw new RequestError(res.status);
+    }
+
+    return res.json();
+  });
 }
 
-export function getParties(): Party[] {
-  return events;
+export const useParty = (id: string) => useCreateApiHook<PartyResponse>(['parties', id]);
+export const useParties = () => useCreateApiHook<PartyResponse[]>(['parties']);
+
+// other stuff
+
+export async function signIn(username: string, password: string): Promise<UserSession | undefined> {
+  const rawHeader = `${username}:${password}`;
+  const response = await fetch(`${AUTH_URL}/signin`, {
+    headers: {
+      Authorization: `Bearer ${window.btoa(rawHeader)}`,
+    },
+    method: 'POST',
+  });
+
+  return response.status === 200 ? response.json() : undefined;
 }
 
-export function createParty(party: Party) {
-  console.log(party);
+export async function signOut(): Promise<boolean> {
+  const response = await fetch(`${AUTH_URL}/signout`, { method: 'POST' });
+  return response.status === 200;
 }
 
-export function createPartyItem(partyId: string, partyItem: PartyItem) {
-  console.log(partyId, partyItem);
+export async function signUp(username: string, password: string, email: string): Promise<UserSession | undefined> {
+  const response = await fetch(`${AUTH_URL}/register`, {
+    method: 'POST',
+    body: JSON.stringify({ username, password, email }),
+  });
+
+  return response.status === 200 ? response.json() : undefined;
 }
 
-export function createWs() {}
+export async function createParty({
+  party,
+  sessionToken,
+}: {
+  party: PartyFormData;
+  sessionToken: string;
+}): Promise<PartyResponse> {
+  return await fetch(`${API_URL}/parties`, {
+    method: 'POST',
+    body: JSON.stringify(party),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
 
-export const SOCKET_URL = 'ws://localhost:8080/ws/123';
+export async function editParty({
+  party,
+  partyId,
+  sessionToken,
+}: {
+  party: PartyFormData;
+  partyId: string;
+  sessionToken: string;
+}): Promise<PartyResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}`, {
+    method: 'POST',
+    body: JSON.stringify(party),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
+export async function addSubmission({
+  partyId,
+  submission,
+  sessionToken,
+}: {
+  partyId: string;
+  submission: PartySubmissionFormData;
+  sessionToken: string;
+}): Promise<PartyResponse> {
+  const formData = new FormData();
+  formData.append('image', submission.files[0]);
+  const meta: any = {
+    ...submission,
+  };
+  delete meta.files;
+  formData.append('meta', JSON.stringify(meta));
+
+  return await fetch(`${API_URL}/parties/${partyId}/submissions`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
+export function createPartySubmission(partyId: string, partySubmission: PartySubmissionResponse) {
+  console.log(partyId, partySubmission);
+}

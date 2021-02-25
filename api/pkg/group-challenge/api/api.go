@@ -2,45 +2,78 @@ package api
 
 import (
 	"fmt"
+	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
-	"group-challenge/pkg/group-challenge/ws"
+	"path"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
+	"github.com/xis/baraka/v2"
 )
 
-func configureAPIRouter(router *gin.Engine) {
-	v1 := router.Group("/api/v1")
+var (
+	con          *pg.DB
+	sessionStore *auth.PGSessionStore
+	formParser   *baraka.Parser
+)
+
+func configureAPIRouter(router *gin.Engine, con *pg.DB) {
+	v1 := router.Group("/_api/v1")
 	{
-		auth := v1.Group("/party/")
+		party := v1.Group("/parties")
 		{
-			auth.GET("/", func(c *gin.Context) {
-				c.JSON(200, gin.H{
-					"message": "pong",
-				})
-			})
+			party.GET("", partiesHandler)
+			party.POST("", addPartyHandler)
+			party.GET("/:id", partyByIDHandler)
+			party.POST("/:id", editPartyByIDHandler)
+			party.POST("/:id/submissions", addPartySubmissionHandler)
 		}
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/signin", signinHandler)
+			auth.POST("/signout", signoutHandler)
+			auth.POST("/register", registerHandler)
+		}
+		image := v1.Group("/images")
+		{
+			image.GET("/:imageId", serveImageHandler)
+		}
+
+		v1.GET("ws", createWsHandler())
 	}
 }
 
 /*
-RunServer Run the server
+RunServer starts the server
 */
-func RunServer(serverConfig config.ServerConfig) {
-	// static files (frontend)
+func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
+	con = _con
+
+	// formdata
+	formParser = baraka.DefaultParser()
+
+	// router setup
 	router := gin.Default()
-	router.Static("/static", serverConfig.StaticFilesDir)
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Authorization", auth.XAuthTokenHeader}
+	router.Use(cors.New(config))
 
-	// api
-	configureAPIRouter(router)
+	// sessions
+	sessionStore = auth.CreatePGSessionStore(con)
+	router.Use(sessionStore.InjectSessionMiddleware())
+	router.Use(sessionStore.RequireSessionMiddleware([]string{"/_api/v1/parties"}))
 
-	// ws
-	hub := ws.NewHub()
-	go hub.Run()
-	go hub.LogClients()
-
-	router.GET("/ws", func(c *gin.Context) {
-		ws.ServeWs(hub, c.Writer, c.Request)
+	// static files
+	router.Use(static.Serve("/", static.LocalFile(serverConfig.StaticFilesDir, true)))
+	router.NoRoute(func(c *gin.Context) {
+		c.File(path.Join(serverConfig.StaticFilesDir, "index.html"))
 	})
+
+	// api and ws
+	configureAPIRouter(router, con)
 
 	router.Run(fmt.Sprintf(":%d", serverConfig.Port))
 }

@@ -1,45 +1,89 @@
-import './App.css';
 import Navigation from './navigation/Navigation';
-
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
-import PartiesOverview from './party/PartiesOverview';
 import ViewParty from './party/view/ViewParty';
-import PostPartyItem from './party/post/PostPartyItem';
-import { useCallback, useContext, useState } from 'react';
-import { appContext as initialAppContext, AppContext, IAppContext } from './appContext';
-import StartScreen from './start/StartScreen';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { useSession } from './user/session';
+import { SignIn, SignUp } from './user/SignInAndSignUp';
+import Home from './home/Home';
+import EditProfile from './user/EditProfile';
+import CreateParty from './party/create/CreateParty';
+import { toast, ToastContainer } from 'react-toastify';
+import { RequestError, useParties } from './api';
+import { useEffect } from 'react';
+import PostPartySubmission from './party/post/PostPartySubmission';
 
 function WithUser() {
+  const parties = useParties();
+  const [, , removeSession] = useSession();
+
+  useEffect(() => {
+    if (!parties.isLoading && (parties.error as RequestError)?.status === 401) {
+      console.error(parties.error);
+      toast('Your session has expired', { type: 'error' });
+      removeSession();
+    }
+  }, [parties.error, parties.isLoading]);
+
   return (
     <Switch>
       <Route exact path="/">
-        <PartiesOverview />
+        <Home />
       </Route>
-      <Route path="/event/view/:id">
+      <Route path="/party/create">
+        <CreateParty />
+      </Route>
+      <Route path="/party/view/:id">
         <ViewParty />
       </Route>
-      <Route path="/event/post/:id">
-        <PostPartyItem />
+      <Route path="/party/post/:id">
+        <PostPartySubmission />
       </Route>
-      <Route path="/event/edit/:id">
+      <Route path="/party/edit/:id">
         <EditParty />
+      </Route>
+      <Route path="/profile">
+        <EditProfile />
+      </Route>
+      <Route>
+        <Redirect to="/" />
       </Route>
     </Switch>
   );
 }
 
+function WithoutUser() {
+  return (
+    <Switch>
+      <Route exact path="/">
+        <Home />
+      </Route>
+      <Route path="/signin">
+        <SignIn />
+      </Route>
+      <Route path="/signup">
+        <SignUp />
+      </Route>
+      <Route path="/">
+        <Redirect to="/" />
+      </Route>
+    </Switch>
+  );
+}
+
+const queryClient = new QueryClient();
+
 function App() {
-  const [appContext, setAppContext] = useState(initialAppContext);
-  const setContextCb = useCallback((context) => setAppContext(context as IAppContext), []);
+  const [session] = useSession();
 
   return (
     <div className="App">
       <Router>
-        <AppContext.Provider value={[appContext, setContextCb]}>
+        <QueryClientProvider client={queryClient}>
           <Navigation />
-          {appContext.user ? <WithUser /> : <StartScreen />}
-        </AppContext.Provider>
+          <ToastContainer position="bottom-right" />
+          <div className="container mx-auto">{session ? <WithUser /> : <WithoutUser />}</div>
+        </QueryClientProvider>
       </Router>
     </div>
   );
