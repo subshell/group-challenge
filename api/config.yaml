@@ -1,0 +1,7 @@
+server:
+  port: 8080
+  staticFilesDir: "./static"
+db:
+  user: postgres
+  password: localPassword
+  database: postgres
