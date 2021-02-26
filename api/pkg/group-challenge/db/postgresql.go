@@ -15,6 +15,7 @@ func Connect(dbConfig config.DBConfig) {
 		User:     dbConfig.User,
 		Password: dbConfig.Password,
 		Database: dbConfig.Database,
+		Addr:     dbConfig.Addr,
 	})
 	defer db.Close()
 
@@ -22,7 +23,7 @@ func Connect(dbConfig config.DBConfig) {
 	_, err := db.QueryOne(pg.Scan(&n), "SELECT 1")
 
 	if err != nil {
-		log.Panic(err, "DB connection error")
+		log.Panic(err)
 		os.Exit(1)
 	}
 

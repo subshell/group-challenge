@@ -3,5 +3,5 @@ server:
   staticFilesDir: "./static"
 db:
   user: postgres
-  password: localPassword
+  password: postgres
   database: postgres

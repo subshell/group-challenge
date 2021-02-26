@@ -6,6 +6,8 @@ WORKDIR /app
 COPY api .
 RUN make go-build-for-docker
 
+#########
+
 # React Frontend
 FROM node:15.10-alpine AS react-builder
 
@@ -16,6 +18,8 @@ COPY frontend/package-lock.json .
 RUN npm ci --silent
 COPY frontend .
 RUN npm run build
+
+#########
 
 # Executable
 FROM alpine
