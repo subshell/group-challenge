@@ -26,6 +26,14 @@ const events: Party[] = [
   },
 ];
 
+const API_HOST = 'localhost:8080'; // '' for production
+const API_PATH = '/_api/v1';
+
+export const WS_PATH = API_PATH + '/ws';
+export const WS_URL = `ws://${API_HOST}${WS_PATH}`;
+
+export const PARTY_PATH = API_PATH + '/party';
+
 export function getParty(id: string): Party {
   return events[0];
 }
@@ -41,7 +49,3 @@ export function createParty(party: Party) {
 export function createPartyItem(partyId: string, partyItem: PartyItem) {
   console.log(partyId, partyItem);
 }
-
-export function createWs() {}
-
-export const SOCKET_URL = 'ws://localhost:8080/ws/123';

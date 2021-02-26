@@ -1,12 +1,13 @@
 import './App.css';
 import Navigation from './navigation/Navigation';
+import { SWRConfig } from 'swr';
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
 import PartiesOverview from './party/PartiesOverview';
 import ViewParty from './party/view/ViewParty';
 import PostPartyItem from './party/post/PostPartyItem';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { appContext as initialAppContext, AppContext, IAppContext } from './appContext';
 import StartScreen from './start/StartScreen';
 
@@ -37,8 +38,15 @@ function App() {
     <div className="App">
       <Router>
         <AppContext.Provider value={[appContext, setContextCb]}>
-          <Navigation />
-          {appContext.user ? <WithUser /> : <StartScreen />}
+          <SWRConfig
+            value={{
+              refreshInterval: 3000,
+              fetcher: (...args) => fetch(args).then((res) => res.json()),
+            }}
+          >
+            <Navigation />
+            {appContext.user ? <WithUser /> : <StartScreen />}
+          </SWRConfig>
         </AppContext.Provider>
       </Router>
     </div>
