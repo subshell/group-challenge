@@ -1,7 +1,13 @@
+import { useParty } from '../api';
 import LinkButton from '../components/LinkButton';
 import { Party } from './party-data';
 
-function PartiesOverviewItem({ party }: { party: Party }) {
+function PartiesOverviewItem({ partyId }: { partyId: string }) {
+  const { party, isError, isLoading } = useParty(partyId);
+
+  if (isError) return <span>ERROR</span>;
+  if (isLoading || !party) return <span>LOADING</span>;
+
   return (
     <div className="border border-gray-200 py-8 px-8 flex flex-col flex-wrap md:flex-nowrap">
       <h2 className="text-2xl font-medium text-gray-900 title-font mb-2">{party.name}</h2>

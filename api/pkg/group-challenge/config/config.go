@@ -2,6 +2,7 @@ package config
 
 // ApplicationConfig app config
 type ApplicationConfig struct {
+	Mode   string
 	Server ServerConfig
 	DB     DBConfig
 }

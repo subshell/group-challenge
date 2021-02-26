@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { getParty, PARTY_PATH, WS_URL } from '../../api';
-import { Party, PartyItem } from '../party-data';
+import { useParty, WS_URL } from '../../api';
+import { PartyItem } from '../party-data';
 import ViewPartyItem from './ViewPartyItem';
 import useWebSocket from 'react-use-websocket';
-import useSWR from 'swr';
 
 function ViewParty() {
   const { id } = useParams<{ id: string }>();
@@ -30,16 +29,18 @@ function ViewParty() {
     [sendMessage]
   );
 
-  const { data: party, error } = useSWR<Party>(PARTY_PATH);
+  const { party, isError, isLoading } = useParty(id);
 
   useEffect(() => {
     if (!partyItem) return;
     setPartyItem(party!.items[partyItemIndex]);
   }, [partyItemIndex]);
 
+  if (isError) return <span> ERROR </span>;
+  if (isLoading) return <span> LOADING </span>;
+
   return (
     <div>
-      test: {JSON.stringify(error, null, 2)}
       {partyItem && (
         <ViewPartyItem key={partyItem.id} partyItem={partyItem} onDone={onItemDone} onRating={onItemRating} />
       )}

@@ -11,5 +11,5 @@ export interface Party {
 export interface PartyItem {
   id: string;
   name?: string;
-  url: string;
+  imageURL: string;
 }

@@ -48,6 +48,8 @@ func init() {
 }
 
 func main() {
-	db.Connect(appConfig.DB)
+	if appConfig.Mode == "db" {
+		db.Connect(appConfig.DB)
+	}
 	api.RunServer(appConfig.Server)
 }

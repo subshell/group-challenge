@@ -41,7 +41,7 @@ function App() {
           <SWRConfig
             value={{
               refreshInterval: 3000,
-              fetcher: (...args) => fetch(args).then((res) => res.json()),
+              fetcher: (path, ...args) => fetch(path, ...args).then((res) => res.json()),
             }}
           >
             <Navigation />

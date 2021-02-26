@@ -1,3 +1,4 @@
+mode: in-memory # db
 server:
   port: 8080
   staticFilesDir: "./static"
