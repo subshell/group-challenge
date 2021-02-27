@@ -4,7 +4,7 @@ import { SWRConfig } from 'swr';
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
-import PartiesOverview from './party/PartiesOverview';
+import PartiesOverview from './party/PartyList';
 import ViewParty from './party/view/ViewParty';
 import PostPartyItem from './party/post/PostPartyItem';
 import { useCallback, useState } from 'react';
@@ -41,7 +41,6 @@ function App() {
           <SWRConfig
             value={{
               refreshInterval: 3000,
-              fetcher: (path, ...args) => fetch(path, ...args).then((res) => res.json()),
             }}
           >
             <Navigation />

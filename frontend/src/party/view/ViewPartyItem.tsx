@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
+import { PartyItemResponse } from '../../api';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
-import { PartyItem } from '../party-data';
 
 export interface ViewPartyItemProps {
-  partyItem: PartyItem;
+  partyItem: PartyItemResponse;
   onDone?: (rating: number) => any;
   onRating?: (rating: number) => any;
 }

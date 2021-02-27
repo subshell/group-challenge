@@ -8,7 +8,7 @@ contribute. Currently supported challenges are:
 
 ## Local development
 
-1. start a postgres db at port `5432`.
+1. start a postgres db at port `5432` or set the `mode` config (env: `GC_MODE`) to `no-db`.
 
 ```sh
   docker-compose up
@@ -32,6 +32,7 @@ The Dockerimage requires a config file `/app/config.yaml`. Env variables are als
 for example: `GC_SERVER_PORT`. The postgreSQL database is not part of the Dockerimage and has to be started separately.
 
 ```yaml
+mode: db # alternative: in-memory
 server:
   port: 8080
   staticFilesDir: "./static"

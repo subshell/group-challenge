@@ -1,16 +1,48 @@
 import useSWR from 'swr';
-import { Party, PartyItem } from './party/party-data';
 
-export const API_HOST = 'http://localhost:8080'; // '' for production
-const API_PATH = `${API_HOST}/_api/v1`;
+//response interfaces
 
-export const WS_PATH = API_PATH + '/ws';
-export const WS_URL = `ws://${API_HOST}/${WS_PATH}`;
+export interface PartyResponse {
+  id: string;
+  name: string;
+  description: string;
+  category: 'photo';
+  startDate: string;
+  endDate: string;
+  items: PartyItemResponse[];
+}
 
-export const PARTY_PATH = API_PATH + '/parties';
+export interface PartyItemResponse {
+  id: string;
+  name?: string;
+  imageURL: string;
+}
+
+// constants
+
+const API_CUSTOM = {
+  SECURE: false,
+  HOST: 'localhost:8080',
+  PATH: '/_api/v1',
+};
+
+const API_AUTO = {
+  SECURE: window.location.protocol.startsWith('https'),
+  HOST: window.location.host,
+  PATH: '/_api/v1',
+};
+
+// determine api config dynamically
+const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
+const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
+const PARTY_URL = `${API_URL}/parties`;
+
+export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
+
+// api hooks
 
 export function useParty(id: string) {
-  const { data, error } = useSWR<Party>(`${PARTY_PATH}/${id}/`);
+  const { data, error } = useSWR<PartyResponse>(`${PARTY_URL}/${id}`);
 
   return {
     party: data,
@@ -20,7 +52,7 @@ export function useParty(id: string) {
 }
 
 export function useParties() {
-  const { data, error } = useSWR<string[]>(`${PARTY_PATH}/`);
+  const { data, error } = useSWR<string[]>(`${PARTY_URL}`);
 
   return {
     partyIds: data,
@@ -29,10 +61,10 @@ export function useParties() {
   };
 }
 
-export function createParty(party: Party) {
+export function createParty(party: PartyResponse) {
   console.log(party);
 }
 
-export function createPartyItem(partyId: string, partyItem: PartyItem) {
+export function createPartyItem(partyId: string, partyItem: PartyItemResponse) {
   console.log(partyId, partyItem);
 }

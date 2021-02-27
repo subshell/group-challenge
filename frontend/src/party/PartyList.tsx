@@ -1,5 +1,5 @@
 import { useParties } from '../api';
-import PartiesOverviewItem from './PartiesOverviewItem';
+import PartiesOverviewItem from './PartyListItem';
 
 function PartiesOverview() {
   const { partyIds, isError, isLoading } = useParties();
