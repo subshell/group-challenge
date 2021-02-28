@@ -2,7 +2,6 @@ package config
 
 // ApplicationConfig app config
 type ApplicationConfig struct {
-	Mode   string
 	Server ServerConfig
 	DB     DBConfig
 }
@@ -18,5 +17,5 @@ type DBConfig struct {
 	User     string
 	Password string
 	Database string
-	Addr     string
+	Host     string
 }

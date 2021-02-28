@@ -1,8 +1,8 @@
-mode: no-db # db
 server:
   port: 8080
   staticFilesDir: "./static"
 db:
   user: postgres
   password: postgres
-  database: postgres
+  database: group_challenge
+  host: "localhost:5432"

@@ -3,43 +3,27 @@ package api
 import (
 	"fmt"
 	"group-challenge/pkg/group-challenge/config"
+	"group-challenge/pkg/group-challenge/data"
 	"group-challenge/pkg/group-challenge/ws"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 )
 
-// Party party dto
-type Party struct {
-	ID          string      `json:"id"`
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	Category    string      `json:"category"`
-	StartDate   string      `json:"startDate"`
-	EndDate     string      `json:"endDate"`
-	Items       []PartyItem `json:"items"`
-}
-
-// PartyItem party item dto
-type PartyItem struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	ImageURL string `json:"imageURL"`
-}
-
 func configureAPIRouter(router *gin.Engine) {
-	testParty := Party{
-		ID:          "12345",
+	testParty := data.Party{
+		ID:          123,
 		Name:        "test",
 		Description: "desc",
 		Category:    "photo",
 		StartDate:   time.Now().Format(time.RFC3339),
 		EndDate:     time.Now().Format(time.RFC3339),
-		Items: []PartyItem{
+		Items: []*data.PartyItem{
 			{
-				ID:       "item-id",
+				ID:       123,
 				Name:     "item name",
 				ImageURL: "https://dummyimage.com/1920x1200",
 			},
@@ -55,7 +39,7 @@ func configureAPIRouter(router *gin.Engine) {
 		party := v1.Group("/parties")
 		{
 			party.GET("", func(c *gin.Context) {
-				c.JSON(200, []string{
+				c.JSON(200, []int64{
 					testParty.ID,
 				})
 			})
@@ -73,7 +57,7 @@ func configureAPIRouter(router *gin.Engine) {
 /*
 RunServer Run the server
 */
-func RunServer(serverConfig config.ServerConfig) {
+func RunServer(serverConfig config.ServerConfig, conn *pg.DB) {
 	// static files (frontend)
 	router := gin.Default()
 	router.Use(cors.Default())
