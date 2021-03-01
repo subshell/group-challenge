@@ -40,6 +40,7 @@ db:
   password: postgres # prefered method: use env variable GC_DB_PASSWORD
   database: group_challenge
   host: "localhost:5432"
+  poolSize: 50
 ```
 
 ## Deploy to k8s with Helm

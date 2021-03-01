@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"group-challenge/pkg/group-challenge/config"
-	"group-challenge/pkg/group-challenge/data"
+	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
 	"time"
 
@@ -14,16 +14,16 @@ import (
 )
 
 func configureAPIRouter(router *gin.Engine) {
-	testParty := data.Party{
-		ID:          123,
+	testParty := models.Party{
+		ID:          "123",
 		Name:        "test",
 		Description: "desc",
 		Category:    "photo",
 		StartDate:   time.Now().Format(time.RFC3339),
 		EndDate:     time.Now().Format(time.RFC3339),
-		Items: []*data.PartyItem{
+		Items: []*models.PartyItem{
 			{
-				ID:       123,
+				ID:       "123",
 				Name:     "item name",
 				ImageURL: "https://dummyimage.com/1920x1200",
 			},
@@ -39,7 +39,7 @@ func configureAPIRouter(router *gin.Engine) {
 		party := v1.Group("/parties")
 		{
 			party.GET("", func(c *gin.Context) {
-				c.JSON(200, []int64{
+				c.JSON(200, []string{
 					testParty.ID,
 				})
 			})

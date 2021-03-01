@@ -31,6 +31,8 @@ func init() {
 	viper.SetDefault("db.User", "")
 	viper.SetDefault("db.Password", "")
 	viper.SetDefault("db.Database", "postgres")
+	viper.SetDefault("db.Host", "localhost:5432")
+	viper.SetDefault("db.PoolSize", 50)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

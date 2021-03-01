@@ -18,4 +18,5 @@ type DBConfig struct {
 	Password string
 	Database string
 	Host     string
+	PoolSize int
 }
