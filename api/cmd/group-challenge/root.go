@@ -50,7 +50,8 @@ func init() {
 }
 
 func main() {
-	conn := db.Connect(appConfig.DB)
-	db.CreateSchema(conn)
-	api.RunServer(appConfig.Server, conn)
+	con := db.Connect(appConfig.DB)
+	defer con.Close()
+	db.CreateSchema(con)
+	api.RunServer(appConfig.Server, con)
 }

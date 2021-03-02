@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/models"
@@ -23,10 +24,21 @@ func Connect(dbConfig config.DBConfig) (con *pg.DB) {
 		MaxRetries: 5,
 	})
 
+	ctx := context.Background()
+
 	// check connection
-	if err := con.Ping(con.Context()); err != nil {
+	if err := con.Ping(ctx); err != nil {
 		panic("cannot connect to postgres")
 	}
+
+	var version string
+	_, err := con.QueryOneContext(ctx, pg.Scan(&version), "SELECT version()")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(version)
+
+	con.AddQueryHook(dbLogger{})
 
 	return
 }
