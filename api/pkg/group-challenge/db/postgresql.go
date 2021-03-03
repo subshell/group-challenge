@@ -47,6 +47,7 @@ func Connect(dbConfig config.DBConfig) (con *pg.DB) {
 func CreateSchema(db *pg.DB) error {
 	models := []interface{}{
 		(*models.User)(nil),
+		(*models.Room)(nil),
 		(*models.Party)(nil),
 		(*models.PartyItem)(nil),
 	}

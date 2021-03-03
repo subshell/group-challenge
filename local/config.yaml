@@ -1,0 +1,9 @@
+server:
+  port: 8080
+  staticFilesDir: "./static"
+db:
+  user: postgres
+  password: postgres
+  database: group_challenge
+  host: "postgres:5432"
+  poolSize: 50
