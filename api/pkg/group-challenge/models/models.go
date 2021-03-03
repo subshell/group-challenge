@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/go-pg/pg/v10"
 	"github.com/gofrs/uuid"
 )
@@ -10,6 +12,7 @@ type User struct {
 	tableName struct{}  `json:"-" pg:"gc_user"`
 	ID        uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Username  string    `json:"username" pg:"username,unique"`
+	Password  string    `json:"-" pg:"password"`
 }
 
 // Room dto
@@ -17,6 +20,8 @@ type Room struct {
 	tableName   struct{}  `json:"-" pg:"room"`
 	ID          uuid.UUID `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string    `json:"name" pg:"name,notnull"`
+	URLName     string    `json:"urlName" pg:"url_name,unique"`
+	Token       string    `json:"-" pg:"token,default:gen_random_uuid()"`
 	Description string    `json:"description" pg:"descrption,notnull"`
 	Parties     []*Party  `json:"parties" pg:"parties"`
 }
@@ -26,10 +31,11 @@ type Party struct {
 	tableName   struct{}     `json:"-" pg:"party"`
 	ID          uuid.UUID    `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string       `json:"name" pg:"name,notnull"`
+	URLName     string       `json:"urlName" pg:"url_name,unique"`
 	Description string       `json:"description" pg:"descrption,notnull"`
 	Category    string       `json:"category" pg:"category,notnull"`
-	StartDate   string       `json:"startDate" pg:"start_date"`
-	EndDate     string       `json:"endDate" pg:"end_date"`
+	StartDate   *time.Time   `json:"startDate" pg:"start_date"`
+	EndDate     *time.Time   `json:"endDate" pg:"end_date"`
 	Items       []*PartyItem `json:"items" pg:"items"`
 }
 
@@ -55,6 +61,12 @@ func (user *User) Insert(con *pg.DB) (err error) {
 // Select selects the user by its user id
 func (user *User) Select(con *pg.DB) (err error) {
 	err = con.Model(user).Select()
+	return
+}
+
+// SelectByUsername selects the user by its user id
+func (user *User) SelectByUsername(con *pg.DB) (err error) {
+	err = con.Model(user).Where("username = ?0", user.Username).Select()
 	return
 }
 

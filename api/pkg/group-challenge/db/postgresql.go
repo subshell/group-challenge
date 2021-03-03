@@ -43,8 +43,13 @@ func Connect(dbConfig config.DBConfig) (con *pg.DB) {
 	return
 }
 
-// CreateSchema creates database schema all modeles if they don't exist
-func CreateSchema(db *pg.DB) error {
+// InitDB initializes the db
+func InitDB(con *pg.DB) error {
+	return createSchema(con)
+}
+
+// createSchema creates database schema all modeles if they don't exist
+func createSchema(db *pg.DB) error {
 	models := []interface{}{
 		(*models.User)(nil),
 		(*models.Room)(nil),

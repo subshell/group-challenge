@@ -2,9 +2,11 @@ package api
 
 import (
 	"fmt"
+	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
+	"net/http"
 	"path"
 
 	"github.com/gin-contrib/cors"
@@ -17,7 +19,7 @@ import (
 // API Handler
 ////////
 
-func createTestHandler(con *pg.DB) func(*gin.Context) {
+func createTestHandler(con *pg.DB) gin.HandlerFunc {
 	user := &models.User{
 		Username: "tom",
 	}
@@ -36,19 +38,54 @@ func createTestHandler(con *pg.DB) func(*gin.Context) {
 	}
 }
 
-func createPartiesHandler(con *pg.DB) func(*gin.Context) {
+func createPartiesHandler(con *pg.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(200, []uuid.UUID{})
 	}
 }
 
-func createPartyByIDHandler(con *pg.DB) func(*gin.Context) {
+func createPartyByIDHandler(con *pg.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(200, models.Party{})
 	}
 }
 
-func createWsHandler() func(*gin.Context) {
+// TODO: Request Validation
+type userLogin struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func createLoginHandler(con *pg.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		body := userLogin{}
+		c.BindJSON(&body)
+
+		if auth.CheckUserPassword(con, body.Username, body.Password) {
+			userModel := &models.User{
+				Username: body.Username,
+			}
+			userModel.SelectByUsername(con)
+			c.JSON(http.StatusOK, userModel)
+			return
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "unauthorized",
+		})
+	}
+}
+
+func createRegisterHandler(con *pg.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		body := userLogin{}
+		c.BindJSON(&body)
+		user := auth.CreateUser(body.Username, body.Password)
+		user.Insert(con)
+		c.JSON(200, user)
+	}
+}
+
+func createWsHandler() gin.HandlerFunc {
 	hub := ws.NewHub()
 	go hub.Run()
 	go hub.LogClients()
@@ -68,8 +105,13 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 
 		party := v1.Group("/parties")
 		{
-			party.GET("", createPartiesHandler(con))
-			party.GET(":id", createPartyByIDHandler(con))
+			party.GET("/", createPartiesHandler(con))
+			party.GET("/:id", createPartyByIDHandler(con))
+		}
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/login", createLoginHandler(con))
+			auth.POST("/register", createRegisterHandler(con))
 		}
 
 		v1.GET("ws", createWsHandler())
@@ -80,9 +122,10 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 RunServer Run the server
 */
 func RunServer(serverConfig config.ServerConfig, con *pg.DB) {
-	// static files (frontend)
+	// router setup
 	router := gin.Default()
 	router.Use(cors.Default())
+	router.Use(AuthMiddleware(con))
 
 	// static files
 	router.Use(static.Serve("/", static.LocalFile(serverConfig.StaticFilesDir, true)))
