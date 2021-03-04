@@ -2,7 +2,7 @@ import { useParties } from '../api';
 import PartiesOverviewItem from './PartyListItem';
 
 function PartiesOverview() {
-  const { partyIds, isError, isLoading } = useParties();
+  const { data: partyIds, isError, isLoading } = useParties();
 
   if (isError) return <span>ERROR</span>;
   if (isLoading) return <span>LOADING</span>;

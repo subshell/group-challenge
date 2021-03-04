@@ -93,7 +93,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 	{
 		party := v1.Group("/parties")
 		{
-			party.GET("/", partiesHandler)
+			party.GET("", partiesHandler)
 			party.GET("/:id", partyByIDHandler)
 		}
 		auth := v1.Group("/auth")
@@ -115,7 +115,11 @@ func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 
 	// router setup
 	router := gin.Default()
-	router.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowHeaders = []string{"Authorization"}
+	config.AllowCredentials = true
+	router.Use(cors.New(config))
 
 	// sessions
 	sessionStore = auth.CreatePGSessionStore(con)

@@ -2,7 +2,7 @@ import { useParty } from '../api';
 import LinkButton from '../components/LinkButton';
 
 function PartiesOverviewItem({ partyId }: { partyId: string }) {
-  const { party, isError, isLoading } = useParty(partyId);
+  const { data: party, isError, isLoading } = useParty(partyId);
 
   if (isError) return <span>ERROR</span>;
   if (isLoading || !party) return <span>LOADING</span>;

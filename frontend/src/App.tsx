@@ -1,6 +1,5 @@
 import './App.css';
 import Navigation from './navigation/Navigation';
-import { SWRConfig } from 'swr';
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
@@ -10,6 +9,7 @@ import PostPartyItem from './party/post/PostPartyItem';
 import { useCallback, useState } from 'react';
 import { appContext as initialAppContext, AppContext, IAppContext } from './appContext';
 import StartScreen from './start/StartScreen';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 function WithUser() {
   return (
@@ -30,6 +30,8 @@ function WithUser() {
   );
 }
 
+const queryClient = new QueryClient();
+
 function App() {
   const [appContext, setAppContext] = useState(initialAppContext);
   const setContextCb = useCallback((context) => setAppContext(context as IAppContext), []);
@@ -37,16 +39,12 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <AppContext.Provider value={[appContext, setContextCb]}>
-          <SWRConfig
-            value={{
-              refreshInterval: 3000,
-            }}
-          >
+        <QueryClientProvider client={queryClient}>
+          <AppContext.Provider value={[appContext, setContextCb]}>
             <Navigation />
-            {appContext.user ? <WithUser /> : <StartScreen />}
-          </SWRConfig>
-        </AppContext.Provider>
+            <div className="container mx-auto">{appContext.user ? <WithUser /> : <StartScreen />}</div>
+          </AppContext.Provider>
+        </QueryClientProvider>
       </Router>
     </div>
   );

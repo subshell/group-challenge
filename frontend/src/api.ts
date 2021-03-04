@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
 
 //response interfaces
 
@@ -18,6 +18,11 @@ export interface PartyItemResponse {
   imageURL: string;
 }
 
+export interface UserResponse {
+  id: string;
+  username: string;
+}
+
 // constants
 
 const API_CUSTOM = {
@@ -35,6 +40,7 @@ const API_AUTO = {
 // determine api config dynamically
 const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
 const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
+const AUTH_URL = `${API_URL}/auth`;
 const PARTY_URL = `${API_URL}/parties`;
 
 export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
@@ -42,23 +48,40 @@ export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`
 // api hooks
 
 export function useParty(id: string) {
-  const { data, error } = useSWR<PartyResponse>(`${PARTY_URL}/${id}`);
-
-  return {
-    party: data,
-    isLoading: !error && !data,
-    isError: error,
-  };
+  return useQuery<PartyResponse>(['party', id], () => fetch(`${PARTY_URL}/${id}`).then((res) => res.json()));
 }
 
 export function useParties() {
-  const { data, error } = useSWR<string[]>(`${PARTY_URL}`);
+  return useQuery<string[]>('parties', () => fetch(PARTY_URL).then((res) => res.json()));
+}
 
-  return {
-    partyIds: data,
-    isLoading: !error && !data,
-    isError: error,
-  };
+// other stuff
+
+export async function signIn(username: string, password: string): Promise<UserResponse | undefined> {
+  const rawHeader = `${username}:${password}`;
+  const response = await fetch(`${AUTH_URL}/signin`, {
+    headers: {
+      Authorization: `Bearer ${window.btoa(rawHeader)}`,
+    },
+    credentials: 'include',
+    method: 'POST',
+  }).then((res) => res.json());
+
+  return response.status === 200 && response;
+}
+
+export async function signOut(): Promise<boolean> {
+  const response = await fetch(`${AUTH_URL}/signout`, { method: 'POST', credentials: 'include' });
+
+  return response.status === 200;
+}
+
+export async function register(): Promise<UserResponse> {
+  const response = await fetch(`${AUTH_URL}/register`, { method: 'POST', credentials: 'include' }).then((res) =>
+    res.json()
+  );
+
+  return response;
 }
 
 export function createParty(party: PartyResponse) {

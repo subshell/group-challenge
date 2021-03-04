@@ -51,7 +51,8 @@ func (store *PGSessionStore) CreateSessionForUser(context *gin.Context, user *mo
 		userSession.Insert(store.Con)
 	}
 
-	context.SetCookie(sessionIDCookie, userSession.ID.String(), 360*24*60*60, "", "", false, true)
+	context.Header("access-control-expose-headers", "Set-Cookie")
+	context.SetCookie(sessionIDCookie, userSession.ID.String(), 360*24*60*60, "", "", false, false)
 
 	return userSession
 }

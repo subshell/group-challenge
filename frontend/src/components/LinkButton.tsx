@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import Button from './Button';
 
 function LinkButton({ to, text }: { to: string; text: string }) {
   return (
     <Link to={to}>
-      <button className="inline-flex border border-1 border-black py-1 px-3 hover:bg-gray-200 text-sm">{text}</button>
+      <Button>{text}</Button>
     </Link>
   );
 }

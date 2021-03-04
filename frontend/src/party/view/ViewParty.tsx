@@ -29,7 +29,7 @@ function ViewParty() {
     [sendMessage]
   );
 
-  const { party, isError, isLoading } = useParty(id);
+  const { data: party, isError, isLoading } = useParty(id);
 
   useEffect(() => {
     setPartyItem(party?.items[partyItemIndex]);
