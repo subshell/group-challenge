@@ -32,6 +32,12 @@ func partyByIDHandler(c *gin.Context) {
 	c.JSON(200, models.Party{})
 }
 
+type userSession struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
+}
+
 func signinHandler(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := auth.GetUserFromToken(con, token)
@@ -43,9 +49,13 @@ func signinHandler(c *gin.Context) {
 		return
 	}
 
-	sessionStore.CreateSessionForUser(c, user)
+	session := sessionStore.CreateSessionForUser(user)
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, &userSession{
+		ID:       user.ID.String(),
+		Username: user.Username,
+		Token:    session.ID.String(),
+	})
 }
 
 func signoutHandler(c *gin.Context) {
@@ -113,12 +123,13 @@ RunServer Run the server
 func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
 
+	auth.CreateUser("tom", "tom").Insert(con)
+
 	// router setup
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"}
-	config.AllowHeaders = []string{"Authorization"}
-	config.AllowCredentials = true
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Authorization", auth.XAuthTokenHeader}
 	router.Use(cors.New(config))
 
 	// sessions

@@ -1,4 +1,6 @@
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useLocalStorage } from 'react-use';
 
 //response interfaces
 
@@ -21,6 +23,15 @@ export interface PartyItemResponse {
 export interface UserResponse {
   id: string;
   username: string;
+  token: string;
+}
+
+// session
+
+export interface UserSession {
+  token: string;
+  username: string;
+  id: string;
 }
 
 // constants
@@ -41,19 +52,54 @@ const API_AUTO = {
 const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
 const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
 const AUTH_URL = `${API_URL}/auth`;
-const PARTY_URL = `${API_URL}/parties`;
 
 export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
 
 // api hooks
 
-export function useParty(id: string) {
-  return useQuery<PartyResponse>(['party', id], () => fetch(`${PARTY_URL}/${id}`).then((res) => res.json()));
+// issue: https://github.com/streamich/react-use/issues/1831
+const sessionChangeListener: Array<(value: UserSession | undefined) => void> = [];
+export const useSession: () => [UserSession | undefined, (v: UserSession) => void, () => void] = () => {
+  const [session, setSession, removeSession] = useLocalStorage<UserSession | undefined>('session');
+
+  const removeSessionCB = useCallback(() => {
+    removeSession();
+    sessionChangeListener.forEach((fn) => fn(undefined));
+  }, []);
+
+  const setSessionCB = useCallback((value) => {
+    setSession(value);
+    sessionChangeListener.forEach((fn) => fn(value));
+  }, []);
+
+  useEffect(() => {
+    const fn = (value: UserSession | undefined) => {
+      value ? setSession(value) : removeSession();
+    };
+    sessionChangeListener.push(fn);
+
+    return () => {
+      sessionChangeListener.splice(sessionChangeListener.indexOf(fn), 1);
+    };
+  }, [setSession, removeSession]);
+
+  return [session, setSessionCB, removeSessionCB];
+};
+
+function useCreateApiHook<T>(queryKey: string[], url: string = `${API_URL}/${queryKey.join('/')}`) {
+  const [session] = useSession();
+
+  return useQuery<T>(queryKey, () =>
+    fetch(url, {
+      headers: {
+        'X-AuthToken': session?.token || '',
+      },
+    }).then((res) => res.json())
+  );
 }
 
-export function useParties() {
-  return useQuery<string[]>('parties', () => fetch(PARTY_URL).then((res) => res.json()));
-}
+export const useParty = (id: string) => useCreateApiHook<PartyResponse>(['parties', id]);
+export const useParties = () => useCreateApiHook<string[]>(['parties']);
 
 // other stuff
 
@@ -63,23 +109,19 @@ export async function signIn(username: string, password: string): Promise<UserRe
     headers: {
       Authorization: `Bearer ${window.btoa(rawHeader)}`,
     },
-    credentials: 'include',
     method: 'POST',
-  }).then((res) => res.json());
+  });
 
-  return response.status === 200 && response;
+  return response.status === 200 ? response.json() : undefined;
 }
 
 export async function signOut(): Promise<boolean> {
-  const response = await fetch(`${AUTH_URL}/signout`, { method: 'POST', credentials: 'include' });
-
+  const response = await fetch(`${AUTH_URL}/signout`, { method: 'POST' });
   return response.status === 200;
 }
 
 export async function register(): Promise<UserResponse> {
-  const response = await fetch(`${AUTH_URL}/register`, { method: 'POST', credentials: 'include' }).then((res) =>
-    res.json()
-  );
+  const response: UserResponse = await fetch(`${AUTH_URL}/register`, { method: 'POST' }).then((res) => res.json());
 
   return response;
 }

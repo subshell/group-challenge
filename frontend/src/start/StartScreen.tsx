@@ -1,5 +1,3 @@
-import { useContext, useRef } from 'react';
-import { AppContext } from '../appContext';
 import Login from '../user/Login';
 
 function StartScreen() {

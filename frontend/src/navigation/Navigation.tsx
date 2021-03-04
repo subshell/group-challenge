@@ -1,11 +1,18 @@
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import { FaUserAstronaut } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { AppContext } from '../appContext';
+
+import { signOut, useSession } from '../api';
 
 function Navigation() {
-  const [appContext] = useContext(AppContext);
-  const signOut = useCallback(() => {}, []);
+  const [session, , removeSession] = useSession();
+  const signOutAndRemoveSession = useCallback(() => {
+    signOut()
+      .then(() => {
+        removeSession();
+      })
+      .catch((e) => console.error(e));
+  }, [session]);
 
   return (
     <header className="text-gray-600 body-font">
@@ -26,10 +33,10 @@ function Navigation() {
           <span className="ml-3 text-xl">Group Challenge</span>
         </Link>
         <nav className="flex flex-wrap text-base">
-          {appContext.user && (
+          {session && (
             <span className="space-x-3">
               <FaUserAstronaut className="w-6 h-6 inline-block mr-2" />
-              {appContext.user?.username} <button onClick={signOut}>Sign out</button>
+              {session.username} <button onClick={signOutAndRemoveSession}>Sign out</button>
             </span>
           )}
         </nav>

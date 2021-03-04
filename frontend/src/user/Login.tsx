@@ -1,10 +1,9 @@
-import { useCallback, useContext, useRef } from 'react';
-import { signIn } from '../api';
-import { AppContext } from '../appContext';
+import { useCallback, useRef } from 'react';
+import { signIn, useSession } from '../api';
 import Button from '../components/Button';
 
 function Login() {
-  const [appContext, setAppContext] = useContext(AppContext);
+  const [, setSession] = useSession();
   const usernameInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const signInAndSetContext = useCallback(() => {
@@ -13,14 +12,22 @@ function Login() {
         return;
       }
 
-      await signIn(usernameInputRef.current.value, passwordInputRef.current.value);
+      let user;
+      try {
+        user = await signIn(usernameInputRef.current.value, passwordInputRef.current.value);
+      } catch (e) {
+        console.log(e);
+        // TODO handle error
+        return;
+      }
 
-      setAppContext({
-        ...appContext,
-        user: {
-          username: usernameInputRef.current!.value,
-        },
-      });
+      if (!user || !user.username) {
+        window.alert('invalid login');
+        // TODO handle error
+        return;
+      }
+
+      setSession(user);
     })();
   }, []);
 

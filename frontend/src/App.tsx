@@ -6,10 +6,12 @@ import EditParty from './party/edit/EditParty';
 import PartiesOverview from './party/PartyList';
 import ViewParty from './party/view/ViewParty';
 import PostPartyItem from './party/post/PostPartyItem';
-import { useCallback, useState } from 'react';
-import { appContext as initialAppContext, AppContext, IAppContext } from './appContext';
 import StartScreen from './start/StartScreen';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { useSession } from './api';
+import { useCallback, useEffect, useState } from 'react';
+import React from 'react';
+import { useEvent } from 'react-use';
 
 function WithUser() {
   return (
@@ -33,17 +35,14 @@ function WithUser() {
 const queryClient = new QueryClient();
 
 function App() {
-  const [appContext, setAppContext] = useState(initialAppContext);
-  const setContextCb = useCallback((context) => setAppContext(context as IAppContext), []);
+  const [session] = useSession();
 
   return (
     <div className="App">
       <Router>
         <QueryClientProvider client={queryClient}>
-          <AppContext.Provider value={[appContext, setContextCb]}>
-            <Navigation />
-            <div className="container mx-auto">{appContext.user ? <WithUser /> : <StartScreen />}</div>
-          </AppContext.Provider>
+          <Navigation />
+          <div className="container mx-auto">{session ? <WithUser /> : <StartScreen />}</div>
         </QueryClientProvider>
       </Router>
     </div>

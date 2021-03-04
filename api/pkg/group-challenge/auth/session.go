@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"group-challenge/pkg/group-challenge/models"
-	"log"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -11,10 +10,9 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// TODO: handle invalidation based on time
-
 const (
-	sessionIDCookie = "gcsession"
+	// XAuthTokenHeader is a http header key pointing to the session token
+	XAuthTokenHeader = "X-AuthToken"
 )
 
 // GenericSessionStore handles session
@@ -39,8 +37,8 @@ func CreatePGSessionStore(con *pg.DB) *PGSessionStore {
 	}
 }
 
-// CreateSessionForUser creates and persists a session for an existing user and sets the session cookie.
-func (store *PGSessionStore) CreateSessionForUser(context *gin.Context, user *models.User) *models.Session {
+// CreateSessionForUser creates and persists a session for an existing user
+func (store *PGSessionStore) CreateSessionForUser(user *models.User) *models.Session {
 	userSession := &models.Session{
 		User: user.ID,
 	}
@@ -51,13 +49,10 @@ func (store *PGSessionStore) CreateSessionForUser(context *gin.Context, user *mo
 		userSession.Insert(store.Con)
 	}
 
-	context.Header("access-control-expose-headers", "Set-Cookie")
-	context.SetCookie(sessionIDCookie, userSession.ID.String(), 360*24*60*60, "", "", false, false)
-
 	return userSession
 }
 
-// DeleteSession deletes a session and invalidates the cookie
+// DeleteSession deletes a session
 func (store *PGSessionStore) DeleteSession(context *gin.Context) bool {
 	session, ok := context.Get("session")
 
@@ -67,7 +62,6 @@ func (store *PGSessionStore) DeleteSession(context *gin.Context) bool {
 
 	typedSession := session.(*models.Session)
 
-	context.SetCookie(sessionIDCookie, typedSession.ID.String(), -1, "", "", false, true)
 	return typedSession.Delete(store.Con) == nil
 }
 
@@ -93,29 +87,31 @@ func (store *PGSessionStore) GetSession(sessionID uuid.UUID) (*models.Session, e
 	return userSession, nil
 }
 
-// InjectSessionMiddleware returns a middleware that will inject the session based on the gin context cookie
+// InjectSessionMiddleware returns a middleware that will inject the session based on the token header
 func (store *PGSessionStore) InjectSessionMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cookie, err := c.Request.Cookie(sessionIDCookie)
+		token := c.Request.Header.Get(XAuthTokenHeader)
 
-		// check if the cookies is present
-		if err != nil {
+		if token == "" {
 			c.Next()
 			return
 		}
 
 		session := &models.Session{
-			ID: uuid.FromStringOrNil(cookie.Value),
+			ID: uuid.FromStringOrNil(token),
 		}
 
 		session.Select(store.Con)
 
-		c.Set("session", session)
+		if session.User != uuid.Nil {
+			c.Set("session", session)
+		}
+
 		c.Next()
 	}
 }
 
-// RequireSessionMiddleware returns a middleware that will inject the session based on the gin context cookie
+// RequireSessionMiddleware returns a middleware that will inject the session based on the gin context header
 func (store *PGSessionStore) RequireSessionMiddleware(pathPrefixes []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		for _, pathPrefix := range pathPrefixes {
@@ -123,14 +119,16 @@ func (store *PGSessionStore) RequireSessionMiddleware(pathPrefixes []string) gin
 				continue
 			}
 
-			if cookie, err := c.Request.Cookie(sessionIDCookie); err != nil {
+			session, ok := c.Get("session")
+			session = session.(*models.Session)
+
+			if !ok {
 				c.AbortWithStatus(401)
 				return
-			} else {
-				// TODO validate cookie
-				log.Println(cookie)
-				c.Next()
 			}
+
+			c.Next()
+			return
 		}
 
 		c.Next()
