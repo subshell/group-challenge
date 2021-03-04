@@ -42,7 +42,7 @@ func CreatePGSessionStore(con *pg.DB) *PGSessionStore {
 // CreateSessionForUser creates and persists a session for an existing user and sets the session cookie.
 func (store *PGSessionStore) CreateSessionForUser(context *gin.Context, user *models.User) *models.Session {
 	userSession := &models.Session{
-		User: &user.ID,
+		User: user.ID,
 	}
 
 	if userSession.Exists(store.Con) {

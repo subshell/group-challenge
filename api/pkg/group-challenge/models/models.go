@@ -17,33 +17,34 @@ type User struct {
 
 // Session session model
 type Session struct {
-	tableName struct{}   `json:"-" pg:"sessions"`
-	ID        uuid.UUID  `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	User      *uuid.UUID `json:"user" pg:"user,unique,type:uuid"`
+	tableName    struct{}  `json:"-" pg:"sessions"`
+	ID           uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
+	User         uuid.UUID `json:"user" pg:"user,unique,type:uuid"`
+	CreationDate time.Time `json:"-" pg:"creation_date,default:now()"`
 }
 
 // Room model
 type Room struct {
-	tableName   struct{}     `json:"-" pg:"room"`
-	ID          uuid.UUID    `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Name        string       `json:"name" pg:"name,notnull"`
-	URLName     string       `json:"urlName" pg:"url_name,unique"`
-	Token       string       `json:"-" pg:"token,default:gen_random_uuid()"`
-	Description string       `json:"description" pg:"descrption,notnull"`
-	Parties     []*uuid.UUID `json:"parties" pg:"parties"`
+	tableName   struct{}    `json:"-" pg:"room"`
+	ID          uuid.UUID   `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
+	Name        string      `json:"name" pg:"name,notnull"`
+	URLName     string      `json:"urlName" pg:"url_name,unique"`
+	Token       string      `json:"-" pg:"token,default:gen_random_uuid()"`
+	Description string      `json:"description" pg:"descrption,notnull"`
+	Parties     []uuid.UUID `json:"parties" pg:"parties"`
 }
 
 // Party party model
 type Party struct {
-	tableName   struct{}     `json:"-" pg:"party"`
-	ID          uuid.UUID    `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Name        string       `json:"name" pg:"name,notnull"`
-	URLName     string       `json:"urlName" pg:"url_name,unique"`
-	Description string       `json:"description" pg:"descrption,notnull"`
-	Category    string       `json:"category" pg:"category,notnull"`
-	StartDate   *time.Time   `json:"startDate" pg:"start_date"`
-	EndDate     *time.Time   `json:"endDate" pg:"end_date"`
-	Items       []*uuid.UUID `json:"items" pg:"items"`
+	tableName   struct{}    `json:"-" pg:"party"`
+	ID          uuid.UUID   `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
+	Name        string      `json:"name" pg:"name,notnull"`
+	URLName     string      `json:"urlName" pg:"url_name,unique"`
+	Description string      `json:"description" pg:"descrption,notnull"`
+	Category    string      `json:"category" pg:"category,notnull"`
+	StartDate   time.Time   `json:"startDate" pg:"start_date"`
+	EndDate     time.Time   `json:"endDate" pg:"end_date"`
+	Items       []uuid.UUID `json:"items" pg:"items"`
 }
 
 // PartyItem party item model
