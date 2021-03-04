@@ -16,73 +16,63 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+var (
+	con          *pg.DB
+	sessionStore *auth.PGSessionStore
+)
+
 // API Handler
 ////////
 
-func createTestHandler(con *pg.DB) gin.HandlerFunc {
-	user := &models.User{
-		Username: "tom",
-	}
-
-	return func(c *gin.Context) {
-		err := user.Insert(con)
-
-		if err != nil {
-			c.JSON(400, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		c.JSON(200, user)
-	}
+func partiesHandler(c *gin.Context) {
+	c.JSON(200, []uuid.UUID{})
 }
 
-func createPartiesHandler(con *pg.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(200, []uuid.UUID{})
-	}
+func partyByIDHandler(c *gin.Context) {
+	c.JSON(200, models.Party{})
 }
 
-func createPartyByIDHandler(con *pg.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(200, models.Party{})
+func signinHandler(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	user, err := auth.GetUserFromToken(con, token)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "unauthorized",
+		})
+		return
 	}
+
+	sessionStore.CreateSessionForUser(c, user)
+
+	c.JSON(http.StatusOK, user)
 }
 
-// TODO: Request Validation
+func signoutHandler(c *gin.Context) {
+	sessionStore.DeleteSession(c)
+	c.Status(http.StatusOK)
+}
+
 type userLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-func createLoginHandler(con *pg.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		body := userLogin{}
-		c.BindJSON(&body)
+func registerHandler(c *gin.Context) {
+	body := userLogin{}
+	c.BindJSON(&body)
 
-		if auth.CheckUserPassword(con, body.Username, body.Password) {
-			userModel := &models.User{
-				Username: body.Username,
-			}
-			userModel.SelectByUsername(con)
-			c.JSON(http.StatusOK, userModel)
-			return
-		}
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "unauthorized",
+	if body.Username == "" || body.Password == "" {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "invalid user data",
 		})
+		return
 	}
-}
 
-func createRegisterHandler(con *pg.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		body := userLogin{}
-		c.BindJSON(&body)
-		user := auth.CreateUser(body.Username, body.Password)
-		user.Insert(con)
-		c.JSON(200, user)
-	}
+	user := auth.CreateUser(body.Username, body.Password)
+	user.Insert(con)
+	c.JSON(200, user)
+
 }
 
 func createWsHandler() gin.HandlerFunc {
@@ -101,17 +91,16 @@ func createWsHandler() gin.HandlerFunc {
 func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 	v1 := router.Group("/_api/v1")
 	{
-		v1.GET("test", createTestHandler(con))
-
 		party := v1.Group("/parties")
 		{
-			party.GET("/", createPartiesHandler(con))
-			party.GET("/:id", createPartyByIDHandler(con))
+			party.GET("/", partiesHandler)
+			party.GET("/:id", partyByIDHandler)
 		}
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/login", createLoginHandler(con))
-			auth.POST("/register", createRegisterHandler(con))
+			auth.POST("/signin", signinHandler)
+			auth.POST("/signout", signoutHandler)
+			auth.POST("/register", registerHandler)
 		}
 
 		v1.GET("ws", createWsHandler())
@@ -121,11 +110,17 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 /*
 RunServer Run the server
 */
-func RunServer(serverConfig config.ServerConfig, con *pg.DB) {
+func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
+	con = _con
+
 	// router setup
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.Use(AuthMiddleware(con))
+
+	// sessions
+	sessionStore = auth.CreatePGSessionStore(con)
+	router.Use(sessionStore.InjectSessionMiddleware())
+	router.Use(sessionStore.RequireSessionMiddleware([]string{"/_api/v1/parties"}))
 
 	// static files
 	router.Use(static.Serve("/", static.LocalFile(serverConfig.StaticFilesDir, true)))

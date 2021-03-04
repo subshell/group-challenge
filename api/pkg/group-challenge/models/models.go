@@ -7,7 +7,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// User user dto
+// User user model
 type User struct {
 	tableName struct{}  `json:"-" pg:"gc_user"`
 	ID        uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
@@ -15,18 +15,25 @@ type User struct {
 	Password  string    `json:"-" pg:"password"`
 }
 
-// Room dto
-type Room struct {
-	tableName   struct{}  `json:"-" pg:"room"`
-	ID          uuid.UUID `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Name        string    `json:"name" pg:"name,notnull"`
-	URLName     string    `json:"urlName" pg:"url_name,unique"`
-	Token       string    `json:"-" pg:"token,default:gen_random_uuid()"`
-	Description string    `json:"description" pg:"descrption,notnull"`
-	Parties     []*Party  `json:"parties" pg:"parties"`
+// Session session model
+type Session struct {
+	tableName struct{}   `json:"-" pg:"sessions"`
+	ID        uuid.UUID  `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
+	User      *uuid.UUID `json:"user" pg:"user,unique,type:uuid"`
 }
 
-// Party party dto
+// Room model
+type Room struct {
+	tableName   struct{}     `json:"-" pg:"room"`
+	ID          uuid.UUID    `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
+	Name        string       `json:"name" pg:"name,notnull"`
+	URLName     string       `json:"urlName" pg:"url_name,unique"`
+	Token       string       `json:"-" pg:"token,default:gen_random_uuid()"`
+	Description string       `json:"description" pg:"descrption,notnull"`
+	Parties     []*uuid.UUID `json:"parties" pg:"parties"`
+}
+
+// Party party model
 type Party struct {
 	tableName   struct{}     `json:"-" pg:"party"`
 	ID          uuid.UUID    `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
@@ -36,10 +43,10 @@ type Party struct {
 	Category    string       `json:"category" pg:"category,notnull"`
 	StartDate   *time.Time   `json:"startDate" pg:"start_date"`
 	EndDate     *time.Time   `json:"endDate" pg:"end_date"`
-	Items       []*PartyItem `json:"items" pg:"items"`
+	Items       []*uuid.UUID `json:"items" pg:"items"`
 }
 
-// PartyItem party item dto
+// PartyItem party item model
 type PartyItem struct {
 	tableName   struct{}  `json:"-" pg:"party_item"`
 	ID          uuid.UUID `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
@@ -72,8 +79,41 @@ func (user *User) SelectByUsername(con *pg.DB) (err error) {
 
 // Update updates the user
 func (user *User) Update(con *pg.DB) error {
-	_, err := con.Model(user).Where("id = ?0", user.ID).Update()
+	_, err := con.Model(user).Update()
 	return err
+}
+
+// session
+//////////
+
+// Insert inserts a new session into the databse
+func (session *Session) Insert(con *pg.DB) (err error) {
+	_, err = con.Model(session).Insert()
+	return
+}
+
+// Select selects the user by its session id
+func (session *Session) Select(con *pg.DB) (err error) {
+	err = con.Model(session).Select()
+	return
+}
+
+// Update updates the session
+func (session *Session) Update(con *pg.DB) error {
+	_, err := con.Model(session).Update()
+	return err
+}
+
+// Delete deletes the session
+func (session *Session) Delete(con *pg.DB) error {
+	_, err := con.Model(session).Delete()
+	return err
+}
+
+// Exists checks if the session exists by looking up the user
+func (session *Session) Exists(con *pg.DB) bool {
+	exisits, err := con.Model(session).Where("session.user = ?0", session.User).Exists()
+	return exisits && err == nil
 }
 
 // room
@@ -93,7 +133,7 @@ func (room *Room) Select(con *pg.DB) (err error) {
 
 // Update updates the party
 func (room *Room) Update(con *pg.DB) error {
-	_, err := con.Model(room).Where("id = ?0", room.ID).Update()
+	_, err := con.Model(room).Update()
 	return err
 }
 
@@ -114,7 +154,7 @@ func (party *Party) Select(con *pg.DB) (err error) {
 
 // Update updates the party
 func (party *Party) Update(con *pg.DB) error {
-	_, err := con.Model(party).Where("id = ?0", party.ID).Update()
+	_, err := con.Model(party).Update()
 	return err
 }
 
@@ -135,6 +175,6 @@ func (partyItem *PartyItem) Select(con *pg.DB) (err error) {
 
 // Update updates the party
 func (partyItem *PartyItem) Update(con *pg.DB) error {
-	_, err := con.Model(partyItem).Where("id = ?0", partyItem.ID).Update()
+	_, err := con.Model(partyItem).Update()
 	return err
 }

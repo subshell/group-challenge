@@ -52,6 +52,7 @@ func InitDB(con *pg.DB) error {
 func createSchema(db *pg.DB) error {
 	models := []interface{}{
 		(*models.User)(nil),
+		(*models.Session)(nil),
 		(*models.Room)(nil),
 		(*models.Party)(nil),
 		(*models.PartyItem)(nil),
