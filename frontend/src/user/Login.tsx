@@ -1,38 +1,22 @@
-import { useCallback, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { signIn, useSession } from '../api';
-import Button from '../components/Button';
 
 function Login() {
   const [, setSession] = useSession();
-  const usernameInputRef = useRef<HTMLInputElement>(null);
-  const passwordInputRef = useRef<HTMLInputElement>(null);
-  const signInAndSetContext = useCallback(() => {
-    (async () => {
-      if (!usernameInputRef.current?.value || !passwordInputRef.current?.value) {
-        return;
-      }
 
-      let user;
-      try {
-        user = await signIn(usernameInputRef.current.value, passwordInputRef.current.value);
-      } catch (e) {
-        console.log(e);
-        // TODO handle error
-        return;
-      }
+  const { register, handleSubmit, errors } = useForm<{ username: string; password: string }>();
+  const onSubmit = async ({ username, password }: { username: string; password: string }) => {
+    const user = await signIn(username, password);
+    if (!user) {
+      alert('invalid login');
+      return;
+    }
 
-      if (!user || !user.username) {
-        window.alert('invalid login');
-        // TODO handle error
-        return;
-      }
-
-      setSession(user);
-    })();
-  }, []);
+    setSession(user);
+  };
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
           Username
@@ -40,9 +24,11 @@ function Login() {
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
           id="username"
+          name="username"
           type="text"
-          ref={usernameInputRef}
+          ref={register({ required: true })}
         />
+        <p>{errors.username && <span>This field is required</span>}</p>
       </div>
       <div className="mb-6">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
@@ -51,14 +37,16 @@ function Login() {
         <input
           className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
           id="password"
+          name="password"
           type="password"
-          ref={passwordInputRef}
+          ref={register({ required: true })}
         />
+        <p>{errors.password && <span>This field is required</span>}</p>
       </div>
       <div className="flex items-center justify-between">
-        <Button onClick={signInAndSetContext}>Sign In</Button>
+        <input type="submit" className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" />
       </div>
-    </>
+    </form>
   );
 }
 

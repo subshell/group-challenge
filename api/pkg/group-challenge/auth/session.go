@@ -120,12 +120,13 @@ func (store *PGSessionStore) RequireSessionMiddleware(pathPrefixes []string) gin
 			}
 
 			session, ok := c.Get("session")
-			session = session.(*models.Session)
 
 			if !ok {
 				c.AbortWithStatus(401)
 				return
 			}
+
+			session = session.(*models.Session)
 
 			c.Next()
 			return
