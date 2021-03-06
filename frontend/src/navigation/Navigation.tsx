@@ -2,7 +2,8 @@ import { useCallback } from 'react';
 import { FaUserAstronaut } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-import { signOut, useSession } from '../api';
+import { signOut } from '../api';
+import { useSession } from '../user/session';
 
 function Navigation() {
   const [session, , removeSession] = useSession();

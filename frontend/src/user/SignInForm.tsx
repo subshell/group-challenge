@@ -1,7 +1,8 @@
 import { useForm } from 'react-hook-form';
-import { signIn, useSession } from '../api';
+import { signIn } from '../api';
+import { useSession } from './session';
 
-function Login() {
+function SignInForm() {
   const [, setSession] = useSession();
 
   const { register, handleSubmit, errors } = useForm<{ username: string; password: string }>();
@@ -44,10 +45,14 @@ function Login() {
         <p>{errors.password && <span>This field is required</span>}</p>
       </div>
       <div className="flex items-center justify-between">
-        <input type="submit" className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" />
+        <input
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+          value="Sign In"
+        />
       </div>
     </form>
   );
 }
 
-export default Login;
+export default SignInForm;

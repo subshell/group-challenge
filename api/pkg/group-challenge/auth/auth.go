@@ -13,10 +13,11 @@ import (
 )
 
 // CreateUser creates a user with and hashes the password
-func CreateUser(username, password string) *models.User {
+func CreateUser(username, password, email string) *models.User {
 	userModel := &models.User{
 		Username: username,
 		Password: createPasswordHash(password),
+		Email:    email,
 	}
 
 	return userModel

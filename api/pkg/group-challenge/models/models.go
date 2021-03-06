@@ -13,6 +13,7 @@ type User struct {
 	ID        uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Username  string    `json:"username" pg:"username,unique"`
 	Password  string    `json:"-" pg:"password"`
+	Email     string    `json:"email" pg:"email"`
 }
 
 // Session session model

@@ -1,23 +1,20 @@
 import './App.css';
 import Navigation from './navigation/Navigation';
 
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
-import PartiesOverview from './party/PartyList';
 import ViewParty from './party/view/ViewParty';
 import PostPartyItem from './party/post/PostPartyItem';
-import StartScreen from './start/StartScreen';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { useSession } from './api';
-import { useCallback, useEffect, useState } from 'react';
-import React from 'react';
-import { useEvent } from 'react-use';
+import { useSession } from './user/session';
+import { SignIn, SignUp } from './user/SignInAndSignUp';
+import Home from './home/Home';
 
 function WithUser() {
   return (
     <Switch>
       <Route exact path="/">
-        <PartiesOverview />
+        <Home />
       </Route>
       <Route path="/event/view/:id">
         <ViewParty />
@@ -27,6 +24,25 @@ function WithUser() {
       </Route>
       <Route path="/event/edit/:id">
         <EditParty />
+      </Route>
+      <Route>
+        <Redirect to="/" />
+      </Route>
+    </Switch>
+  );
+}
+
+function WithoutUser() {
+  return (
+    <Switch>
+      <Route exact path="/">
+        <Home />
+      </Route>
+      <Route path="/signin">
+        <SignIn />
+      </Route>
+      <Route path="/signup">
+        <SignUp />
       </Route>
     </Switch>
   );
@@ -42,7 +58,7 @@ function App() {
       <Router>
         <QueryClientProvider client={queryClient}>
           <Navigation />
-          <div className="container mx-auto">{session ? <WithUser /> : <StartScreen />}</div>
+          <div className="container mx-auto">{session ? <WithUser /> : <WithoutUser />}</div>
         </QueryClientProvider>
       </Router>
     </div>

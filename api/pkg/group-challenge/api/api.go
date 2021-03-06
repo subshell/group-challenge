@@ -63,13 +63,19 @@ func signoutHandler(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-type userLogin struct {
+type userSignIn struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+type userSignUp struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
 func registerHandler(c *gin.Context) {
-	body := userLogin{}
+	body := userSignUp{}
 	c.BindJSON(&body)
 
 	if body.Username == "" || body.Password == "" {
@@ -79,7 +85,7 @@ func registerHandler(c *gin.Context) {
 		return
 	}
 
-	user := auth.CreateUser(body.Username, body.Password)
+	user := auth.CreateUser(body.Username, body.Password, body.Email)
 	user.Insert(con)
 	c.JSON(200, user)
 
@@ -122,8 +128,6 @@ RunServer Run the server
 */
 func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
-
-	auth.CreateUser("tom", "tom").Insert(con)
 
 	// router setup
 	router := gin.Default()

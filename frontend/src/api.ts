@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocalStorage } from 'react-use';
+import { useSession } from './user/session';
 
 //response interfaces
 
@@ -57,35 +58,6 @@ export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`
 
 // api hooks
 
-// issue: https://github.com/streamich/react-use/issues/1831
-const sessionChangeListener: Array<(value: UserSession | undefined) => void> = [];
-export const useSession: () => [UserSession | undefined, (v: UserSession) => void, () => void] = () => {
-  const [session, setSession, removeSession] = useLocalStorage<UserSession | undefined>('session');
-
-  const removeSessionCB = useCallback(() => {
-    removeSession();
-    sessionChangeListener.forEach((fn) => fn(undefined));
-  }, []);
-
-  const setSessionCB = useCallback((value) => {
-    setSession(value);
-    sessionChangeListener.forEach((fn) => fn(value));
-  }, []);
-
-  useEffect(() => {
-    const fn = (value: UserSession | undefined) => {
-      value ? setSession(value) : removeSession();
-    };
-    sessionChangeListener.push(fn);
-
-    return () => {
-      sessionChangeListener.splice(sessionChangeListener.indexOf(fn), 1);
-    };
-  }, [setSession, removeSession]);
-
-  return [session, setSessionCB, removeSessionCB];
-};
-
 function useCreateApiHook<T>(queryKey: string[], url: string = `${API_URL}/${queryKey.join('/')}`) {
   const [session] = useSession();
 
@@ -120,10 +92,13 @@ export async function signOut(): Promise<boolean> {
   return response.status === 200;
 }
 
-export async function register(): Promise<UserResponse> {
-  const response: UserResponse = await fetch(`${AUTH_URL}/register`, { method: 'POST' }).then((res) => res.json());
+export async function signUp(username: string, password: string, email: string): Promise<UserResponse | undefined> {
+  const response = await fetch(`${AUTH_URL}/register`, {
+    method: 'POST',
+    body: JSON.stringify({ username, password, email }),
+  });
 
-  return response;
+  return response.status === 200 ? response.json() : undefined;
 }
 
 export function createParty(party: PartyResponse) {
