@@ -56,7 +56,7 @@ type PartyItem struct {
 	Name        string    `json:"name" pg:"name"`
 	Description string    `json:"description" pg:"description"`
 	ImageURL    string    `json:"imageURL" pg:"image_url"`
-	ImageData   string    `json:"-" pg:"image_data"`
+	ImageData   []byte    `json:"-" pg:"image_data,type:bytea"`
 }
 
 // user

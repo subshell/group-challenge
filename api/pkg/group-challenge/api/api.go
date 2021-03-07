@@ -6,7 +6,10 @@ import (
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
+	"io"
+	"log"
 	"net/http"
+	"os"
 	"path"
 	"time"
 
@@ -60,6 +63,59 @@ func addPartyHandler(c *gin.Context) {
 	}
 	party.Insert(con)
 	c.JSON(200, party)
+}
+
+type partyItemRequestBody struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ImageURL    string `json:"imageUrl"`
+}
+
+func getFileFromRequest(c *gin.Context, key string) string {
+	file, header, err := c.Request.FormFile(key)
+	filename := header.Filename
+	fmt.Println(header.Filename)
+	filePath := "./tmp/" + filename + ".png"
+	out, err := os.Create(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return filePath
+}
+
+func addPartyItemHandler(c *gin.Context) {
+	// TODO validation
+	partyID, ok := c.Params.Get("id")
+	if !ok {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	body := partyItemRequestBody{}
+	c.BindJSON(&body)
+
+	partyItem := &models.PartyItem{
+		Name:        body.Name,
+		Description: body.Description,
+		ImageURL:    body.ImageURL,
+		ImageData:   nil,
+	}
+	partyItem.Insert(con)
+
+	party := &models.Party{
+		ID: uuid.FromStringOrNil(partyID),
+	}
+	party.Select(con)
+	party.Items = append(party.Items, partyItem.ID)
+	party.Update(con)
+
+	c.JSON(200, partyItem)
 }
 
 func partyByIDHandler(c *gin.Context) {
@@ -152,6 +208,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.GET("", partiesHandler)
 			party.POST("", addPartyHandler)
 			party.GET("/:id", partyByIDHandler)
+			party.POST("/:id/item", addPartyItemHandler)
 		}
 		auth := v1.Group("/auth")
 		{
