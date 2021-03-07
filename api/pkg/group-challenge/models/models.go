@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/go-pg/pg/v10"
@@ -27,7 +28,7 @@ type Session struct {
 // Room model
 type Room struct {
 	tableName   struct{}    `json:"-" pg:"room"`
-	ID          uuid.UUID   `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
+	ID          uuid.UUID   `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string      `json:"name" pg:"name,notnull"`
 	URLName     string      `json:"urlName" pg:"url_name,unique"`
 	Token       string      `json:"-" pg:"token,default:gen_random_uuid()"`
@@ -38,7 +39,7 @@ type Room struct {
 // Party party model
 type Party struct {
 	tableName   struct{}    `json:"-" pg:"party"`
-	ID          uuid.UUID   `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
+	ID          uuid.UUID   `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string      `json:"name" pg:"name,notnull"`
 	URLName     string      `json:"urlName" pg:"url_name,unique"`
 	Description string      `json:"description" pg:"descrption,notnull"`
@@ -51,7 +52,7 @@ type Party struct {
 // PartyItem party item model
 type PartyItem struct {
 	tableName   struct{}  `json:"-" pg:"party_item"`
-	ID          uuid.UUID `json:"id" sql:"id,pk,type:uuid,default:gen_random_uuid()"`
+	ID          uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string    `json:"name" pg:"name"`
 	Description string    `json:"description" pg:"description"`
 	ImageURL    string    `json:"imageURL" pg:"image_url"`
@@ -157,6 +158,14 @@ func (party *Party) Select(con *pg.DB) (err error) {
 // Update updates the party
 func (party *Party) Update(con *pg.DB) error {
 	_, err := con.Model(party).Update()
+	return err
+}
+
+// GetAllParties returns all parties
+func GetAllParties(parties *[]Party, con *pg.DB) error {
+	// TODO paging
+	err := con.Model(parties).Limit(200).Select()
+	fmt.Println(parties)
 	return err
 }
 

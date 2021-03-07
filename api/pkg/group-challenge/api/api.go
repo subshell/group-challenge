@@ -8,6 +8,7 @@ import (
 	"group-challenge/pkg/group-challenge/ws"
 	"net/http"
 	"path"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
@@ -25,11 +26,55 @@ var (
 ////////
 
 func partiesHandler(c *gin.Context) {
-	c.JSON(200, []uuid.UUID{})
+	parties := &[]models.Party{}
+	err := models.GetAllParties(parties, con)
+
+	if err != nil {
+		c.Status(500)
+		return
+	}
+	c.JSON(200, parties)
+}
+
+type partyRequestBody struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Category    string    `json:"category"`
+	StartDate   time.Time `json:"startDate"`
+	EndDate     time.Time `json:"endDate"`
+}
+
+func addPartyHandler(c *gin.Context) {
+	// TODO validation
+	body := partyRequestBody{}
+	c.BindJSON(&body)
+
+	party := &models.Party{
+		Name:        body.Name,
+		URLName:     body.Name, // TODO
+		Description: body.Description,
+		Category:    body.Category,
+		StartDate:   body.StartDate,
+		EndDate:     body.EndDate,
+		Items:       []uuid.UUID{},
+	}
+	party.Insert(con)
+	c.JSON(200, party)
 }
 
 func partyByIDHandler(c *gin.Context) {
-	c.JSON(200, models.Party{})
+	// TODO validation
+	partyID, ok := c.Params.Get("id")
+	if !ok {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	party := &models.Party{
+		ID: uuid.FromStringOrNil(partyID),
+	}
+	party.Select(con)
+	c.JSON(200, party)
 }
 
 type userSession struct {
@@ -63,19 +108,14 @@ func signoutHandler(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-type userSignIn struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type userSignUp struct {
+type userSignUpRequestBody struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
 }
 
 func registerHandler(c *gin.Context) {
-	body := userSignUp{}
+	body := userSignUpRequestBody{}
 	c.BindJSON(&body)
 
 	if body.Username == "" || body.Password == "" {
@@ -110,6 +150,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 		party := v1.Group("/parties")
 		{
 			party.GET("", partiesHandler)
+			party.POST("", addPartyHandler)
 			party.GET("/:id", partyByIDHandler)
 		}
 		auth := v1.Group("/auth")

@@ -1,23 +1,22 @@
 import { useParties } from '../api';
 import PartiesOverviewItem from './PartyListItem';
 
-function PartiesOverview() {
-  const { data: partyIds, isError, isLoading } = useParties();
+function PartyList() {
+  const { data: parties, isError, isLoading } = useParties();
 
-  if (isError) return <span>ERROR</span>;
-  if (isLoading) return <span>LOADING</span>;
+  if (isError) return <p>ERROR!</p>;
+  if (isLoading) return <p>loading parties...</p>;
+  if (!parties?.length) return <p>No parties</p>;
 
   return (
-    <section className="text-gray-600 body-font overflow-hidden">
-      <div className="container px-5 py-24 mx-auto">
-        <div className="-my-8 divide-y-2 divide-gray-100">
-          {partyIds!.map((partyId) => (
-            <PartiesOverviewItem key={partyId} partyId={partyId} />
-          ))}
-        </div>
+    <div className="container px-5 pt-5 mx-auto">
+      <div className="my-8 divide-y-2 divide-gray-100">
+        {parties.map((party) => (
+          <PartiesOverviewItem key={party.id} partyId={party.id} />
+        ))}
       </div>
-    </section>
+    </div>
   );
 }
 
-export default PartiesOverview;
+export default PartyList;

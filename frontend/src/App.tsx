@@ -9,6 +9,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { useSession } from './user/session';
 import { SignIn, SignUp } from './user/SignInAndSignUp';
 import Home from './home/Home';
+import EditProfile from './user/EditProfile';
+import CreateParty from './party/create/CreateParty';
 
 function WithUser() {
   return (
@@ -16,14 +18,20 @@ function WithUser() {
       <Route exact path="/">
         <Home />
       </Route>
-      <Route path="/event/view/:id">
+      <Route path="/party/create">
+        <CreateParty />
+      </Route>
+      <Route path="/party/view/:id">
         <ViewParty />
       </Route>
-      <Route path="/event/post/:id">
+      <Route path="/party/post/:id">
         <PostPartyItem />
       </Route>
-      <Route path="/event/edit/:id">
+      <Route path="/party/edit/:id">
         <EditParty />
+      </Route>
+      <Route path="/profile">
+        <EditProfile />
       </Route>
       <Route>
         <Redirect to="/" />
@@ -43,6 +51,9 @@ function WithoutUser() {
       </Route>
       <Route path="/signup">
         <SignUp />
+      </Route>
+      <Route path="/">
+        <Redirect to="/" />
       </Route>
     </Switch>
   );

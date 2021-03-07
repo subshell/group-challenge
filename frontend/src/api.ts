@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { useLocalStorage } from 'react-use';
+import { PartyFormData } from './party/create/CreateParty';
 import { useSession } from './user/session';
 
 //response interfaces
@@ -71,7 +70,7 @@ function useCreateApiHook<T>(queryKey: string[], url: string = `${API_URL}/${que
 }
 
 export const useParty = (id: string) => useCreateApiHook<PartyResponse>(['parties', id]);
-export const useParties = () => useCreateApiHook<string[]>(['parties']);
+export const useParties = () => useCreateApiHook<PartyResponse[]>(['parties']);
 
 // other stuff
 
@@ -101,8 +100,14 @@ export async function signUp(username: string, password: string, email: string):
   return response.status === 200 ? response.json() : undefined;
 }
 
-export function createParty(party: PartyResponse) {
-  console.log(party);
+export async function createParty({ party, sessionToken }: { party: PartyFormData; sessionToken: string }) {
+  return await fetch(`${API_URL}/parties`, {
+    method: 'POST',
+    body: JSON.stringify(party),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
 }
 
 export function createPartyItem(partyId: string, partyItem: PartyItemResponse) {

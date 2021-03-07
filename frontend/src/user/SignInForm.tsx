@@ -7,13 +7,18 @@ function SignInForm() {
 
   const { register, handleSubmit, errors } = useForm<{ username: string; password: string }>();
   const onSubmit = async ({ username, password }: { username: string; password: string }) => {
-    const user = await signIn(username, password);
-    if (!user) {
-      alert('invalid login');
-      return;
-    }
+    try {
+      const user = await signIn(username, password);
+      if (!user) {
+        alert('invalid login');
+        return;
+      }
 
-    setSession(user);
+      setSession(user);
+    } catch (e) {
+      console.error(e);
+      alert('Cannot reach backend service');
+    }
   };
 
   return (

@@ -4,6 +4,8 @@ import LinkButton from '../components/LinkButton';
 function PartiesOverviewItem({ partyId }: { partyId: string }) {
   const { data: party, isError, isLoading } = useParty(partyId);
 
+  console.log(partyId);
+
   if (isError) return <span>ERROR</span>;
   if (isLoading || !party) return <span>LOADING</span>;
 
@@ -18,9 +20,9 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
 
       <p className="leading-relaxed">{party.description}</p>
       <div className="space-x-2 mt-2">
-        <LinkButton to={'/event/view/' + party.id} text="View" />
-        <LinkButton to={'/event/post/' + party.id} text="Post" />
-        <LinkButton to={'/event/edit/' + party.id} text="Edit" />
+        <LinkButton to={'/party/view/' + party.id} text="View" />
+        <LinkButton to={'/party/post/' + party.id} text="Post" />
+        <LinkButton to={'/party/edit/' + party.id} text="Edit" />
       </div>
     </div>
   );
