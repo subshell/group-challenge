@@ -4,8 +4,6 @@ import LinkButton from '../components/LinkButton';
 function PartiesOverviewItem({ partyId }: { partyId: string }) {
   const { data: party, isError, isLoading } = useParty(partyId);
 
-  console.log(partyId);
-
   if (isError) return <span>ERROR</span>;
   if (isLoading || !party) return <span>LOADING</span>;
 

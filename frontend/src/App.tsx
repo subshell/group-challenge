@@ -1,4 +1,4 @@
-import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
 import Navigation from './navigation/Navigation';
 
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
@@ -11,8 +11,22 @@ import { SignIn, SignUp } from './user/SignInAndSignUp';
 import Home from './home/Home';
 import EditProfile from './user/EditProfile';
 import CreateParty from './party/create/CreateParty';
+import { toast, ToastContainer } from 'react-toastify';
+import { RequestError, useParties } from './api';
+import { useEffect } from 'react';
 
 function WithUser() {
+  const { error } = useParties();
+  const [, , removeSession] = useSession();
+
+  useEffect(() => {
+    if ((error as RequestError)?.status === 401) {
+      console.error(error);
+      toast('Your session has expired', { type: 'error' });
+      removeSession();
+    }
+  }, [error]);
+
   return (
     <Switch>
       <Route exact path="/">
@@ -69,6 +83,7 @@ function App() {
       <Router>
         <QueryClientProvider client={queryClient}>
           <Navigation />
+          <ToastContainer position="bottom-right" />
           <div className="container mx-auto">{session ? <WithUser /> : <WithoutUser />}</div>
         </QueryClientProvider>
       </Router>

@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { PartyFormData } from './party/create/CreateParty';
+import { PartyFormData } from './party/PartyForm';
 import { useSession } from './user/session';
 
 //response interfaces
@@ -57,16 +57,28 @@ export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`
 
 // api hooks
 
+export class RequestError extends Error {
+  constructor(public readonly status: number) {
+    super(status + '');
+  }
+}
+
 function useCreateApiHook<T>(queryKey: string[], url: string = `${API_URL}/${queryKey.join('/')}`) {
   const [session] = useSession();
 
-  return useQuery<T>(queryKey, () =>
-    fetch(url, {
+  return useQuery<T>(queryKey, async () => {
+    const res = await fetch(url, {
       headers: {
         'X-AuthToken': session?.token || '',
       },
-    }).then((res) => res.json())
-  );
+    });
+
+    if (res.status === 401 || res.status === 403) {
+      throw new RequestError(res.status);
+    }
+
+    return res.json();
+  });
 }
 
 export const useParty = (id: string) => useCreateApiHook<PartyResponse>(['parties', id]);
@@ -100,7 +112,13 @@ export async function signUp(username: string, password: string, email: string):
   return response.status === 200 ? response.json() : undefined;
 }
 
-export async function createParty({ party, sessionToken }: { party: PartyFormData; sessionToken: string }) {
+export async function createParty({
+  party,
+  sessionToken,
+}: {
+  party: PartyFormData;
+  sessionToken: string;
+}): Promise<PartyResponse> {
   return await fetch(`${API_URL}/parties`, {
     method: 'POST',
     body: JSON.stringify(party),

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/go-pg/pg/v10"
@@ -33,7 +32,7 @@ type Room struct {
 	URLName     string      `json:"urlName" pg:"url_name,unique"`
 	Token       string      `json:"-" pg:"token,default:gen_random_uuid()"`
 	Description string      `json:"description" pg:"descrption,notnull"`
-	Parties     []uuid.UUID `json:"parties" pg:"parties"`
+	PartyIDs    []uuid.UUID `json:"parties" pg:"parties"`
 }
 
 // Party party model
@@ -41,12 +40,13 @@ type Party struct {
 	tableName   struct{}    `json:"-" pg:"party"`
 	ID          uuid.UUID   `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string      `json:"name" pg:"name,notnull"`
+	AdminID     uuid.UUID   `json:"admin" pg:"admin,notnull,type:uuid"`
 	URLName     string      `json:"urlName" pg:"url_name,unique"`
 	Description string      `json:"description" pg:"descrption,notnull"`
 	Category    string      `json:"category" pg:"category,notnull"`
 	StartDate   time.Time   `json:"startDate" pg:"start_date"`
 	EndDate     time.Time   `json:"endDate" pg:"end_date"`
-	Items       []uuid.UUID `json:"items" pg:"items"`
+	ItemIDs     []uuid.UUID `json:"items" pg:"items"`
 }
 
 // PartyItem party item model
@@ -151,7 +151,7 @@ func (party *Party) Insert(con *pg.DB) (err error) {
 
 // Select selects the party by its id
 func (party *Party) Select(con *pg.DB) (err error) {
-	err = con.Model(party).Select()
+	err = con.Model(party).Where("id = ?0", party.ID).Select()
 	return
 }
 
@@ -165,7 +165,6 @@ func (party *Party) Update(con *pg.DB) error {
 func GetAllParties(parties *[]Party, con *pg.DB) error {
 	// TODO paging
 	err := con.Model(parties).Limit(200).Select()
-	fmt.Println(parties)
 	return err
 }
 

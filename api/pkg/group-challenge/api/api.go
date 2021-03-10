@@ -36,6 +36,7 @@ func partiesHandler(c *gin.Context) {
 		c.Status(500)
 		return
 	}
+
 	c.JSON(200, parties)
 }
 
@@ -48,18 +49,22 @@ type partyRequestBody struct {
 }
 
 func addPartyHandler(c *gin.Context) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+
 	// TODO validation
 	body := partyRequestBody{}
 	c.BindJSON(&body)
 
 	party := &models.Party{
-		Name:        body.Name,
-		URLName:     body.Name, // TODO
+		Name: body.Name,
+		//URLName:     body.Name, // TODO
+		AdminID:     session.User,
 		Description: body.Description,
 		Category:    body.Category,
 		StartDate:   body.StartDate,
 		EndDate:     body.EndDate,
-		Items:       []uuid.UUID{},
+		ItemIDs:     []uuid.UUID{},
 	}
 	party.Insert(con)
 	c.JSON(200, party)
@@ -112,7 +117,7 @@ func addPartyItemHandler(c *gin.Context) {
 		ID: uuid.FromStringOrNil(partyID),
 	}
 	party.Select(con)
-	party.Items = append(party.Items, partyItem.ID)
+	party.ItemIDs = append(party.ItemIDs, partyItem.ID)
 	party.Update(con)
 
 	c.JSON(200, partyItem)
@@ -129,7 +134,10 @@ func partyByIDHandler(c *gin.Context) {
 	party := &models.Party{
 		ID: uuid.FromStringOrNil(partyID),
 	}
+
 	party.Select(con)
+	fmt.Println(uuid.FromStringOrNil(partyID))
+
 	c.JSON(200, party)
 }
 
@@ -184,7 +192,6 @@ func registerHandler(c *gin.Context) {
 	user := auth.CreateUser(body.Username, body.Password, body.Email)
 	user.Insert(con)
 	c.JSON(200, user)
-
 }
 
 func createWsHandler() gin.HandlerFunc {
