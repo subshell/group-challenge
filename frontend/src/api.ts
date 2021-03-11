@@ -1,38 +1,7 @@
 import { useQuery } from 'react-query';
+import { PartyResponse, PartySubmissionResponse, UserResponse, UserSession } from './api-models';
 import { PartyFormData } from './party/PartyForm';
 import { useSession } from './user/session';
-
-//response interfaces
-
-export interface PartyResponse {
-  id: string;
-  name: string;
-  description: string;
-  category: 'photo';
-  startDate: string;
-  endDate: string;
-  items: PartyItemResponse[];
-}
-
-export interface PartyItemResponse {
-  id: string;
-  name?: string;
-  imageURL: string;
-}
-
-export interface UserResponse {
-  id: string;
-  username: string;
-  token: string;
-}
-
-// session
-
-export interface UserSession {
-  token: string;
-  username: string;
-  id: string;
-}
 
 // constants
 
@@ -86,7 +55,7 @@ export const useParties = () => useCreateApiHook<PartyResponse[]>(['parties']);
 
 // other stuff
 
-export async function signIn(username: string, password: string): Promise<UserResponse | undefined> {
+export async function signIn(username: string, password: string): Promise<UserSession | undefined> {
   const rawHeader = `${username}:${password}`;
   const response = await fetch(`${AUTH_URL}/signin`, {
     headers: {
@@ -103,7 +72,7 @@ export async function signOut(): Promise<boolean> {
   return response.status === 200;
 }
 
-export async function signUp(username: string, password: string, email: string): Promise<UserResponse | undefined> {
+export async function signUp(username: string, password: string, email: string): Promise<UserSession | undefined> {
   const response = await fetch(`${AUTH_URL}/register`, {
     method: 'POST',
     body: JSON.stringify({ username, password, email }),
@@ -128,6 +97,6 @@ export async function createParty({
   }).then((r) => r.json());
 }
 
-export function createPartyItem(partyId: string, partyItem: PartyItemResponse) {
-  console.log(partyId, partyItem);
+export function createPartySubmission(partyId: string, partySubmission: PartySubmissionResponse) {
+  console.log(partyId, partySubmission);
 }

@@ -1,28 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { PartyItemResponse, useParty, WS_URL } from '../../api';
-import ViewPartyItem from './ViewPartyItem';
+import { useParty, WS_URL } from '../../api';
+import ViewPartySubmission from './ViewPartySubmission';
 import useWebSocket from 'react-use-websocket';
 import ViewPartyDoneItem from './ViewPartyDoneItem';
+import { PartySubmissionResponse } from '../../api-models';
 
 function ViewParty() {
   const { id } = useParams<{ id: string }>();
-  const [partyItemIndex, setPartyItemIndex] = useState(0);
-  const [partyItem, setPartyItem] = useState<PartyItemResponse | undefined>(undefined);
+  const [partySubmissionIndex, setPartySubmissionIndex] = useState(0);
+  const [partySubmission, setPartySubmission] = useState<PartySubmissionResponse | undefined>(undefined);
   const { sendMessage } = useWebSocket(WS_URL, {
     onMessage: (msg) => console.log(msg),
     onOpen: () => console.log('opened'),
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (_) => true,
   });
-  const onItemDone = useCallback(
+  const onSubmissionDone = useCallback(
     (rating: number) => {
       sendMessage('last rating:' + rating);
-      setPartyItemIndex((index) => index + 1);
+      setPartySubmissionIndex((index) => index + 1);
     },
-    [partyItemIndex, sendMessage]
+    [partySubmissionIndex, sendMessage]
   );
-  const onItemRating = useCallback(
+  const onSubmissionRating = useCallback(
     (rating: number) => {
       sendMessage('intermediate rating:' + rating);
     },
@@ -32,20 +33,25 @@ function ViewParty() {
   const { data: party, isError, isLoading } = useParty(id);
 
   useEffect(() => {
-    setPartyItem(party?.items[partyItemIndex]);
-  }, [party, partyItemIndex]);
+    setPartySubmission(party?.submissions[partySubmissionIndex]);
+  }, [party, partySubmissionIndex]);
 
   if (isError) return <span> ERROR </span>;
   if (isLoading) return <span> LOADING </span>;
 
-  if (partyItemIndex === party?.items.length) {
+  if (partySubmissionIndex === party?.submissions.length) {
     return <ViewPartyDoneItem party={party} />;
   }
 
   return (
     <div>
-      {partyItem && (
-        <ViewPartyItem key={partyItem.id} partyItem={partyItem} onDone={onItemDone} onRating={onItemRating} />
+      {partySubmission && (
+        <ViewPartySubmission
+          key={partySubmission.id}
+          partySubmission={partySubmission}
+          onDone={onSubmissionDone}
+          onRating={onSubmissionRating}
+        />
       )}
     </div>
   );

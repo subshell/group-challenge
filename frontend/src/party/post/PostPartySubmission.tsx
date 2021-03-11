@@ -1,8 +1,8 @@
 import { useParams } from 'react-router';
 
-function PostPartyItem() {
+function PostPartySubmission() {
   const { id } = useParams<{ id: string }>();
   return <>Post party entry {id}</>;
 }
 
-export default PostPartyItem;
+export default PostPartySubmission;

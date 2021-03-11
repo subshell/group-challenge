@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useLocalStorage } from 'react-use';
-import { UserSession } from '../api';
+import { UserSession } from '../api-models';
 
 // issue: https://github.com/streamich/react-use/issues/1831
 const sessionChangeListener: Array<(value: UserSession | undefined) => void> = [];

@@ -37,21 +37,21 @@ type Room struct {
 
 // Party party model
 type Party struct {
-	tableName   struct{}    `json:"-" pg:"party"`
-	ID          uuid.UUID   `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Name        string      `json:"name" pg:"name,notnull"`
-	AdminID     uuid.UUID   `json:"admin" pg:"admin,notnull,type:uuid"`
-	URLName     string      `json:"urlName" pg:"url_name,unique"`
-	Description string      `json:"description" pg:"descrption,notnull"`
-	Category    string      `json:"category" pg:"category,notnull"`
-	StartDate   time.Time   `json:"startDate" pg:"start_date"`
-	EndDate     time.Time   `json:"endDate" pg:"end_date"`
-	ItemIDs     []uuid.UUID `json:"items" pg:"items"`
+	tableName     struct{}    `json:"-" pg:"party"`
+	ID            uuid.UUID   `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
+	Name          string      `json:"name" pg:"name,notnull"`
+	AdminID       uuid.UUID   `json:"admin" pg:"admin,notnull,type:uuid"`
+	Slug          string      `json:"slug" pg:"slug,unique"`
+	Description   string      `json:"description" pg:"descrption,notnull"`
+	Category      string      `json:"category" pg:"category,notnull"`
+	StartDate     time.Time   `json:"startDate" pg:"start_date"`
+	EndDate       time.Time   `json:"endDate" pg:"end_date"`
+	SubmissionIDs []uuid.UUID `json:"submissions" pg:"submissions"`
 }
 
-// PartyItem party item model
-type PartyItem struct {
-	tableName   struct{}  `json:"-" pg:"party_item"`
+// PartySubmission party submission model
+type PartySubmission struct {
+	tableName   struct{}  `json:"-" pg:"party_submission"`
 	ID          uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string    `json:"name" pg:"name"`
 	Description string    `json:"description" pg:"description"`
@@ -168,23 +168,23 @@ func GetAllParties(parties *[]Party, con *pg.DB) error {
 	return err
 }
 
-// party item
+// party submission
 //////////
 
 // Insert inserts a new party into the databse
-func (partyItem *PartyItem) Insert(con *pg.DB) (err error) {
-	_, err = con.Model(partyItem).Insert()
+func (partySubmission *PartySubmission) Insert(con *pg.DB) (err error) {
+	_, err = con.Model(partySubmission).Insert()
 	return
 }
 
 // Select selects the party by its id
-func (partyItem *PartyItem) Select(con *pg.DB) (err error) {
-	err = con.Model(partyItem).Select()
+func (partySubmission *PartySubmission) Select(con *pg.DB) (err error) {
+	err = con.Model(partySubmission).Select()
 	return
 }
 
 // Update updates the party
-func (partyItem *PartyItem) Update(con *pg.DB) error {
-	_, err := con.Model(partyItem).Update()
+func (partySubmission *PartySubmission) Update(con *pg.DB) error {
+	_, err := con.Model(partySubmission).Update()
 	return err
 }

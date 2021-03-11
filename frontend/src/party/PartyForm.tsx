@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { PartyResponse } from '../api';
+import { PartyResponse } from '../api-models';
 
 export interface PartyFormData {
   name: string;
@@ -66,11 +66,10 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
       </div>
 
       <div>
-        <h3 className="text-lg mb-4">Submissions</h3>
         <div className="flex space-between space-x-2">
           <div className="w-full">
             <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="startDate">
-              Start Date
+              Submission Start Date
             </label>
             <input
               className="shadow border rounded w-full py-2 px-3 text-grey-darker"
@@ -81,7 +80,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
           </div>
           <div className="w-full">
             <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="endDate">
-              End Date
+              Submission End Date
             </label>
             <input
               className="shadow border rounded w-full py-2 px-3 text-grey-darker"

@@ -55,7 +55,7 @@ func createSchema(db *pg.DB) error {
 		(*models.Session)(nil),
 		(*models.Room)(nil),
 		(*models.Party)(nil),
-		(*models.PartyItem)(nil),
+		(*models.PartySubmission)(nil),
 	}
 
 	for _, model := range models {

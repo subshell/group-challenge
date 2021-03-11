@@ -59,18 +59,18 @@ func addPartyHandler(c *gin.Context) {
 	party := &models.Party{
 		Name: body.Name,
 		//URLName:     body.Name, // TODO
-		AdminID:     session.User,
-		Description: body.Description,
-		Category:    body.Category,
-		StartDate:   body.StartDate,
-		EndDate:     body.EndDate,
-		ItemIDs:     []uuid.UUID{},
+		AdminID:       session.User,
+		Description:   body.Description,
+		Category:      body.Category,
+		StartDate:     body.StartDate,
+		EndDate:       body.EndDate,
+		SubmissionIDs: []uuid.UUID{},
 	}
 	party.Insert(con)
 	c.JSON(200, party)
 }
 
-type partyItemRequestBody struct {
+type partySubmissionRequestBody struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	ImageURL    string `json:"imageUrl"`
@@ -94,7 +94,7 @@ func getFileFromRequest(c *gin.Context, key string) string {
 	return filePath
 }
 
-func addPartyItemHandler(c *gin.Context) {
+func addPartySubmissionHandler(c *gin.Context) {
 	// TODO validation
 	partyID, ok := c.Params.Get("id")
 	if !ok {
@@ -102,25 +102,25 @@ func addPartyItemHandler(c *gin.Context) {
 		return
 	}
 
-	body := partyItemRequestBody{}
+	body := partySubmissionRequestBody{}
 	c.BindJSON(&body)
 
-	partyItem := &models.PartyItem{
+	partySubmission := &models.PartySubmission{
 		Name:        body.Name,
 		Description: body.Description,
 		ImageURL:    body.ImageURL,
 		ImageData:   nil,
 	}
-	partyItem.Insert(con)
+	partySubmission.Insert(con)
 
 	party := &models.Party{
 		ID: uuid.FromStringOrNil(partyID),
 	}
 	party.Select(con)
-	party.ItemIDs = append(party.ItemIDs, partyItem.ID)
+	party.SubmissionIDs = append(party.SubmissionIDs, partySubmission.ID)
 	party.Update(con)
 
-	c.JSON(200, partyItem)
+	c.JSON(200, partySubmission)
 }
 
 func partyByIDHandler(c *gin.Context) {
@@ -215,7 +215,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.GET("", partiesHandler)
 			party.POST("", addPartyHandler)
 			party.GET("/:id", partyByIDHandler)
-			party.POST("/:id/item", addPartyItemHandler)
+			party.POST("/:id/submission", addPartySubmissionHandler)
 		}
 		auth := v1.Group("/auth")
 		{

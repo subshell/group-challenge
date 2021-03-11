@@ -1,10 +1,7 @@
-import 'react-toastify/dist/ReactToastify.css';
 import Navigation from './navigation/Navigation';
-
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
 import ViewParty from './party/view/ViewParty';
-import PostPartyItem from './party/post/PostPartyItem';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { useSession } from './user/session';
 import { SignIn, SignUp } from './user/SignInAndSignUp';
@@ -14,6 +11,7 @@ import CreateParty from './party/create/CreateParty';
 import { toast, ToastContainer } from 'react-toastify';
 import { RequestError, useParties } from './api';
 import { useEffect } from 'react';
+import PostPartySubmission from './party/post/PostPartySubmission';
 
 function WithUser() {
   const { error } = useParties();
@@ -39,7 +37,7 @@ function WithUser() {
         <ViewParty />
       </Route>
       <Route path="/party/post/:id">
-        <PostPartyItem />
+        <PostPartySubmission />
       </Route>
       <Route path="/party/edit/:id">
         <EditParty />

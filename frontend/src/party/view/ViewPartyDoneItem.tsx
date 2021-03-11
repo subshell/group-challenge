@@ -1,11 +1,11 @@
-import { PartyResponse } from '../../api';
+import { PartyResponse } from '../../api-models';
 
 function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
   return (
     <section className="text-gray-600 body-font">
       Challenge Done!
-      {party.items.map((item) => (
-        <img key={item.id} src={item.imageURL} />
+      {party.submissions.map((submission) => (
+        <img key={submission.id} src={submission.imageURL} />
       ))}
     </section>
   );
