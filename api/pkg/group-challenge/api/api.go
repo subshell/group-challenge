@@ -234,19 +234,20 @@ func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
 
 	// temp tests
+	userID, _ := uuid.NewV4()
 	party := &models.Party{
-		ID:          uuid.FromStringOrNil("d27315ac-6849-4ec5-9a34-3ea02e893b9b"),
 		Name:        "test Party",
 		Description: "test Description",
 		StartDate:   time.Now(),
 		Category:    "photo",
 		EndDate:     time.Now(),
-		Admin:       &models.User{},
-		Slug:        "test-slug76k",
+		UserID:      userID,
+		Slug:        "test-slug",
 	}
-	//party.TestWrite(con)
-	party.Select(con)
-	party.TestRead(con)
+	party.TestWrite(con)
+	err := party.Select(con)
+	fmt.Println(err)
+	fmt.Println(party.Submissions[0].ID)
 
 	// router setup
 	router := gin.Default()

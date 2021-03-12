@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/go-pg/pg/v10"
@@ -9,28 +8,28 @@ import (
 )
 
 type PartiesSubmissionsRelation struct {
-	tableName    struct{}  `pg:"parties_submissions_relation"`
+	tableName    struct{}  `pg:"parties_submissions"`
 	ID           uuid.UUID `pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	PartyID      uuid.UUID `pg:"party_id,type:uuid"`
 	SubmissionID uuid.UUID `pg:"submission_id,type:uuid"`
 }
 
 type PartiesStatisticsRelation struct {
-	tableName   struct{}  `pg:"parties_statistics_relation"`
+	tableName   struct{}  `pg:"parties_statistics"`
 	ID          uuid.UUID `pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	PartyID     uuid.UUID `pg:"party_id,type:uuid"`
 	StatisticID uuid.UUID `pg:"statistic_id,type:uuid"`
 }
 
 type PartyStatisticsParticipantsRelation struct {
-	tableName   struct{}  `pg:"party_statistics_participants_relation"`
+	tableName   struct{}  `pg:"statistics_participants"`
 	ID          uuid.UUID `pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	StatisticID uuid.UUID `pg:"statistic_id,type:uuid"`
 	UserID      uuid.UUID `pg:"user_id,type:uuid"`
 }
 
 type Party struct {
-	tableName   struct{}  `json:"-" pg:"party"`
+	tableName   struct{}  `json:"-" pg:"parties;alias:p"`
 	ID          uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string    `json:"name" pg:"name,notnull"`
 	Description string    `json:"description" pg:"descrption,notnull"`
@@ -38,37 +37,37 @@ type Party struct {
 	Slug        string    `json:"slug" pg:"slug,unique"`
 	StartDate   time.Time `json:"startDate" pg:"start_date"`
 	EndDate     time.Time `json:"endDate" pg:"end_date"`
+	UserID      uuid.UUID `json:"userId" pg:"user_id,type:uuid"`
 
-	Admin       *User              `json:"admin" pg:"admin,notnull,fk:admin_id"`
-	Statistics  []*PartyStatistics `json:"statistics" pg:",many2many:parties_statistics_relation"`
-	Submissions []*PartySubmission `json:"submissions" pg:",many2many:parties_submissions_relation"`
+	Statistics  []*PartyStatistics `json:"statistics" pg:",many2many:parties_statistics"`
+	Submissions []*PartySubmission `json:"submissions" pg:",many2many:parties_submissions"`
 }
 
 type PartyStatistics struct {
-	tableName    struct{}  `json:"-" pg:"party_statistics"`
+	tableName    struct{}  `json:"-" pg:"party_statistics,alias:pstat"`
 	ID           uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	SubmissionID uuid.UUID `json:"submissionId" pg:"submission_id,type:uuid"`
 	Rating       float64   `json:"rating" pg:"rating"`
 
-	Participants []*User `json:"participants" pg:"participants,many2many:party_statistics_participants_relation"`
+	Participants []*User `json:"participants" pg:"participants,many2many:statistics_participants"`
 }
 
 type PartySubmission struct {
-	tableName      struct{}  `json:"-" pg:"party_submission"`
+	tableName      struct{}  `json:"-" pg:"party_submissions,alias:psubm"`
 	ID             uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name           string    `json:"name" pg:"name"`
 	Description    string    `json:"description" pg:"description"`
 	SubmissionDate time.Time `json:"submissionDate" pg:"submission_date"`
 	ImageURL       string    `json:"imageURL" pg:"image_url"`
 	ImageData      []byte    `json:"-" pg:"image_data,type:bytea"`
-
-	User *User `json:"user" pg:"user,fk:user_id"`
+	UserID         uuid.UUID `json:"userId" pg:"user_id,type:uuid"`
 }
 
 func (party *Party) TestWrite(con *pg.DB) {
+	id, _ := uuid.NewV4()
 	submission := &PartySubmission{
 		Name:           "test",
-		User:           &User{ID: uuid.UUID{}},
+		UserID:         id,
 		Description:    "test desc",
 		SubmissionDate: time.Now(),
 	}
@@ -83,27 +82,6 @@ func (party *Party) TestWrite(con *pg.DB) {
 	con.Model(submissionRelation).Insert()
 }
 
-func (party *Party) TestRead(con *pg.DB) {
-	// submissions
-	/*
-		SELECT ps.*
-		FROM "party_submission" AS ps
-		INNER JOIN parties_submissions_relation psr on psr.submission_id = ps.id
-		WHERE (psr.party_id = 'd27315ac-6849-4ec5-9a34-3ea02e893b9b')
-	*/
-	submissions := []*PartySubmission{}
-	err := con.Model(&submissions).Column("party_submission.*").Join("INNER JOIN parties_submissions_relation psr on psr.submission_id = party_submission.id").Where("psr.party_id = ?", party.ID).Select()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		for _, submission := range submissions {
-			fmt.Printf("Submission -> id: %d, name:%s \n", submission.ID, submission.Name)
-		}
-	}
-
-	party.Submissions = submissions
-}
-
 // Insert inserts a new party into the databse
 func (party *Party) Insert(con *pg.DB) (err error) {
 	_, err = con.Model(party).Insert()
@@ -112,7 +90,28 @@ func (party *Party) Insert(con *pg.DB) (err error) {
 
 // Select selects the party by its id
 func (party *Party) Select(con *pg.DB) (err error) {
+	// party
 	err = con.Model(party).Where("id = ?0", party.ID).Select()
+	if err != nil {
+		return err
+	}
+
+	// submissions
+	submissions := []*PartySubmission{}
+	err = con.Model(&submissions).Column("psubm.*").Join("INNER JOIN parties_submissions psr on psr.submission_id = psubm.id").Where("psr.party_id = ?", party.ID).Select()
+	if err != nil {
+		return err
+	}
+	party.Submissions = submissions
+
+	// statistics
+	statistics := []*PartyStatistics{}
+	err = con.Model(&statistics).Column("pstat.*").Join("INNER JOIN parties_statistics psr on psr.statistic_id = pstat.id").Where("psr.party_id = ?", party.ID).Select()
+	if err != nil {
+		return err
+	}
+	party.Statistics = statistics
+
 	return
 }
 
