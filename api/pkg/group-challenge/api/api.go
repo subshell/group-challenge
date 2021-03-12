@@ -49,8 +49,8 @@ type partyRequestBody struct {
 }
 
 func addPartyHandler(c *gin.Context) {
-	_session, _ := c.Get("session")
-	session := _session.(*models.Session)
+	//_session, _ := c.Get("session")
+	//session := _session.(*models.Session)
 
 	// TODO validation
 	body := partyRequestBody{}
@@ -59,12 +59,12 @@ func addPartyHandler(c *gin.Context) {
 	party := &models.Party{
 		Name: body.Name,
 		//URLName:     body.Name, // TODO
-		AdminID:       session.User,
-		Description:   body.Description,
-		Category:      body.Category,
-		StartDate:     body.StartDate,
-		EndDate:       body.EndDate,
-		SubmissionIDs: []uuid.UUID{},
+		//Admin:       session.User,
+		Description: body.Description,
+		Category:    body.Category,
+		StartDate:   body.StartDate,
+		EndDate:     body.EndDate,
+		//Submissions: []uuid.UUID{},
 	}
 	party.Insert(con)
 	c.JSON(200, party)
@@ -117,7 +117,6 @@ func addPartySubmissionHandler(c *gin.Context) {
 		ID: uuid.FromStringOrNil(partyID),
 	}
 	party.Select(con)
-	party.SubmissionIDs = append(party.SubmissionIDs, partySubmission.ID)
 	party.Update(con)
 
 	c.JSON(200, partySubmission)
@@ -233,6 +232,21 @@ RunServer Run the server
 */
 func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
+
+	// temp tests
+	party := &models.Party{
+		ID:          uuid.FromStringOrNil("d27315ac-6849-4ec5-9a34-3ea02e893b9b"),
+		Name:        "test Party",
+		Description: "test Description",
+		StartDate:   time.Now(),
+		Category:    "photo",
+		EndDate:     time.Now(),
+		Admin:       &models.User{},
+		Slug:        "test-slug76k",
+	}
+	//party.TestWrite(con)
+	party.Select(con)
+	party.TestRead(con)
 
 	// router setup
 	router := gin.Default()
