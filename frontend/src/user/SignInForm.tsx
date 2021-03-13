@@ -9,13 +9,13 @@ function SignInForm() {
   const { register, handleSubmit, errors } = useForm<{ username: string; password: string }>();
   const onSubmit = async ({ username, password }: { username: string; password: string }) => {
     try {
-      const user = await signIn(username, password);
-      if (!user) {
+      const session = await signIn(username, password);
+      if (!session) {
         toast('invalid login', { type: 'error' });
         return;
       }
 
-      setSession(user);
+      setSession(session);
     } catch (e) {
       console.error(e);
       alert('Cannot reach backend service');

@@ -4,20 +4,14 @@ import (
 	"fmt"
 	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
-	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
-	"io"
-	"log"
 	"net/http"
-	"os"
 	"path"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
-	"github.com/gofrs/uuid"
 )
 
 var (
@@ -25,164 +19,9 @@ var (
 	sessionStore *auth.PGSessionStore
 )
 
-// API Handler
-////////
-
-func partiesHandler(c *gin.Context) {
-	parties := &[]*models.Party{}
-	err := models.GetAllParties(parties, con)
-
-	if err != nil {
-		fmt.Println(err)
-		c.Status(500)
-		return
-	}
-
-	c.JSON(200, parties)
-}
-
-type partyRequestBody struct {
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Category    string    `json:"category"`
-	StartDate   time.Time `json:"startDate"`
-	EndDate     time.Time `json:"endDate"`
-}
-
-func requestBodyToParty(c *gin.Context) *models.Party {
-	_session, _ := c.Get("session")
-	session := _session.(*models.Session)
-
-	// TODO validation
-	body := partyRequestBody{}
-	c.BindJSON(&body)
-
-	return &models.Party{
-		Name:        body.Name,
-		Slug:        body.Name, // TODO escape name
-		UserID:      session.User,
-		Description: body.Description,
-		Category:    body.Category,
-		StartDate:   body.StartDate,
-		EndDate:     body.EndDate,
-	}
-}
-
-func addPartyHandler(c *gin.Context) {
-	party := requestBodyToParty(c)
-
-	err := party.Insert(con)
-	if err != nil {
-		fmt.Println(err)
-		c.Status(500)
-		return
-	}
-
-	c.JSON(200, party)
-}
-
-type partySubmissionRequestBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ImageURL    string `json:"imageUrl"`
-}
-
-func getFileFromRequest(c *gin.Context, key string) string {
-	file, header, err := c.Request.FormFile(key)
-	filename := header.Filename
-	fmt.Println(header.Filename)
-	filePath := "./tmp/" + filename + ".png"
-	out, err := os.Create(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer out.Close()
-	_, err = io.Copy(out, file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return filePath
-}
-
-func addPartySubmissionHandler(c *gin.Context) {
-	_session, _ := c.Get("session")
-	session := _session.(*models.Session)
-
-	// TODO validation
-	partyID, ok := c.Params.Get("id")
-	if !ok {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	body := partySubmissionRequestBody{}
-	c.BindJSON(&body)
-
-	partyUUID, err := uuid.FromString(partyID)
-	if err != nil {
-		c.Status(400)
-		return
-	}
-
-	party := &models.Party{
-		ID: partyUUID,
-	}
-	// TODO support all fields
-	// TODO support image upload
-	partySubmission := &models.PartySubmission{
-		Name:           body.Name,
-		Description:    body.Description,
-		ImageURL:       body.ImageURL,
-		SubmissionDate: time.Now(),
-		UserID:         session.User,
-		ImageData:      nil,
-	}
-	party.AddSubmission(partySubmission, con)
-
-	c.JSON(200, partySubmission)
-}
-
-func partyByIDHandler(c *gin.Context) {
-	// TODO validation
-	partyID, ok := c.Params.Get("id")
-	if !ok {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	party := &models.Party{
-		ID: uuid.FromStringOrNil(partyID),
-	}
-
-	party.Select(con)
-
-	c.JSON(200, party)
-}
-
-func editPartyByIDHandler(c *gin.Context) {
-	partyID, ok := c.Params.Get("id")
-	if !ok {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	party := requestBodyToParty(c)
-	party.ID, _ = uuid.FromString(partyID)
-
-	err := party.Update(con)
-	if err != nil {
-		fmt.Println(err)
-		c.Status(http.StatusInternalServerError)
-		return
-	}
-
-	c.JSON(200, party)
-}
-
 type userSession struct {
-	ID       string `json:"id"`
 	Username string `json:"username"`
+	UserID   string `json:"userId"`
 	Token    string `json:"token"`
 }
 
@@ -200,7 +39,7 @@ func signinHandler(c *gin.Context) {
 	session := sessionStore.CreateSessionForUser(user)
 
 	c.JSON(http.StatusOK, &userSession{
-		ID:       user.ID.String(),
+		UserID:   user.ID.String(),
 		Username: user.Username,
 		Token:    session.ID.String(),
 	})

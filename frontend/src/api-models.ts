@@ -26,7 +26,7 @@ export interface Vote {
 
 export interface PartySubmissionResponse {
   id: string;
-  user: UserResponse;
+  userId: string;
   name?: string;
   description?: string;
   submissionDate: string;
@@ -34,10 +34,16 @@ export interface PartySubmissionResponse {
   votes: Vote[];
 }
 
+export interface PartySubmissionFormData {
+  file: FileList;
+  name: string;
+  description: string;
+}
+
 // session
 
 export interface UserSession {
   token: string;
   username: string;
-  id: string;
+  userId: string;
 }

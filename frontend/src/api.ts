@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { PartyResponse, PartySubmissionResponse, UserResponse, UserSession } from './api-models';
+import { PartyResponse, PartySubmissionFormData, PartySubmissionResponse, UserSession } from './api-models';
 import { PartyFormData } from './party/PartyForm';
 import { useSession } from './user/session';
 
@@ -109,6 +109,33 @@ export async function editParty({
   return await fetch(`${API_URL}/parties/${partyId}`, {
     method: 'POST',
     body: JSON.stringify(party),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
+export async function addSubmission({
+  partyId,
+  submission,
+  sessionToken,
+}: {
+  partyId: string;
+  submission: PartySubmissionFormData;
+  sessionToken: string;
+}): Promise<PartyResponse> {
+  const formData = new FormData();
+  for (const field in submission) {
+    let value = (submission as any)[field];
+    if (field === 'file') {
+      value = value[0];
+    }
+    formData.append(field, value);
+  }
+
+  return await fetch(`${API_URL}/parties/${partyId}/submission`, {
+    method: 'POST',
+    body: formData,
     headers: {
       'X-AuthToken': sessionToken,
     },

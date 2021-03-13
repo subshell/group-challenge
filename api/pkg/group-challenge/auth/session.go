@@ -44,7 +44,7 @@ func (store *PGSessionStore) CreateSessionForUser(user *models.User) *models.Ses
 	}
 
 	if userSession.Exists(store.Con) {
-		userSession.Select(store.Con)
+		userSession.SelectByUser(store.Con)
 	} else {
 		userSession.Insert(store.Con)
 	}

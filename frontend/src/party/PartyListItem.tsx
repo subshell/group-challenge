@@ -1,7 +1,9 @@
 import { useParty } from '../api';
 import LinkButton from '../components/LinkButton';
+import { useSession } from '../user/session';
 
 function PartiesOverviewItem({ partyId }: { partyId: string }) {
+  const [session] = useSession();
   const { data: party, isError, isLoading } = useParty(partyId);
 
   if (isError) return <span>ERROR</span>;
@@ -20,7 +22,7 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
       <div className="space-x-2 mt-2">
         <LinkButton to={'/party/view/' + party.id} text="View" />
         <LinkButton to={'/party/post/' + party.id} text="Post" />
-        <LinkButton to={'/party/edit/' + party.id} text="Edit" />
+        {session!.userId === party.userId && <LinkButton to={'/party/edit/' + party.id} text="Edit" />}
       </div>
     </div>
   );

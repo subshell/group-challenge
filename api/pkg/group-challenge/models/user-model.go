@@ -62,7 +62,13 @@ func (session *Session) Insert(con *pg.DB) (err error) {
 
 // Select selects the user by its session id
 func (session *Session) Select(con *pg.DB) (err error) {
-	err = con.Model(session).Select()
+	err = con.Model(session).Where("session.id = ?0", session.ID).Select()
+	return
+}
+
+// Select selects the user by its session id
+func (session *Session) SelectByUser(con *pg.DB) (err error) {
+	err = con.Model(session).Where("session.User = ?0", session.User).Select()
 	return
 }
 
