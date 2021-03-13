@@ -54,11 +54,10 @@ func createSchema(db *pg.DB) error {
 		(*models.User)(nil),
 		(*models.Session)(nil),
 		(*models.Room)(nil),
-		(*models.PartiesStatisticsRelation)(nil),
 		(*models.PartiesSubmissionsRelation)(nil),
-		(*models.PartyStatisticsParticipantsRelation)(nil),
+		(*models.SubmissionsVotesRelation)(nil),
 		(*models.PartySubmission)(nil),
-		(*models.PartyStatistics)(nil),
+		(*models.Vote)(nil),
 		(*models.Party)(nil),
 	}
 

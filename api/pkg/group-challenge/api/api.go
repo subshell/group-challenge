@@ -29,7 +29,7 @@ var (
 ////////
 
 func partiesHandler(c *gin.Context) {
-	parties := &[]models.Party{}
+	parties := []*models.Party{}
 	err := models.GetAllParties(parties, con)
 
 	if err != nil {
@@ -105,19 +105,24 @@ func addPartySubmissionHandler(c *gin.Context) {
 	body := partySubmissionRequestBody{}
 	c.BindJSON(&body)
 
+	partyUUID, err := uuid.FromString(partyID)
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	party := &models.Party{
+		ID: partyUUID,
+	}
+	// TODO support all fields
+	// TODO support image upload
 	partySubmission := &models.PartySubmission{
 		Name:        body.Name,
 		Description: body.Description,
 		ImageURL:    body.ImageURL,
 		ImageData:   nil,
 	}
-	partySubmission.Insert(con)
-
-	party := &models.Party{
-		ID: uuid.FromStringOrNil(partyID),
-	}
-	party.Select(con)
-	party.Update(con)
+	party.AddSubmission(partySubmission, con)
 
 	c.JSON(200, partySubmission)
 }
@@ -232,22 +237,6 @@ RunServer Run the server
 */
 func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
-
-	// temp tests
-	userID, _ := uuid.NewV4()
-	party := &models.Party{
-		Name:        "test Party",
-		Description: "test Description",
-		StartDate:   time.Now(),
-		Category:    "photo",
-		EndDate:     time.Now(),
-		UserID:      userID,
-		Slug:        "test-slug",
-	}
-	party.TestWrite(con)
-	err := party.Select(con)
-	fmt.Println(err)
-	fmt.Println(party.Submissions[0].ID)
 
 	// router setup
 	router := gin.Default()
