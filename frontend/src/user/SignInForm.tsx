@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import { signIn } from '../api';
 import { useSession } from './session';
 
@@ -10,7 +11,7 @@ function SignInForm() {
     try {
       const user = await signIn(username, password);
       if (!user) {
-        alert('invalid login');
+        toast('invalid login', { type: 'error' });
         return;
       }
 

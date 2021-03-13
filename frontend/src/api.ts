@@ -97,6 +97,24 @@ export async function createParty({
   }).then((r) => r.json());
 }
 
+export async function editParty({
+  party,
+  partyId,
+  sessionToken,
+}: {
+  party: PartyFormData;
+  partyId: string;
+  sessionToken: string;
+}): Promise<PartyResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}`, {
+    method: 'POST',
+    body: JSON.stringify(party),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
 export function createPartySubmission(partyId: string, partySubmission: PartySubmissionResponse) {
   console.log(partyId, partySubmission);
 }

@@ -29,10 +29,11 @@ var (
 ////////
 
 func partiesHandler(c *gin.Context) {
-	parties := []*models.Party{}
+	parties := &[]*models.Party{}
 	err := models.GetAllParties(parties, con)
 
 	if err != nil {
+		fmt.Println(err)
 		c.Status(500)
 		return
 	}
@@ -48,25 +49,35 @@ type partyRequestBody struct {
 	EndDate     time.Time `json:"endDate"`
 }
 
-func addPartyHandler(c *gin.Context) {
-	//_session, _ := c.Get("session")
-	//session := _session.(*models.Session)
+func requestBodyToParty(c *gin.Context) *models.Party {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
 
 	// TODO validation
 	body := partyRequestBody{}
 	c.BindJSON(&body)
 
-	party := &models.Party{
-		Name: body.Name,
-		//URLName:     body.Name, // TODO
-		//Admin:       session.User,
+	return &models.Party{
+		Name:        body.Name,
+		Slug:        body.Name, // TODO escape name
+		UserID:      session.User,
 		Description: body.Description,
 		Category:    body.Category,
 		StartDate:   body.StartDate,
 		EndDate:     body.EndDate,
-		//Submissions: []uuid.UUID{},
 	}
-	party.Insert(con)
+}
+
+func addPartyHandler(c *gin.Context) {
+	party := requestBodyToParty(c)
+
+	err := party.Insert(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(500)
+		return
+	}
+
 	c.JSON(200, party)
 }
 
@@ -95,6 +106,9 @@ func getFileFromRequest(c *gin.Context, key string) string {
 }
 
 func addPartySubmissionHandler(c *gin.Context) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+
 	// TODO validation
 	partyID, ok := c.Params.Get("id")
 	if !ok {
@@ -117,10 +131,12 @@ func addPartySubmissionHandler(c *gin.Context) {
 	// TODO support all fields
 	// TODO support image upload
 	partySubmission := &models.PartySubmission{
-		Name:        body.Name,
-		Description: body.Description,
-		ImageURL:    body.ImageURL,
-		ImageData:   nil,
+		Name:           body.Name,
+		Description:    body.Description,
+		ImageURL:       body.ImageURL,
+		SubmissionDate: time.Now(),
+		UserID:         session.User,
+		ImageData:      nil,
 	}
 	party.AddSubmission(partySubmission, con)
 
@@ -140,7 +156,26 @@ func partyByIDHandler(c *gin.Context) {
 	}
 
 	party.Select(con)
-	fmt.Println(uuid.FromStringOrNil(partyID))
+
+	c.JSON(200, party)
+}
+
+func editPartyByIDHandler(c *gin.Context) {
+	partyID, ok := c.Params.Get("id")
+	if !ok {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	party := requestBodyToParty(c)
+	party.ID, _ = uuid.FromString(partyID)
+
+	err := party.Update(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
 
 	c.JSON(200, party)
 }
@@ -219,6 +254,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.GET("", partiesHandler)
 			party.POST("", addPartyHandler)
 			party.GET("/:id", partyByIDHandler)
+			party.POST("/:id", editPartyByIDHandler)
 			party.POST("/:id/submission", addPartySubmissionHandler)
 		}
 		auth := v1.Group("/auth")

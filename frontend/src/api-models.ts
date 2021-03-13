@@ -1,7 +1,5 @@
 //response interfaces
 
-import { StringMappingType } from 'typescript';
-
 export interface PartyResponse {
   id: string;
   name: string;
@@ -9,9 +7,8 @@ export interface PartyResponse {
   category: 'photo';
   startDate: string;
   endDate: string;
-  admin: UserResponse;
+  userId: string;
   slug: string;
-  statistics: PartyStatisticsResponse[];
   submissions: PartySubmissionResponse[];
 }
 
@@ -21,9 +18,9 @@ export interface UserResponse {
   email?: string;
 }
 
-export interface PartyStatisticsResponse {
-  submissionId: StringMappingType;
-  participants: UserResponse[];
+export interface Vote {
+  id: string;
+  userId: string;
   rating: number;
 }
 
@@ -34,6 +31,7 @@ export interface PartySubmissionResponse {
   description?: string;
   submissionDate: string;
   imageURL: string;
+  votes: Vote[];
 }
 
 // session

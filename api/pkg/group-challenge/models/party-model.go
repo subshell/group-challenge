@@ -55,25 +55,6 @@ type PartySubmission struct {
 	Votes []*Vote `json:"votes" pg:",many2many:submissions_votes"`
 }
 
-func (party *Party) TestWrite(con *pg.DB) {
-	id, _ := uuid.NewV4()
-	submission := &PartySubmission{
-		Name:           "test",
-		UserID:         id,
-		Description:    "test desc",
-		SubmissionDate: time.Now(),
-	}
-	con.Model(submission).Insert()
-	party.Insert(con)
-
-	submissionRelation := &PartiesSubmissionsRelation{
-		PartyID:      party.ID,
-		SubmissionID: submission.ID,
-	}
-
-	con.Model(submissionRelation).Insert()
-}
-
 // Insert inserts a new party into the databse
 func (party *Party) Insert(con *pg.DB) (err error) {
 	_, err = con.Model(party).Insert()
@@ -146,14 +127,14 @@ func (party *Party) Update(con *pg.DB) error {
 }
 
 // GetAllParties returns all parties
-func GetAllParties(parties []*Party, con *pg.DB) error {
-	err := con.Model(&parties).Limit(200).Select("id")
+func GetAllParties(parties *[]*Party, con *pg.DB) error {
+	err := con.Model(parties).Column("id").Limit(200).Select()
 
 	if err != nil {
 		return err
 	}
 
-	for _, party := range parties {
+	for _, party := range *parties {
 		if err = party.Select(con); err != nil {
 			return err
 		}
