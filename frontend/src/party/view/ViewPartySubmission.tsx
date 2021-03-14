@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { getImageUrl } from '../../api';
 import { PartySubmissionResponse } from '../../api-models';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
@@ -28,7 +29,7 @@ function ViewPartySubmission({ partySubmission, onDone, onRating }: ViewPartySub
         <img
           className="lg:w-2/6 md:w-3/6 w-5/6 mb-10 object-cover object-center rounded"
           alt="hero"
-          src={partySubmission.imageURL}
+          src={getImageUrl(partySubmission.imageId)}
         />
 
         <div className="text-center lg:w-2/3 w-full">

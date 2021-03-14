@@ -22,16 +22,16 @@ type SubmissionsVotesRelation struct {
 }
 
 type Party struct {
-	tableName   struct{}  `json:"-" pg:"parties;alias:p"`
-	ID          uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Name        string    `json:"name" pg:"name,notnull"`
-	Description string    `json:"description" pg:"descrption,notnull"`
-	Category    string    `json:"category" pg:"category,notnull"`
-	Slug        string    `json:"slug" pg:"slug,unique"`
-	StartDate   time.Time `json:"startDate" pg:"start_date"`
-	EndDate     time.Time `json:"endDate" pg:"end_date"`
-	UserID      uuid.UUID `json:"userId" pg:"user_id,type:uuid"`
-
+	tableName   struct{}           `json:"-" pg:"parties;alias:p"`
+	ID          uuid.UUID          `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
+	Name        string             `json:"name" pg:"name,notnull"`
+	Description string             `json:"description" pg:"descrption,notnull"`
+	Category    string             `json:"category" pg:"category,notnull"`
+	Slug        string             `json:"slug" pg:"slug,unique"`
+	StartDate   time.Time          `json:"startDate" pg:"start_date"`
+	EndDate     time.Time          `json:"endDate" pg:"end_date"`
+	UserID      uuid.UUID          `json:"userId" pg:"user_id,type:uuid"`
+	ImageID     uuid.UUID          `json:"imageId" pg:"image_id,type:uuid"`
 	Submissions []*PartySubmission `json:"submissions" pg:",many2many:parties_submissions"`
 }
 
@@ -48,8 +48,7 @@ type PartySubmission struct {
 	Name           string    `json:"name" pg:"name"`
 	Description    string    `json:"description" pg:"description"`
 	SubmissionDate time.Time `json:"submissionDate" pg:"submission_date"`
-	ImageURL       string    `json:"imageURL" pg:"image_url"`
-	ImageData      []byte    `json:"-" pg:"image_data,type:bytea"`
+	ImageID        uuid.UUID `json:"imageId" pg:"image_id,type:uuid"`
 	UserID         uuid.UUID `json:"userId" pg:"user_id,type:uuid"`
 
 	Votes []*Vote `json:"votes" pg:",many2many:submissions_votes"`
@@ -118,6 +117,10 @@ func (party *Party) Select(con *pg.DB) (err error) {
 	}
 
 	return
+}
+
+func (submission *PartySubmission) Select(con *pg.DB) (err error) {
+	return con.Model(submission).Where("id = ?0", submission.ID).Select()
 }
 
 // Update updates the party

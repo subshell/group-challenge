@@ -4,86 +4,20 @@ import (
 	"fmt"
 	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
-	"group-challenge/pkg/group-challenge/ws"
-	"net/http"
 	"path"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
+	"github.com/xis/baraka/v2"
 )
 
 var (
 	con          *pg.DB
 	sessionStore *auth.PGSessionStore
+	formParser   *baraka.Parser
 )
-
-type userSession struct {
-	Username string `json:"username"`
-	UserID   string `json:"userId"`
-	Token    string `json:"token"`
-}
-
-func signinHandler(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	user, err := auth.GetUserFromToken(con, token)
-
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "unauthorized",
-		})
-		return
-	}
-
-	session := sessionStore.CreateSessionForUser(user)
-
-	c.JSON(http.StatusOK, &userSession{
-		UserID:   user.ID.String(),
-		Username: user.Username,
-		Token:    session.ID.String(),
-	})
-}
-
-func signoutHandler(c *gin.Context) {
-	sessionStore.DeleteSession(c)
-	c.Status(http.StatusOK)
-}
-
-type userSignUpRequestBody struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-}
-
-func registerHandler(c *gin.Context) {
-	body := userSignUpRequestBody{}
-	c.BindJSON(&body)
-
-	if body.Username == "" || body.Password == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "invalid user data",
-		})
-		return
-	}
-
-	user := auth.CreateUser(body.Username, body.Password, body.Email)
-	user.Insert(con)
-	c.JSON(200, user)
-}
-
-func createWsHandler() gin.HandlerFunc {
-	hub := ws.NewHub()
-	go hub.Run()
-	go hub.LogClients()
-
-	return func(c *gin.Context) {
-		ws.ServeWs(hub, c.Writer, c.Request)
-	}
-}
-
-// API Configuration
-////////
 
 func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 	v1 := router.Group("/_api/v1")
@@ -94,7 +28,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.POST("", addPartyHandler)
 			party.GET("/:id", partyByIDHandler)
 			party.POST("/:id", editPartyByIDHandler)
-			party.POST("/:id/submission", addPartySubmissionHandler)
+			party.POST("/:id/submissions", addPartySubmissionHandler)
 		}
 		auth := v1.Group("/auth")
 		{
@@ -102,16 +36,23 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			auth.POST("/signout", signoutHandler)
 			auth.POST("/register", registerHandler)
 		}
+		image := v1.Group("/images")
+		{
+			image.GET("/:imageId", serveImageHandler)
+		}
 
 		v1.GET("ws", createWsHandler())
 	}
 }
 
 /*
-RunServer Run the server
+RunServer starts the server
 */
 func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
+
+	// formdata
+	formParser = baraka.DefaultParser()
 
 	// router setup
 	router := gin.Default()

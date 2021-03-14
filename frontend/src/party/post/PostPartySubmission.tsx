@@ -18,29 +18,19 @@ function PostPartySubmission() {
   const history = useHistory();
 
   const hasFile = () => {
-    return form.getValues('file')?.length > 0;
+    return form.getValues('files')?.length > 0;
   };
 
   useEffect(() => {
     if (!hasFile()) return;
 
-    const file = form.getValues('file');
+    const file = form.getValues('files')[0];
     const reader = new FileReader();
     reader.onload = function (e: ProgressEvent<FileReader>) {
       setImgPrevSrc(e.target!.result as string);
     };
-    reader.readAsDataURL(form.getValues('file')[0]);
+    reader.readAsDataURL(file);
   }, [imgPrevSrc, setImgPrevSrc, form]);
-
-  useEffect(() => {
-    if (!party?.data) return;
-
-    if (party.data!.submissions.some((submission) => submission.userId === session?.userId)) {
-      // user already submitted something
-      history.push('/');
-      toast('You have already submitted your entry');
-    }
-  }, [party]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     const sumbission = await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
@@ -66,7 +56,7 @@ function PostPartySubmission() {
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal">Select a file</span>
               <input
-                name="file"
+                name="files"
                 ref={form.register({ required: true })}
                 type="file"
                 accept="image/*"

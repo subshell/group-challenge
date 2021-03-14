@@ -33,7 +33,7 @@ function EditParty() {
         <PartyForm onSubmit={onSubmit} initialData={initialPartyFormData} />
       </div>
       <h3 className="text-xl mb-8">Submissions</h3>
-      <PartySubmissions partySubmissions={party!.submissions} />
+      <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
     </div>
   );
 }

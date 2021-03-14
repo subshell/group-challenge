@@ -10,6 +10,7 @@ type ApplicationConfig struct {
 type ServerConfig struct {
 	Port           int
 	StaticFilesDir string
+	UploadDir      string
 }
 
 // DBConfig database config

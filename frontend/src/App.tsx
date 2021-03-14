@@ -14,16 +14,16 @@ import { useEffect } from 'react';
 import PostPartySubmission from './party/post/PostPartySubmission';
 
 function WithUser() {
-  const { error } = useParties();
+  const parties = useParties();
   const [, , removeSession] = useSession();
 
   useEffect(() => {
-    if ((error as RequestError)?.status === 401) {
-      console.error(error);
+    if (!parties.isLoading && (parties.error as RequestError)?.status === 401) {
+      console.error(parties.error);
       toast('Your session has expired', { type: 'error' });
       removeSession();
     }
-  }, [error]);
+  }, [parties.error, parties.isLoading]);
 
   return (
     <Switch>

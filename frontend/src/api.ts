@@ -22,6 +22,8 @@ const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
 const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
 const AUTH_URL = `${API_URL}/auth`;
 
+export const getImageUrl = (imageId: string) => `${API_URL}/images/${imageId}`;
+
 export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
 
 // api hooks
@@ -125,15 +127,14 @@ export async function addSubmission({
   sessionToken: string;
 }): Promise<PartyResponse> {
   const formData = new FormData();
-  for (const field in submission) {
-    let value = (submission as any)[field];
-    if (field === 'file') {
-      value = value[0];
-    }
-    formData.append(field, value);
-  }
+  formData.append('image', submission.files[0]);
+  const meta: any = {
+    ...submission,
+  };
+  delete meta.files;
+  formData.append('meta', JSON.stringify(meta));
 
-  return await fetch(`${API_URL}/parties/${partyId}/submission`, {
+  return await fetch(`${API_URL}/parties/${partyId}/submissions`, {
     method: 'POST',
     body: formData,
     headers: {

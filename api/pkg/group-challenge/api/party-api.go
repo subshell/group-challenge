@@ -1,17 +1,31 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"group-challenge/pkg/group-challenge/models"
-	"io"
-	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
+	"github.com/xis/baraka/v2"
 )
+
+type partyRequestBody struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Category    string    `json:"category"`
+	StartDate   time.Time `json:"startDate"`
+	EndDate     time.Time `json:"endDate"`
+}
+
+type partySubmissionRequestBody struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ImageURL    string `json:"imageUrl"`
+}
 
 func partiesHandler(c *gin.Context) {
 	parties := &[]*models.Party{}
@@ -26,14 +40,6 @@ func partiesHandler(c *gin.Context) {
 	c.JSON(200, parties)
 }
 
-type partyRequestBody struct {
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Category    string    `json:"category"`
-	StartDate   time.Time `json:"startDate"`
-	EndDate     time.Time `json:"endDate"`
-}
-
 func requestBodyToParty(c *gin.Context) *models.Party {
 	_session, _ := c.Get("session")
 	session := _session.(*models.Session)
@@ -41,6 +47,8 @@ func requestBodyToParty(c *gin.Context) *models.Party {
 	// TODO validation
 	body := partyRequestBody{}
 	c.BindJSON(&body)
+
+	imageUUID, _ := uuid.NewV4()
 
 	return &models.Party{
 		Name:        body.Name,
@@ -50,6 +58,7 @@ func requestBodyToParty(c *gin.Context) *models.Party {
 		Category:    body.Category,
 		StartDate:   body.StartDate,
 		EndDate:     body.EndDate,
+		ImageID:     imageUUID, // TODO
 	}
 }
 
@@ -66,74 +75,59 @@ func addPartyHandler(c *gin.Context) {
 	c.JSON(200, party)
 }
 
-type partySubmissionRequestBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ImageURL    string `json:"imageUrl"`
-}
-
-func getFileFromRequest(c *gin.Context, key string) string {
-	file, header, err := c.Request.FormFile(key)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	filename := header.Filename
-	fmt.Println(header.Filename)
-	out, err := os.CreateTemp("", filename)
-	fmt.Println(out.Name())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer out.Close()
-	_, err = io.Copy(out, file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return out.Name()
-}
-
 func addPartySubmissionHandler(c *gin.Context) {
 	_session, _ := c.Get("session")
 	session := _session.(*models.Session)
 
-	// TODO validation
-	partyID, ok := c.Params.Get("id")
-	if !ok {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	file := getFileFromRequest(c, "file")
-	println(file)
-
-	// TODO
-	body := partySubmissionRequestBody{
-		Name:        "test",
-		Description: "test",
-		ImageURL:    "http://fakeurl.de",
-	}
-
-	partyUUID, err := uuid.FromString(partyID)
+	party, err := parseParty(c)
 	if err != nil {
+		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	party := &models.Party{
-		ID: partyUUID,
+	var meta = &partySubmissionRequestBody{}
+	uploadedImage, err := readFormData(c, "image", meta)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	mimeType, err := GetFileContentType(&uploadedImage.Content)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println(mimeType)
+
+	image := &models.Image{
+		ImageData:     uploadedImage.Content,
+		Extension:     uploadedImage.Extension,
+		FileSizeBytes: int64(uploadedImage.Size),
+		UserID:        session.User,
+		MimeType:      mimeType,
+		// ImageURL: , TODO: support external image urls
+	}
+	if err = image.Insert(con); err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 
 	partySubmission := &models.PartySubmission{
-		Name:           body.Name,
-		Description:    body.Description,
-		ImageURL:       body.ImageURL,
+		Name:           meta.Name,
+		Description:    meta.Description,
 		SubmissionDate: time.Now(),
 		UserID:         session.User,
-		ImageData:      nil,
+		ImageID:        image.ID,
 	}
-	party.AddSubmission(partySubmission, con)
+	if err = party.AddSubmission(partySubmission, con); err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
 
 	c.JSON(200, partySubmission)
 }
@@ -173,4 +167,56 @@ func editPartyByIDHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, party)
+}
+
+// helper functions
+
+func parseFormId(c *gin.Context, idKey string) (uuid.UUID, error) {
+	id, ok := c.Params.Get(idKey)
+	if !ok {
+		return uuid.Nil, errors.New("no such id in parameters")
+	}
+	parsedUUID, err := uuid.FromString(id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return parsedUUID, nil
+}
+
+func parseParty(c *gin.Context) (*models.Party, error) {
+	var party = &models.Party{}
+	uuid, err := parseFormId(c, "id")
+	party.ID = uuid
+	return party, err
+}
+
+func parseSubmission(c *gin.Context) (*models.PartySubmission, error) {
+	var submission = &models.PartySubmission{}
+	uuid, err := parseFormId(c, "submissionId")
+	submission.ID = uuid
+	return submission, err
+}
+
+func readFormData(c *gin.Context, key string, meta interface{}) (*baraka.Part, error) {
+	// parse formdata
+	request, err := formParser.Parse(c.Request)
+	if err != nil {
+		return nil, err
+	}
+
+	metaForm, err := request.GetForm("meta")
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(metaForm[0].Content, meta); err != nil {
+		return nil, err
+	}
+
+	images, err := request.GetForm(key)
+	if err != nil || len(images) != 1 {
+		return nil, err
+	}
+	image := images[0]
+
+	return image, nil
 }

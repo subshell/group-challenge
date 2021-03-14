@@ -9,6 +9,7 @@ export interface PartyResponse {
   endDate: string;
   userId: string;
   slug: string;
+  imageId: string;
   submissions: PartySubmissionResponse[];
 }
 
@@ -30,12 +31,12 @@ export interface PartySubmissionResponse {
   name?: string;
   description?: string;
   submissionDate: string;
-  imageURL: string;
   votes: Vote[];
+  imageId: string;
 }
 
 export interface PartySubmissionFormData {
-  file: FileList;
+  files: FileList;
   name: string;
   description: string;
 }

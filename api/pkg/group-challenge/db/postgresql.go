@@ -38,7 +38,7 @@ func Connect(dbConfig config.DBConfig) (con *pg.DB) {
 	}
 	fmt.Println(version)
 
-	con.AddQueryHook(dbLogger{})
+	//con.AddQueryHook(dbLogger{})
 
 	return
 }
@@ -54,6 +54,7 @@ func createSchema(db *pg.DB) error {
 		(*models.User)(nil),
 		(*models.Session)(nil),
 		(*models.Room)(nil),
+		(*models.Image)(nil),
 		(*models.PartiesSubmissionsRelation)(nil),
 		(*models.SubmissionsVotesRelation)(nil),
 		(*models.PartySubmission)(nil),
