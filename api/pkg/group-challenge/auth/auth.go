@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"group-challenge/pkg/group-challenge/models"
 	"log"
 	"strings"
@@ -106,8 +105,6 @@ func parseToken(token string) (string, string, error) {
 
 	username := usernamePasswordArr[0]
 	password := usernamePasswordArr[1]
-
-	fmt.Println(username, password)
 
 	return username, password, nil
 }
