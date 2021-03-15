@@ -1,14 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import InnerImageZoom from 'react-inner-image-zoom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getImageUrl } from '../../api';
 import { PartySubmissionResponse } from '../../api-models';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
+import ReactionPicker from '../../components/ReactionPicker';
+import { relative } from 'node:path';
 
 export interface ViewPartySubmissionProps {
   partySubmission: PartySubmissionResponse;
   onDone?: (rating: number) => any;
   onRating?: (rating: number) => any;
 }
+
+const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡'];
 
 function ViewPartySubmission({ partySubmission, onDone, onRating }: ViewPartySubmissionProps) {
   const [rating, setRating] = useState(0);
@@ -21,22 +26,39 @@ function ViewPartySubmission({ partySubmission, onDone, onRating }: ViewPartySub
   }, [rating]);
 
   return (
-    <section className="text-gray-600 body-font">
-      <Timer forSeconds={10} onFinish={onTimer} />
-      <div className="container mx-auto flex px-5 py-24 items-center justify-center flex-col">
-        <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">{partySubmission.name}</h1>
+    <section className="text-gray-600 body-font space-y-2">
+      <div className="container mx-auto flex px-5 flex-col space-y-2 lg:w-4/6 md:w-full w-5/6">
+        <Timer forSeconds={800} onFinish={onTimer} />
 
-        <img
-          className="lg:w-2/6 md:w-3/6 w-5/6 mb-10 object-cover object-center rounded"
-          alt="hero"
-          src={getImageUrl(partySubmission.imageId)}
-        />
+        {useMemo(
+          () => (
+            <InnerImageZoom
+              className="object-cover h-screen object-center rounded"
+              src={getImageUrl(partySubmission.imageId)}
+              hideHint={true}
+              hideCloseButton={true}
+              zoomSrc={getImageUrl(partySubmission.imageId)}
+            />
+          ),
+          [partySubmission]
+        )}
 
-        <div className="text-center lg:w-2/3 w-full">
-          <div className="flex justify-center">
+        <div className="flex flex-row justify-between mt-8">
+          <div className="space-y-2">
+            <h3 className="sm:text-4xl text-3xl font-medium text-gray-900">{partySubmission.name}</h3>
+            <p className="text-gray-600">{partySubmission.description}</p>
+          </div>
+          <div className="flex justify-center flex-col items-start">
             <StarRating stars={10} onRating={setRating} />
+            <div className="mt-4">
+              <span className="text-gray-600 text-2xl">5</span>
+              <span className="text-gray-300 ml-2 mr-2 text-2xl">/</span>
+              <span className="text-gray-800 text-4xl">10</span>
+              <span className="text-gray-600 ml-4 text-2xl">votes</span>
+            </div>
           </div>
         </div>
+        <ReactionPicker reactions={REACTIONS} />
       </div>
     </section>
   );

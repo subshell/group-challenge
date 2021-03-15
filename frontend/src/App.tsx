@@ -11,7 +11,7 @@ import CreateParty from './party/create/CreateParty';
 import { toast, ToastContainer } from 'react-toastify';
 import { RequestError, useParties } from './api';
 import { useEffect } from 'react';
-import PostPartySubmission from './party/post/PostPartySubmission';
+import PostPartySubmission from './party/submissions/PostPartySubmission';
 
 function WithUser() {
   const parties = useParties();
@@ -77,7 +77,7 @@ function App() {
   const [session] = useSession();
 
   return (
-    <div className="App">
+    <div className="App mb-16">
       <Router>
         <QueryClientProvider client={queryClient}>
           <Navigation />
