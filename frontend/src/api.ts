@@ -1,5 +1,14 @@
-import { useQuery } from 'react-query';
-import { PartyResponse, PartySubmissionFormData, PartySubmissionResponse, UserSession } from './api-models';
+import { useCallback, useEffect, useState } from 'react';
+import { useQuery, UseQueryOptions } from 'react-query';
+import useWebSocket from 'react-use-websocket';
+import {
+  PartyResponse,
+  PartyStatusResponse,
+  PartySubmissionFormData,
+  PartySubmissionResponse,
+  UserSession,
+  WSEvent,
+} from './api-models';
 import { PartyFormData } from './party/PartyForm';
 import { useSession } from './user/session';
 
@@ -21,12 +30,46 @@ const API_AUTO = {
 const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
 const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
 const AUTH_URL = `${API_URL}/auth`;
+const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
 
 export const getImageUrl = (imageId: string) => `${API_URL}/images/${imageId}`;
 
-export const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
-
 // api hooks
+
+export function useWSEvents() {
+  const ws = useWebSocket(WS_URL, {
+    onMessage: (msg) => console.log(msg),
+    onOpen: () => console.log('ws session created'),
+    onClose: () => console.log('ws session closed'),
+    onError: (err) => console.error(err),
+    shouldReconnect: (_) => true,
+  });
+  const [lastEvent, setLastEvent] = useState<WSEvent>();
+  const sendEvent = useCallback(
+    (event: WSEvent) => {
+      ws.sendJsonMessage(event);
+    },
+    [ws.sendJsonMessage]
+  );
+  useEffect(() => {
+    if (!ws.getWebSocket()) {
+      return;
+    }
+
+    const webSocket: WebSocket = ws.getWebSocket() as WebSocket;
+    const onMessage = (msg: MessageEvent) => {
+      setLastEvent(JSON.parse(msg.data));
+    };
+    webSocket.addEventListener('message', onMessage);
+
+    return () => webSocket.removeEventListener('message', onMessage);
+  }, [ws]);
+
+  return {
+    sendEvent,
+    lastEvent,
+  };
+}
 
 export class RequestError extends Error {
   constructor(public readonly status: number) {
@@ -34,26 +77,46 @@ export class RequestError extends Error {
   }
 }
 
-function useCreateApiHook<T>(queryKey: string[], url: string = `${API_URL}/${queryKey.join('/')}`) {
+function useCreateApiHook<T>({
+  queryKey,
+  url = `${API_URL}/${queryKey.join('/')}`,
+  options,
+}: {
+  queryKey: string[];
+  url?: string;
+  options?: UseQueryOptions<T, unknown, T>;
+}) {
   const [session] = useSession();
 
-  return useQuery<T>(queryKey, async () => {
-    const res = await fetch(url, {
-      headers: {
-        'X-AuthToken': session?.token || '',
-      },
-    });
+  return useQuery<T>(
+    queryKey,
+    async () => {
+      const res = await fetch(url, {
+        headers: {
+          'X-AuthToken': session?.token || '',
+        },
+      });
 
-    if (res.status === 401 || res.status === 403) {
-      throw new RequestError(res.status);
-    }
+      if (res.status === 401 || res.status === 403) {
+        throw new RequestError(res.status);
+      }
 
-    return res.json();
-  });
+      return res.json();
+    },
+    options
+  );
 }
 
-export const useParty = (id: string) => useCreateApiHook<PartyResponse>(['parties', id]);
-export const useParties = () => useCreateApiHook<PartyResponse[]>(['parties']);
+export const useParties = () => useCreateApiHook<PartyResponse[]>({ queryKey: ['parties'] });
+export const useParty = (id: string) => useCreateApiHook<PartyResponse>({ queryKey: ['parties', id] });
+export const usePartyStatus = (id: string) => {
+  // invalidate based on websockets
+  const useQueryHook = useCreateApiHook<PartyStatusResponse>({
+    queryKey: ['parties', id, 'status'],
+    options: { refetchInterval: 2500 },
+  });
+  return useQueryHook;
+};
 
 // other stuff
 

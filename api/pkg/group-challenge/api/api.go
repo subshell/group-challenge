@@ -29,6 +29,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.GET("/:id", partyByIDHandler)
 			party.POST("/:id", editPartyByIDHandler)
 			party.POST("/:id/submissions", addPartySubmissionHandler)
+			party.GET("/:id/status", partyStatusHandler)
 		}
 		auth := v1.Group("/auth")
 		{

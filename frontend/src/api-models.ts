@@ -41,10 +41,32 @@ export interface PartySubmissionFormData {
   description: string;
 }
 
+export interface PartyStatusResponse {
+  current: {
+    index: number;
+    startTime: string;
+    votes: number[];
+  };
+  partyStartTime: string;
+  submissionTimeMs: number;
+  participants: number;
+}
+
 // session
 
 export interface UserSession {
   token: string;
   username: string;
   userId: string;
+}
+
+// ws models
+
+export type WSEvent = WSRatingEvent;
+
+export interface WSRatingEvent {
+  type: 'rating';
+  data: {
+    rating: number;
+  };
 }
