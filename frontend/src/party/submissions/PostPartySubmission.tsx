@@ -16,29 +16,30 @@ function PostPartySubmission() {
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
 
-  const hasFile = () => {
-    return form.getValues('files')?.length > 0;
-  };
-
   useEffect(() => {
-    if (!hasFile()) return;
-
-    const file = form.getValues('files')[0];
+    const files = form.watch().files;
+    if (!files || (files && files.length === 0)) {
+      return;
+    }
+    const file = files[0];
     const reader = new FileReader();
     reader.onload = function (e: ProgressEvent<FileReader>) {
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [imgPrevSrc, setImgPrevSrc, form]);
+  }, [imgPrevSrc, setImgPrevSrc, form.watch().files]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
-    const sumbission = await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
+    await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
     form.reset();
+    setImgPrevSrc(undefined);
     toast('Your submission has been added!');
   };
 
   if (party.isError) return <p>Error</p>;
   if (party.isLoading || party.isIdle) return <p>Loading...</p>;
+
+  const hasFile = () => !!imgPrevSrc;
 
   return (
     <div>

@@ -31,8 +31,11 @@ function ViewParty() {
     [session, id]
   );
   const onNextButton = async () => {
-    await nextMutateAsync({ partyId: id, sessionToken: session!.token });
+    const partyStatusResponse = await nextMutateAsync({ partyId: id, sessionToken: session!.token });
     setWaitForNextSubmission(false);
+    if (!partyStatusResponse.current) {
+      party.refetch();
+    }
   };
 
   useEffect(() => {

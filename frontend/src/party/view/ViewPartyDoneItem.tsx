@@ -3,12 +3,10 @@ import { getImageUrl } from '../../api';
 import { PartyResponse, PartySubmissionResponse } from '../../api-models';
 
 function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
-  // TODO: show results
-
   const totalRating = (submission: PartySubmissionResponse) => submission.votes.reduce((x1, x2) => x1 + x2.rating, 0);
 
   const sortedSubmissions = party.submissions.sort((a, b) => {
-    return totalRating(a) - totalRating(b);
+    return totalRating(b) - totalRating(a);
   });
 
   return (

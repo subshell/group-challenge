@@ -97,20 +97,19 @@ func (liveParty *LiveParty) Vote(userID uuid.UUID, rating int) {
 		return
 	}
 
-	votes := liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes
 	var vote, ok = liveParty.findUserVote(userID)
 	if !ok {
 		vote = &models.Vote{
-			Rating: float64(rating),
+			Rating: rating,
 			UserID: userID,
 		}
-		liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes = append(votes, vote)
+		liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes = append(liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes, vote)
 	} else {
-		vote.Rating = float64(rating)
+		vote.Rating = rating
 	}
 
 	liveParty.Status.Current.Votes = []int{}
-	for _, vote = range votes {
+	for _, vote = range liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes {
 		liveParty.Status.Current.Votes = append(liveParty.Status.Current.Votes, int(vote.Rating))
 	}
 }

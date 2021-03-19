@@ -22,7 +22,7 @@ type SubmissionsVotesRelation struct {
 }
 
 type Party struct {
-	tableName   struct{}           `json:"-" pg:"parties;alias:p"`
+	tableName   struct{}           `json:"-" pg:"parties,alias:p"`
 	ID          uuid.UUID          `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Name        string             `json:"name" pg:"name,notnull"`
 	Description string             `json:"description" pg:"descrption,notnull"`
@@ -37,9 +37,9 @@ type Party struct {
 }
 
 type Vote struct {
-	tableName struct{}  `json:"-" pg:"submissions_votes,alias:svote"`
+	tableName struct{}  `json:"-" pg:"submission_votes,alias:svote"`
 	ID        uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Rating    float64   `json:"rating" pg:"rating"`
+	Rating    int       `json:"rating" pg:"rating"`
 	UserID    uuid.UUID `json:"user" pg:"user_id,type:uuid"`
 }
 

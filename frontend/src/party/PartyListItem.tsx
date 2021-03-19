@@ -38,12 +38,10 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
       </p>
 
       <p className="leading-relaxed">{party.description}</p>
-      {!party.done && (
-        <div className="space-x-2 mt-2">
-          {isLive && <LinkButton to={'/party/view/' + party.id} text="View" />}
-          {!isLive && <LinkButton to={'/party/post/' + party.id} text="Post" />}
-        </div>
-      )}
+      <div className="space-x-2 mt-2">
+        {(party.done || isLive) && <LinkButton to={'/party/view/' + party.id} text="View" />}
+        {!party.done && !isLive && <LinkButton to={'/party/post/' + party.id} text="Post" />}
+      </div>
 
       {session!.userId === party.userId && (
         <div className="space-x-2 mt-2">
