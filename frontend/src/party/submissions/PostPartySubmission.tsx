@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUpload } from 'react-icons/fa';
 import { useMutation } from 'react-query';
-import { useHistory, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { addSubmission, useParty } from '../../api';
 import { PartySubmissionFormData } from '../../api-models';
@@ -15,7 +15,6 @@ function PostPartySubmission() {
   const party = useParty(id);
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
-  const history = useHistory();
 
   const hasFile = () => {
     return form.getValues('files')?.length > 0;

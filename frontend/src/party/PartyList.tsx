@@ -18,7 +18,7 @@ function PartyList() {
   return (
     <div className="container px-5 pt-5 mx-auto">
       <div className="my-8 divide-y-2 divide-gray-100">
-        {parties.map((party) => (
+        {[...parties].reverse().map((party) => (
           <PartiesOverviewItem key={party.id} partyId={party.id} />
         ))}
       </div>

@@ -32,6 +32,7 @@ type Party struct {
 	EndDate     time.Time          `json:"endDate" pg:"end_date"`
 	UserID      uuid.UUID          `json:"userId" pg:"user_id,type:uuid"`
 	ImageID     uuid.UUID          `json:"imageId" pg:"image_id,type:uuid"`
+	Done        bool               `json:"done" pg:"done"`
 	Submissions []*PartySubmission `json:"submissions" pg:",many2many:parties_submissions"`
 }
 
@@ -75,7 +76,7 @@ func (party *Party) AddSubmission(submission *PartySubmission, con *pg.DB) (err 
 	return
 }
 
-func (partySubmission *PartySubmission) AddVote(vote *Vote, submission, con *pg.DB) (err error) {
+func (partySubmission *PartySubmission) AddVote(vote *Vote, con *pg.DB) (err error) {
 	_, err = con.Model(vote).Insert()
 	if err != nil {
 		return
@@ -126,6 +127,12 @@ func (submission *PartySubmission) Select(con *pg.DB) (err error) {
 // Update updates the party
 func (party *Party) Update(con *pg.DB) error {
 	_, err := con.Model(party).Where("id = ?0", party.ID).Update()
+	return err
+}
+
+// Update updates the vote
+func (submission *PartySubmission) Update(con *pg.DB) error {
+	_, err := con.Model(submission).Where("id = ?0", submission.ID).Update()
 	return err
 }
 

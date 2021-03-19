@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"group-challenge/pkg/group-challenge/models"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -26,18 +25,6 @@ type partySubmissionRequestBody struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	ImageURL    string `json:"imageUrl"`
-}
-
-type currentSubmissionStatus struct {
-	Index     int       `json:"index"`
-	StartTime time.Time `json:"startTime"`
-	Votes     []int     `json:"votes"`
-}
-type partyStatusResponseBody struct {
-	Current          *currentSubmissionStatus `json:"current"`
-	PartyStartTime   time.Time                `json:"partyStartTime"`
-	SubmissionTimeMs int                      `json:"submissionTimeMs"`
-	Participants     int                      `json:"participants"`
 }
 
 func partiesHandler(c *gin.Context) {
@@ -86,30 +73,6 @@ func addPartyHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, party)
-}
-
-// TODO in memory live party
-func partyStatusHandler(c *gin.Context) {
-	party, err := parseParty(c)
-	if err != nil {
-		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	partyStatus := &partyStatusResponseBody{
-		Current: &currentSubmissionStatus{
-			Index:     rand.Intn(2),
-			StartTime: time.Now(),
-			Votes:     []int{rand.Intn(10), rand.Intn(10), rand.Intn(10)},
-		},
-		PartyStartTime:   time.Now(),
-		SubmissionTimeMs: 45000,
-		Participants:     rand.Intn(50),
-	}
-
-	fmt.Println(party)
-	c.JSON(200, partyStatus)
 }
 
 func addPartySubmissionHandler(c *gin.Context) {
@@ -225,13 +188,6 @@ func parseParty(c *gin.Context) (*models.Party, error) {
 	uuid, err := parseFormId(c, "id")
 	party.ID = uuid
 	return party, err
-}
-
-func parseSubmission(c *gin.Context) (*models.PartySubmission, error) {
-	var submission = &models.PartySubmission{}
-	uuid, err := parseFormId(c, "submissionId")
-	submission.ID = uuid
-	return submission, err
 }
 
 func readFormData(c *gin.Context, key string, meta interface{}) (*baraka.Part, error) {

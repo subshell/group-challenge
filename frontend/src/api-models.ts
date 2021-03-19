@@ -7,6 +7,7 @@ export interface PartyResponse {
   category: 'photo';
   startDate: string;
   endDate: string;
+  done: boolean;
   userId: string;
   slug: string;
   imageId: string;
@@ -42,7 +43,7 @@ export interface PartySubmissionFormData {
 }
 
 export interface PartyStatusResponse {
-  current: {
+  current?: {
     index: number;
     startTime: string;
     votes: number[];
@@ -50,6 +51,7 @@ export interface PartyStatusResponse {
   partyStartTime: string;
   submissionTimeMs: number;
   participants: number;
+  isLive: boolean;
 }
 
 // session

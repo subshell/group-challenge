@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
+	"group-challenge/pkg/group-challenge/liveparty"
 	"path"
 
 	"github.com/gin-contrib/cors"
@@ -17,6 +18,7 @@ var (
 	con          *pg.DB
 	sessionStore *auth.PGSessionStore
 	formParser   *baraka.Parser
+	livePartyHub *liveparty.LivePartyHub
 )
 
 func configureAPIRouter(router *gin.Engine, con *pg.DB) {
@@ -29,7 +31,14 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.GET("/:id", partyByIDHandler)
 			party.POST("/:id", editPartyByIDHandler)
 			party.POST("/:id/submissions", addPartySubmissionHandler)
-			party.GET("/:id/status", partyStatusHandler)
+
+			live := party.Group("/:id/live")
+			{
+				live.GET("/status", livePartyStatusHandler)
+				live.POST("/start", livePartyStartHandler)
+				live.POST("/next", livePartyNextHandler)
+				live.POST("/vote", livePartyVoteHandler)
+			}
 		}
 		auth := v1.Group("/auth")
 		{
@@ -51,6 +60,7 @@ RunServer starts the server
 */
 func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
 	con = _con
+	livePartyHub = liveparty.CreateLivePartyHub(con)
 
 	// formdata
 	formParser = baraka.DefaultParser()

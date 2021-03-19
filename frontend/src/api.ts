@@ -97,7 +97,7 @@ function useCreateApiHook<T>({
         },
       });
 
-      if (res.status === 401 || res.status === 403) {
+      if (res.status >= 400 && res.status < 600) {
         throw new RequestError(res.status);
       }
 
@@ -112,7 +112,7 @@ export const useParty = (id: string) => useCreateApiHook<PartyResponse>({ queryK
 export const usePartyStatus = (id: string) => {
   // invalidate based on websockets
   const useQueryHook = useCreateApiHook<PartyStatusResponse>({
-    queryKey: ['parties', id, 'status'],
+    queryKey: ['parties', id, 'live', 'status'],
     options: { refetchInterval: 2500 },
   });
   return useQueryHook;
@@ -180,6 +180,54 @@ export async function editParty({
   }).then((r) => r.json());
 }
 
+export async function startParty({
+  partyId,
+  sessionToken,
+}: {
+  partyId: string;
+  sessionToken: string;
+}): Promise<PartyStatusResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}/live/start`, {
+    method: 'POST',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
+export async function nextPartySubmissions({
+  partyId,
+  sessionToken,
+}: {
+  partyId: string;
+  sessionToken: string;
+}): Promise<PartyStatusResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}/live/next`, {
+    method: 'POST',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
+export async function votePartySubmissions({
+  partyId,
+  rating,
+  sessionToken,
+}: {
+  partyId: string;
+  rating: number;
+  sessionToken: string;
+}): Promise<PartyStatusResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}/live/vote`, {
+    method: 'POST',
+    body: JSON.stringify({ rating }),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
 export async function addSubmission({
   partyId,
   submission,
@@ -204,8 +252,4 @@ export async function addSubmission({
       'X-AuthToken': sessionToken,
     },
   }).then((r) => r.json());
-}
-
-export function createPartySubmission(partyId: string, partySubmission: PartySubmissionResponse) {
-  console.log(partyId, partySubmission);
 }
