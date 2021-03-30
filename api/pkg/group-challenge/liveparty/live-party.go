@@ -23,9 +23,10 @@ type PartyStatus struct {
 }
 
 type LiveParty struct {
-	Status *PartyStatus
-	Party  *models.Party
-	Con    *pg.DB
+	Status              *PartyStatus
+	ParticipantsUserIDs []uuid.UUID
+	Party               *models.Party
+	Con                 *pg.DB
 }
 
 func createLiveParty(party *models.Party, con *pg.DB) (*LiveParty, error) {
@@ -41,8 +42,9 @@ func createLiveParty(party *models.Party, con *pg.DB) (*LiveParty, error) {
 			Participants:     1,
 			IsLive:           true,
 		},
-		Party: party,
-		Con:   con,
+		ParticipantsUserIDs: []uuid.UUID{party.UserID},
+		Party:               party,
+		Con:                 con,
 	}
 
 	return liveParty, nil
@@ -53,7 +55,7 @@ func CreateNonLivePartyStatus() *PartyStatus {
 		Current:          nil,
 		PartyStartTime:   time.Now(),
 		SubmissionTimeMs: 0,
-		Participants:     -1,
+		Participants:     0,
 		IsLive:           false,
 	}
 }
@@ -114,16 +116,9 @@ func (liveParty *LiveParty) Vote(userID uuid.UUID, rating int) {
 	}
 }
 
-func (liveParty *LiveParty) AddParticipant() {
-	liveParty.Status.Participants += 1
-}
-
-func (liveParty *LiveParty) RemoveParticipant() {
-	if liveParty.Status.Participants == 0 {
-		return
-	}
-
-	liveParty.Status.Participants -= 1
+func (liveParty *LiveParty) AddParticipant(userID *uuid.UUID) {
+	liveParty.ParticipantsUserIDs = append(liveParty.ParticipantsUserIDs, *userID)
+	liveParty.Status.Participants = len(liveParty.ParticipantsUserIDs)
 }
 
 func (liveParty *LiveParty) findUserVote(userID uuid.UUID) (*models.Vote, bool) {

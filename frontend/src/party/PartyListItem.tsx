@@ -38,17 +38,19 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
       </p>
 
       <p className="leading-relaxed">{party.description}</p>
-      <div className="space-x-2 mt-2">
-        {(party.done || isLive) && <LinkButton to={'/party/view/' + party.id} text="View" />}
-        {!party.done && !isLive && <LinkButton to={'/party/post/' + party.id} text="Post" />}
-      </div>
-
-      {session!.userId === party.userId && (
-        <div className="space-x-2 mt-2">
-          <LinkButton to={'/party/edit/' + party.id} text="Edit" />
-          {!isLive && !party.done && <Button onClick={onStartPartyButton}>Go Live!</Button>}
+      <div className="flex justify-between mt-2">
+        <div className="space-x-2">
+          {(party.done || isLive) && <LinkButton to={'/party/view/' + party.id} text="Enter" />}
+          {!party.done && !isLive && <LinkButton to={'/party/post/' + party.id} text="Add Submission" />}
         </div>
-      )}
+
+        {session!.userId === party.userId && (
+          <div className="space-x-2">
+            <LinkButton to={'/party/edit/' + party.id} text="Edit" />
+            {!isLive && !party.done && <Button onClick={onStartPartyButton}>Go Live!</Button>}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

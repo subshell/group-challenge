@@ -4,7 +4,6 @@ import { getImageUrl } from '../../api';
 import { PartyStatusResponse, PartySubmissionResponse } from '../../api-models';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
-import ReactionPicker from '../../components/ReactionPicker';
 
 export interface ViewPartySubmissionProps {
   partySubmission: PartySubmissionResponse;
@@ -14,6 +13,7 @@ export interface ViewPartySubmissionProps {
 }
 
 const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡'];
+// <ReactionPicker reactions={REACTIONS} />
 
 function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }: ViewPartySubmissionProps) {
   const [rating, setRating] = useState(0);
@@ -62,7 +62,6 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
             </div>
           </div>
         </div>
-        <ReactionPicker reactions={REACTIONS} />
       </div>
     </section>
   );
