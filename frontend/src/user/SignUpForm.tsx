@@ -77,7 +77,7 @@ function SignUpForm() {
           className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
           id="confirmpassword"
           name="confirmpassword"
-          type="confirmpassword"
+          type="password"
           ref={register({ required: true, validate: (value) => watch('password') === value })}
         />
         <p>{errors.confirmpassword?.type === 'required' && <span>This field is required</span>}</p>
