@@ -33,7 +33,6 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
           startAt={new Date(partyStatus.current!.startTime)}
           onFinish={onTimer}
         />
-
         {useMemo(
           () => (
             <InnerImageZoom
@@ -46,7 +45,6 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
           ),
           [partySubmission]
         )}
-
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
             <h3 className="text-2xl font-medium text-gray-900">{partySubmission.name}</h3>

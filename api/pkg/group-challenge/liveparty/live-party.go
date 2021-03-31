@@ -38,7 +38,7 @@ func createLiveParty(party *models.Party, con *pg.DB) (*LiveParty, error) {
 		Status: &PartyStatus{
 			Current:          nil,
 			PartyStartTime:   time.Now(),
-			SubmissionTimeMs: 45000,
+			SubmissionTimeMs: 7500,
 			Participants:     1,
 			IsLive:           true,
 		},

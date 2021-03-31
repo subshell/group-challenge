@@ -13,6 +13,7 @@ const Timer = ({
   const [endTime] = useState(new Date(startAt.getTime() + forSeconds * 1_000));
   const [remainingSeconds, setRemainingSeconds] = useState((endTime.getTime() - Date.now()) / 1000);
   const timerInterval = useRef<any>();
+  const [timerDone, setTimerDone] = useState(false);
 
   useEffect(() => {
     timerInterval.current = setInterval(() => {
@@ -24,11 +25,17 @@ const Timer = ({
   }, [endTime, startTime]);
 
   useEffect(() => {
-    if (remainingSeconds < 0) {
+    if (remainingSeconds <= 0) {
+      setTimerDone(true);
+    }
+  }, [remainingSeconds, forSeconds]);
+
+  useEffect(() => {
+    if (timerDone) {
       onFinish?.();
       clearInterval(timerInterval.current);
     }
-  }, [remainingSeconds, forSeconds]);
+  }, [timerDone]);
 
   return (
     <div className="relative">

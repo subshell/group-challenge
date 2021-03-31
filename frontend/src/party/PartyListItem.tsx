@@ -45,7 +45,7 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
       <p className="leading-relaxed">{party.description}</p>
       <div className="flex justify-between mt-2">
         <div className="space-x-2">
-          {(party.done || isLive) && <Button onClick={onJoinPartyButton}>Join</Button>}
+          {(party.done || isLive) && <Button onClick={onJoinPartyButton}>{party.done ? 'See Results' : 'Join'}</Button>}
           {!party.done && !isLive && <LinkButton to={'/party/post/' + party.id} text="Add Submission" />}
         </div>
 

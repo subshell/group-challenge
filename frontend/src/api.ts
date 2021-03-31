@@ -113,7 +113,7 @@ export const usePartyStatus = (id: string) => {
   // invalidate based on websockets
   const useQueryHook = useCreateApiHook<PartyStatusResponse>({
     queryKey: ['parties', id, 'live', 'status'],
-    options: { refetchInterval: 2500 },
+    options: { refetchInterval: 3000 },
   });
   return useQueryHook;
 };
