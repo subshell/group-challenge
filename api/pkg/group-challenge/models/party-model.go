@@ -14,13 +14,6 @@ type PartiesSubmissionsRelation struct {
 	SubmissionID uuid.UUID `pg:"submission_id,type:uuid"`
 }
 
-type SubmissionsVotesRelation struct {
-	tableName    struct{}  `pg:"submissions_votes"`
-	ID           uuid.UUID `pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	SubmissionID uuid.UUID `pg:"submission_id,type:uuid"`
-	VoteId       uuid.UUID `pg:"vote_id,type:uuid"`
-}
-
 type Party struct {
 	tableName   struct{}           `json:"-" pg:"parties,alias:p"`
 	ID          uuid.UUID          `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
@@ -37,10 +30,11 @@ type Party struct {
 }
 
 type Vote struct {
-	tableName struct{}  `json:"-" pg:"submission_votes,alias:svote"`
-	ID        uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Rating    int       `json:"rating" pg:"rating"`
-	UserID    uuid.UUID `json:"user" pg:"user_id,type:uuid"`
+	tableName    struct{}  `json:"-" pg:"submission_votes,alias:svote"`
+	ID           uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
+	Rating       int       `json:"rating" pg:"rating"`
+	UserID       uuid.UUID `json:"user" pg:"user_id,type:uuid"`
+	SubmissionID uuid.UUID `pg:"submission_id,type:uuid"`
 }
 
 type PartySubmission struct {
@@ -52,7 +46,7 @@ type PartySubmission struct {
 	ImageID        uuid.UUID `json:"imageId" pg:"image_id,type:uuid"`
 	UserID         uuid.UUID `json:"userId" pg:"user_id,type:uuid"`
 
-	Votes []*Vote `json:"votes" pg:",many2many:submissions_votes"`
+	Votes []*Vote `json:"votes" pg:",many2many:submission_votes"`
 }
 
 // Insert inserts a new party into the databse
@@ -77,17 +71,8 @@ func (party *Party) AddSubmission(submission *PartySubmission, con *pg.DB) (err 
 }
 
 func (partySubmission *PartySubmission) AddVote(vote *Vote, con *pg.DB) (err error) {
+	vote.SubmissionID = partySubmission.ID
 	_, err = con.Model(vote).Insert()
-	if err != nil {
-		return
-	}
-
-	submissionsVotesRelation := &SubmissionsVotesRelation{
-		SubmissionID: partySubmission.ID,
-		VoteId:       vote.ID,
-	}
-
-	_, err = con.Model(submissionsVotesRelation).Insert()
 	return
 }
 
@@ -110,7 +95,7 @@ func (party *Party) Select(con *pg.DB) (err error) {
 	// votes for each submission
 	for _, submission := range submissions {
 		votes := []*Vote{}
-		err = con.Model(&votes).Column("svote.*").Join("INNER JOIN submissions_votes svr on svr.vote_id = svote.id").Where("svr.submission_id = ?", submission.ID).Select()
+		err = con.Model(&votes).Where("svote.submission_id = ?", submission.ID).Select()
 		if err != nil {
 			return err
 		}
@@ -118,6 +103,11 @@ func (party *Party) Select(con *pg.DB) (err error) {
 	}
 
 	return
+}
+
+func (submission *PartySubmission) DeleteVotes(con *pg.DB) {
+	con.Model(&submission.Votes).Where("svote.submission_id = ?", submission.ID).Delete()
+	submission.Votes = []*Vote{}
 }
 
 func (submission *PartySubmission) Select(con *pg.DB) (err error) {

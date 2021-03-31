@@ -31,6 +31,10 @@ func (livePartyHub *LivePartyHub) CreateLiveParty(party *models.Party) (*LivePar
 	return liveParty, err
 }
 
+func (livePartyHub *LivePartyHub) RemoveLiveParty(partyID uuid.UUID) {
+	delete(livePartyHub.liveParties, partyID)
+}
+
 func (livePartyHub *LivePartyHub) GetLiveParty(partyID uuid.UUID) (*LiveParty, bool) {
 	liveParty, ok := livePartyHub.liveParties[partyID]
 	return liveParty, ok

@@ -117,6 +117,12 @@ func (liveParty *LiveParty) Vote(userID uuid.UUID, rating int) {
 }
 
 func (liveParty *LiveParty) AddParticipant(userID *uuid.UUID) {
+	for _, existingUserIDs := range liveParty.ParticipantsUserIDs {
+		if existingUserIDs == *userID {
+			return
+		}
+	}
+
 	liveParty.ParticipantsUserIDs = append(liveParty.ParticipantsUserIDs, *userID)
 	liveParty.Status.Participants = len(liveParty.ParticipantsUserIDs)
 }

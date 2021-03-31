@@ -1,7 +1,7 @@
 import { FaTv } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router';
-import { startParty, useParty, usePartyStatus } from '../api';
+import { joinParty, startParty, useParty, usePartyStatus } from '../api';
 import Button from '../components/Button';
 import LinkButton from '../components/LinkButton';
 import { useSession } from '../user/session';
@@ -10,10 +10,15 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
   const [session] = useSession();
   const { data: party, isError, isLoading } = useParty(partyId);
   const partyStatus = usePartyStatus(partyId);
-  const { mutateAsync } = useMutation(startParty);
+  const { mutateAsync: startMutateAsync } = useMutation(startParty);
+  const { mutateAsync: joinMutateAsync } = useMutation(joinParty);
   const history = useHistory();
   const onStartPartyButton = async () => {
-    await mutateAsync({ partyId: partyId, sessionToken: session!.token });
+    await startMutateAsync({ partyId: partyId, sessionToken: session!.token });
+    history.push('/party/view/' + partyId);
+  };
+  const onJoinPartyButton = async () => {
+    await joinMutateAsync({ partyId: partyId, sessionToken: session!.token });
     history.push('/party/view/' + partyId);
   };
 
@@ -40,14 +45,14 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
       <p className="leading-relaxed">{party.description}</p>
       <div className="flex justify-between mt-2">
         <div className="space-x-2">
-          {(party.done || isLive) && <LinkButton to={'/party/view/' + party.id} text="Enter" />}
+          {(party.done || isLive) && <Button onClick={onJoinPartyButton}>Join</Button>}
           {!party.done && !isLive && <LinkButton to={'/party/post/' + party.id} text="Add Submission" />}
         </div>
 
         {session!.userId === party.userId && (
           <div className="space-x-2">
             <LinkButton to={'/party/edit/' + party.id} text="Edit" />
-            {!isLive && !party.done && <Button onClick={onStartPartyButton}>Go Live!</Button>}
+            {!isLive && <Button onClick={onStartPartyButton}>{party.done ? 'Restart Party' : 'Start Party'}</Button>}
           </div>
         )}
       </div>

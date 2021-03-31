@@ -18,11 +18,12 @@ function ViewParty() {
   const { mutateAsync: nextMutateAsync } = useMutation(nextPartySubmissions);
   const { mutateAsync: voteMutateAsync } = useMutation(votePartySubmissions);
   const onSubmissionDone = useCallback(() => {
-    if (session?.userId !== party.data?.userId) {
+    if (session?.userId !== party.data?.userId || !partyStatus.data?.current) {
       return;
     }
+    console.log('done');
     setWaitForNextSubmission(true);
-  }, [session, party.data]);
+  }, [session?.userId, party.data?.userId, partyStatus.data?.current]);
   const onSubmissionRating = useCallback(
     (rating: number) => {
       if (!rating) return;
@@ -31,6 +32,7 @@ function ViewParty() {
     [session, id]
   );
   const onNextButton = async () => {
+    console.log('next');
     const partyStatusResponse = await nextMutateAsync({ partyId: id, sessionToken: session!.token });
     setWaitForNextSubmission(false);
     if (!partyStatusResponse.current) {
@@ -63,6 +65,11 @@ function ViewParty() {
 
   return (
     <div>
+      {session?.userId === party.data.userId && (
+        <div className="mb-4 container">
+          <Button onClick={onNextButton}>Next Image</Button>
+        </div>
+      )}
       {partySubmission && (
         <ViewPartySubmission
           key={partySubmission.id}

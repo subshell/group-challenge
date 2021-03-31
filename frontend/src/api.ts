@@ -195,6 +195,21 @@ export async function startParty({
   }).then((r) => r.json());
 }
 
+export async function joinParty({
+  partyId,
+  sessionToken,
+}: {
+  partyId: string;
+  sessionToken: string;
+}): Promise<PartyStatusResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}/live/join`, {
+    method: 'POST',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
 export async function nextPartySubmissions({
   partyId,
   sessionToken,

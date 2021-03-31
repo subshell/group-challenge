@@ -41,6 +41,7 @@ db:
   database: group_challenge
   host: "localhost:5432"
   poolSize: 50
+  logQueries: false
 ```
 
 ## Deploy to k8s with Helm

@@ -38,6 +38,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 				live.POST("/start", livePartyStartHandler)
 				live.POST("/next", livePartyNextHandler)
 				live.POST("/vote", livePartyVoteHandler)
+				live.POST("/join", livePartyJoinHandler)
 			}
 		}
 		auth := v1.Group("/auth")
