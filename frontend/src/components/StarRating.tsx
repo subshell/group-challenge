@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 
-function Star({ active, preview }: { active: boolean; preview: boolean }) {
-  const color = preview ? 'grey' : 'black';
-  return active ? <FaStar color={color} size={35} /> : <FaRegStar color={color} size={35} />;
+function Star({ active, preview, className = '' }: { active: boolean; preview: boolean; className?: string }) {
+  return active ? (
+    <FaStar color="#ff9900" size={35} className={className} />
+  ) : (
+    <FaRegStar color="grey" size={35} className={className} />
+  );
 }
 
 function StarRating({ stars, onRating }: { stars: number; onRating: (rating: number) => void }) {
@@ -27,7 +30,11 @@ function StarRating({ stars, onRating }: { stars: number; onRating: (rating: num
             onMouseLeave={() => setHoverRating(0)}
             onClick={() => setRating(i + 1)}
           >
-            <Star active={rating > i} preview={hoverRating > i}></Star>
+            <Star
+              className="transition ease-in-out duration-100 transform hover:scale-125 select-none cursor-pointer"
+              active={rating > i}
+              preview={hoverRating > i}
+            ></Star>
           </div>
         ))}
     </div>

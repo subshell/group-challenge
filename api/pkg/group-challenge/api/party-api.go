@@ -190,13 +190,6 @@ func parseParty(c *gin.Context) (*models.Party, error) {
 	return party, err
 }
 
-func parseSubmission(c *gin.Context) (*models.PartySubmission, error) {
-	var submission = &models.PartySubmission{}
-	uuid, err := parseFormId(c, "submissionId")
-	submission.ID = uuid
-	return submission, err
-}
-
 func readFormData(c *gin.Context, key string, meta interface{}) (*baraka.Part, error) {
 	// parse formdata
 	request, err := formParser.Parse(c.Request)

@@ -15,9 +15,10 @@ type ServerConfig struct {
 
 // DBConfig database config
 type DBConfig struct {
-	User     string
-	Password string
-	Database string
-	Host     string
-	PoolSize int
+	User       string
+	Password   string
+	Database   string
+	Host       string
+	PoolSize   int
+	LogQueries bool
 }
