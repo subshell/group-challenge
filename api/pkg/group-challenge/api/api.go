@@ -59,9 +59,9 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 /*
 RunServer starts the server
 */
-func RunServer(serverConfig config.ServerConfig, _con *pg.DB) {
+func RunServer(serverConfig config.ServerConfig, challengesConfig config.ChallengesConfig, _con *pg.DB) {
 	con = _con
-	livePartyHub = liveparty.CreateLivePartyHub(con)
+	livePartyHub = liveparty.CreateLivePartyHub(challengesConfig.LiveParty, con)
 
 	// formdata
 	formParser = baraka.DefaultParser()

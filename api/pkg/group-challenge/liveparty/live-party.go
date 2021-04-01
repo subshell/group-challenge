@@ -2,6 +2,7 @@ package liveparty
 
 import (
 	"errors"
+	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/models"
 	"time"
 
@@ -29,7 +30,7 @@ type LiveParty struct {
 	Con                 *pg.DB
 }
 
-func createLiveParty(party *models.Party, con *pg.DB) (*LiveParty, error) {
+func createLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.LivePartyConfig) (*LiveParty, error) {
 	if party.Done {
 		return nil, errors.New("party is over")
 	}
@@ -38,7 +39,7 @@ func createLiveParty(party *models.Party, con *pg.DB) (*LiveParty, error) {
 		Status: &PartyStatus{
 			Current:          nil,
 			PartyStartTime:   time.Now(),
-			SubmissionTimeMs: 7500,
+			SubmissionTimeMs: livePartyConfig.DefaultDimePerSubmissionSeconds * 1000,
 			Participants:     1,
 			IsLive:           true,
 		},

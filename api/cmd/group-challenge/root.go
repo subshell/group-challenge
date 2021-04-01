@@ -33,6 +33,7 @@ func init() {
 	viper.SetDefault("db.Database", "postgres")
 	viper.SetDefault("db.Host", "localhost:5432")
 	viper.SetDefault("db.PoolSize", 50)
+	viper.SetDefault("challenges.party.live.defaultDimePerSubmissionSeconds", 45)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -53,5 +54,5 @@ func main() {
 	con := db.Connect(appConfig.DB)
 	defer con.Close()
 	db.InitDB(con)
-	api.RunServer(appConfig.Server, con)
+	api.RunServer(appConfig.Server, appConfig.Challenges, con)
 }
