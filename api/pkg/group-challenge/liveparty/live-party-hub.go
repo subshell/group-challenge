@@ -2,6 +2,7 @@ package liveparty
 
 import (
 	"errors"
+	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/models"
 
 	"github.com/go-pg/pg/v10"
@@ -9,14 +10,16 @@ import (
 )
 
 type LivePartyHub struct {
-	con         *pg.DB
-	liveParties map[uuid.UUID]*LiveParty
+	con             *pg.DB
+	livePartyConfig config.LivePartyConfig
+	liveParties     map[uuid.UUID]*LiveParty
 }
 
-func CreateLivePartyHub(con *pg.DB) *LivePartyHub {
+func CreateLivePartyHub(_livePartyConfig config.LivePartyConfig, con *pg.DB) *LivePartyHub {
 	return &LivePartyHub{
-		con:         con,
-		liveParties: make(map[uuid.UUID]*LiveParty),
+		con:             con,
+		livePartyConfig: _livePartyConfig,
+		liveParties:     make(map[uuid.UUID]*LiveParty),
 	}
 }
 
@@ -25,7 +28,7 @@ func (livePartyHub *LivePartyHub) CreateLiveParty(party *models.Party) (*LivePar
 		return nil, errors.New("party exists")
 	}
 
-	liveParty, err := createLiveParty(party, livePartyHub.con)
+	liveParty, err := createLiveParty(party, livePartyHub.con, livePartyHub.livePartyConfig)
 	livePartyHub.liveParties[party.ID] = liveParty
 
 	return liveParty, err

@@ -7,3 +7,7 @@ db:
   database: group_challenge
   host: "postgres:5432"
   poolSize: 50
+  logQueries: false
+challenges:
+  liveParty:
+    defaultDimePerSubmissionSeconds: 45
