@@ -40,7 +40,6 @@ function ViewParty() {
   const onNextButton = async () => {
     await nextMutation.mutateAsync({ partyId: id, sessionToken: session!.token });
     await partyStatus.refetch();
-    await party.refetch();
     setWaitForNextSubmission(false);
   };
 
@@ -50,6 +49,10 @@ function ViewParty() {
     }
     mutateParty.mutate({ partyId: party.data.id, sessionToken: session!.token });
   }, [party.data?.id]);
+
+  useEffect(() => {
+    party.refetch();
+  }, [partyStatus.data?.current, partyStatus.data?.isLive, partyStatus.data?.participants]);
 
   useEffect(() => {
     if (!party.data || !partyStatus.data?.current) return;

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FaTv } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router';
@@ -8,7 +9,7 @@ import { useSession } from '../user/session';
 
 function PartiesOverviewItem({ partyId }: { partyId: string }) {
   const [session] = useSession();
-  const { data: party, isError, isLoading } = useParty(partyId);
+  const { data: party, isError, isLoading, refetch: refetchParty } = useParty(partyId);
   const partyStatus = usePartyStatus(partyId);
   const { mutateAsync: startMutateAsync } = useMutation(startParty);
   const { mutateAsync: joinMutateAsync } = useMutation(joinParty);
@@ -21,6 +22,10 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
     await joinMutateAsync({ partyId: partyId, sessionToken: session!.token });
     history.push('/party/view/' + partyId);
   };
+
+  useEffect(() => {
+    refetchParty();
+  }, [partyStatus.data?.isLive, partyStatus.data?.current]);
 
   if (isError) return <span>ERROR</span>;
   if (isLoading || !party) return <span>LOADING</span>;
@@ -47,6 +52,7 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
         <div className="space-x-2">
           {(party.done || isLive) && <Button onClick={onJoinPartyButton}>{party.done ? 'See Results' : 'Join'}</Button>}
           {!party.done && !isLive && <LinkButton to={'/party/post/' + party.id} text="Add Submission" />}
+          <LinkButton to={'/party/my-submissions/' + party.id} text="My Submissions" />
         </div>
 
         {session!.userId === party.userId && (

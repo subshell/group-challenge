@@ -12,7 +12,7 @@ function CreateParty() {
   const onSubmit = async (data: PartyFormData) => {
     const party = await mutateAsync({ party: data, sessionToken: session!.token });
     toast(`new party '${party.name}' created 🥳`, { type: 'success' });
-    history.push('/party/edit/' + party.id);
+    history.push('/');
   };
 
   return (

@@ -75,6 +75,35 @@ func addPartyHandler(c *gin.Context) {
 	c.JSON(200, party)
 }
 
+func deletePartyHandler(c *gin.Context) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+	partyID, err := parseFormId(c, "id")
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	party := &models.Party{
+		ID: partyID,
+	}
+	party.Select(con)
+
+	if party.UserID != session.User {
+		c.Status(403)
+		return
+	}
+
+	err = party.Delete(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(500)
+		return
+	}
+
+	c.Status(200)
+}
+
 func addPartySubmissionHandler(c *gin.Context) {
 	_session, _ := c.Get("session")
 	session := _session.(*models.Session)
@@ -144,7 +173,10 @@ func partyByIDHandler(c *gin.Context) {
 		ID: uuid.FromStringOrNil(partyID),
 	}
 
-	party.Select(con)
+	if err := party.Select(con); err != nil {
+		c.Status(http.StatusNotFound)
+		return
+	}
 
 	c.JSON(200, party)
 }

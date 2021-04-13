@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/go-pg/pg/v10"
@@ -52,6 +53,12 @@ type PartySubmission struct {
 // Insert inserts a new party into the databse
 func (party *Party) Insert(con *pg.DB) (err error) {
 	_, err = con.Model(party).Insert()
+	return
+}
+
+func (party *Party) Delete(con *pg.DB) (err error) {
+	_, err = con.Model(party).Where("id = ?0", party.ID).Delete()
+	fmt.Println(party.ID)
 	return
 }
 

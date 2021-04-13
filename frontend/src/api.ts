@@ -210,6 +210,21 @@ export async function joinParty({
   }).then((r) => r.json());
 }
 
+export async function deleteParty({
+  partyId,
+  sessionToken,
+}: {
+  partyId: string;
+  sessionToken: string;
+}): Promise<Response> {
+  return await fetch(`${API_URL}/parties/${partyId}`, {
+    method: 'DELETE',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  });
+}
+
 export async function nextPartySubmissions({
   partyId,
   sessionToken,

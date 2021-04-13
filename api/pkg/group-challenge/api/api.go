@@ -6,6 +6,7 @@ import (
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/liveparty"
 	"path"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
@@ -30,6 +31,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.POST("", addPartyHandler)
 			party.GET("/:id", partyByIDHandler)
 			party.POST("/:id", editPartyByIDHandler)
+			party.DELETE("/:id", deletePartyHandler)
 			party.POST("/:id/submissions", addPartySubmissionHandler)
 
 			live := party.Group("/:id/live")
@@ -80,7 +82,17 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 
 	// static files
 	router.Use(static.Serve("/", static.LocalFile(serverConfig.StaticFilesDir, true)))
+	var epoch = time.Unix(0, 0).Format(time.RFC1123)
+	var noCacheHeaders = map[string]string{
+		"Expires":         epoch,
+		"Cache-Control":   "no-cache, private, max-age=0",
+		"Pragma":          "no-cache",
+		"X-Accel-Expires": "0",
+	}
 	router.NoRoute(func(c *gin.Context) {
+		for k, v := range noCacheHeaders {
+			c.Header(k, v)
+		}
 		c.File(path.Join(serverConfig.StaticFilesDir, "index.html"))
 	})
 

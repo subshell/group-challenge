@@ -12,6 +12,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { RequestError, useParties } from './api';
 import { useEffect } from 'react';
 import PostPartySubmission from './party/submissions/PostPartySubmission';
+import OwnSubmissions from './party/own-submissions/OwnSubmissions';
 
 function WithUser() {
   const parties = useParties();
@@ -42,6 +43,9 @@ function WithUser() {
       <Route path="/party/edit/:id">
         <EditParty />
       </Route>
+      <Route path="/party/my-submissions/:id">
+        <OwnSubmissions />
+      </Route>
       <Route path="/profile">
         <EditProfile />
       </Route>
@@ -71,7 +75,14 @@ function WithoutUser() {
   );
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   const [session] = useSession();
