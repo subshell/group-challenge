@@ -1,4 +1,5 @@
-import { useForm } from 'react-hook-form';
+import ReactDatePicker from 'react-datepicker';
+import { Controller, useForm } from 'react-hook-form';
 import { PartyResponse } from '../api-models';
 
 export interface PartyFormData {
@@ -16,9 +17,11 @@ export interface PartyFormProps {
 }
 
 function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: PartyFormProps) {
-  const { register, handleSubmit, formState } = useForm<PartyFormData>({
+  const { register, handleSubmit, formState, control } = useForm<PartyFormData>({
     defaultValues: {
       ...initialData,
+      startDate: initialData.startDate ?? new Date(),
+      endDate: initialData.endDate ?? new Date(),
     },
   });
 
@@ -66,27 +69,37 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
       </div>
 
       <div>
-        <div className="flex space-between space-x-2">
-          <div className="w-full">
+        <div className="flex space-x-8">
+          <div>
             <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="startDate">
               Submission Start Date
             </label>
-            <input
-              className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-              type="date"
-              ref={register({ required: true, valueAsDate: true })}
+            <Controller
               name="startDate"
+              control={control}
+              render={({ onChange, value }) => (
+                <ReactDatePicker
+                  className="shadow border rounded w-full py-2 px-3 text-grey-darker"
+                  selected={new Date(value)}
+                  onChange={onChange}
+                />
+              )}
             />
           </div>
-          <div className="w-full">
+          <div>
             <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="endDate">
               Submission End Date
             </label>
-            <input
-              className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-              type="date"
-              ref={register({ required: true, valueAsDate: true })}
+            <Controller
               name="endDate"
+              control={control}
+              render={({ onChange, value }) => (
+                <ReactDatePicker
+                  className="shadow border rounded w-full py-2 px-3 text-grey-darker"
+                  selected={new Date(value)}
+                  onChange={onChange}
+                />
+              )}
             />
           </div>
         </div>

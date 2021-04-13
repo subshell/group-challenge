@@ -51,6 +51,17 @@ func createLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.Liv
 	return liveParty, nil
 }
 
+func createDoneLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.LivePartyConfig) (*LiveParty, error) {
+	liveParty := &LiveParty{
+		Status:              CreateNonLivePartyStatus(),
+		ParticipantsUserIDs: []uuid.UUID{party.UserID},
+		Party:               party,
+		Con:                 con,
+	}
+
+	return liveParty, nil
+}
+
 func CreateNonLivePartyStatus() *PartyStatus {
 	return &PartyStatus{
 		Current:          nil,

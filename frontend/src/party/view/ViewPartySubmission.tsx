@@ -1,5 +1,4 @@
-import InnerImageZoom from 'react-inner-image-zoom';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getImageUrl } from '../../api';
 import { PartyStatusResponse, PartySubmissionResponse } from '../../api-models';
 import StarRating from '../../components/StarRating';
@@ -33,18 +32,18 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
           startAt={new Date(partyStatus.current!.startTime)}
           onFinish={onTimer}
         />
-        {useMemo(
-          () => (
-            <InnerImageZoom
-              className="object-cover object-center rounded"
+        <div className="bg-gray-100">
+          <a href={getImageUrl(partySubmission.imageId)} target="_blank" rel="noopener noreferrer">
+            <img
+              className="object-contain w-full rounded"
+              style={{
+                maxHeight: '80vh',
+              }}
               src={getImageUrl(partySubmission.imageId)}
-              hideHint={true}
-              hideCloseButton={true}
-              zoomSrc={getImageUrl(partySubmission.imageId)}
             />
-          ),
-          [partySubmission]
-        )}
+          </a>
+        </div>
+
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
             <h3 className="text-2xl font-medium text-gray-900">{partySubmission.name}</h3>

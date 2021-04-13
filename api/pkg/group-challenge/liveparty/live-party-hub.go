@@ -40,5 +40,22 @@ func (livePartyHub *LivePartyHub) RemoveLiveParty(partyID uuid.UUID) {
 
 func (livePartyHub *LivePartyHub) GetLiveParty(partyID uuid.UUID) (*LiveParty, bool) {
 	liveParty, ok := livePartyHub.liveParties[partyID]
+
+	if !ok {
+		party := &models.Party{
+			ID: partyID,
+		}
+		party.Select(livePartyHub.con)
+		if !party.Done {
+			return nil, false
+		}
+
+		liveParty, err := createDoneLiveParty(party, livePartyHub.con, livePartyHub.livePartyConfig)
+		if err != nil {
+			return nil, false
+		}
+		livePartyHub.liveParties[partyID] = liveParty
+	}
+
 	return liveParty, ok
 }
