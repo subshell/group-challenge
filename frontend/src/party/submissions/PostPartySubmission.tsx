@@ -12,6 +12,7 @@ function PostPartySubmission() {
   const [session] = useSession();
   const { id } = useParams<{ id: string }>();
   const [imgPrevSrc, setImgPrevSrc] = useState<string | undefined>();
+  const [evaluateImage, setEvaluateImage] = useState<boolean>(false);
   const party = useParty(id);
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
@@ -27,7 +28,8 @@ function PostPartySubmission() {
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [imgPrevSrc, setImgPrevSrc, form.watch().files]);
+    setEvaluateImage(false);
+  }, [evaluateImage, setImgPrevSrc]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
@@ -58,6 +60,7 @@ function PostPartySubmission() {
               <input
                 name="files"
                 ref={form.register({ required: true })}
+                onChange={() => setEvaluateImage(true)}
                 type="file"
                 accept="image/*"
                 className="hidden"
