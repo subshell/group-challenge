@@ -104,6 +104,46 @@ func deletePartyHandler(c *gin.Context) {
 	c.Status(200)
 }
 
+func deletePartySubmissionHandler(c *gin.Context) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+	partyID, err := parseFormId(c, "id")
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	submissionID, err := parseFormId(c, "submissionId")
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	party := &models.Party{
+		ID: partyID,
+	}
+	party.Select(con)
+
+	if party.UserID != session.User {
+		c.Status(403)
+		return
+	}
+
+	for _, submissionInParty := range party.Submissions {
+		if submissionID == submissionInParty.ID && submissionInParty.UserID == session.User {
+			err = party.DeleteSubmission(submissionInParty, con)
+			if err != nil {
+				fmt.Println(err)
+				c.Status(500)
+				return
+			}
+			c.Status(200)
+			return
+		}
+	}
+
+	c.Status(403)
+}
+
 func addPartySubmissionHandler(c *gin.Context) {
 	_session, _ := c.Get("session")
 	session := _session.(*models.Session)

@@ -77,6 +77,19 @@ func (party *Party) AddSubmission(submission *PartySubmission, con *pg.DB) (err 
 	return
 }
 
+func (party *Party) DeleteSubmission(submission *PartySubmission, con *pg.DB) (err error) {
+	submissionRelation := &PartiesSubmissionsRelation{
+		PartyID:      party.ID,
+		SubmissionID: submission.ID,
+	}
+	_, err = con.Model(submissionRelation).Where("party_id = ? AND submission_id = ?", party.ID, submission.ID).Delete()
+	if err != nil {
+		return
+	}
+	_, err = con.Model(submission).Where("id = ?0", submission.ID).Delete()
+	return
+}
+
 func (partySubmission *PartySubmission) AddVote(vote *Vote, con *pg.DB) (err error) {
 	vote.SubmissionID = partySubmission.ID
 	_, err = con.Model(vote).Insert()

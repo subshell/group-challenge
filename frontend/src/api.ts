@@ -218,6 +218,23 @@ export async function deleteParty({
   });
 }
 
+export async function deleteSubmission({
+  partyId,
+  submissionId,
+  sessionToken,
+}: {
+  partyId: string;
+  submissionId: string;
+  sessionToken: string;
+}): Promise<Response> {
+  return await fetch(`${API_URL}/parties/${partyId}/submissions/${submissionId}`, {
+    method: 'DELETE',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  });
+}
+
 export async function nextPartySubmissions({
   partyId,
   sessionToken,
