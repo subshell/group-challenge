@@ -24,7 +24,7 @@ function WithUser() {
       toast('Your session has expired', { type: 'error' });
       removeSession();
     }
-  }, [parties.error, parties.isLoading]);
+  }, [parties.error, parties.isLoading, removeSession]);
 
   return (
     <Switch>
@@ -79,6 +79,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
+      refetchOnWindowFocus: false,
     },
   },
 });

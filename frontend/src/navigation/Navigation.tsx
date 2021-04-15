@@ -1,4 +1,4 @@
-import { FaGraduationCap, FaUserAstronaut } from 'react-icons/fa';
+import { FaUserAstronaut } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 import { signOut } from '../api';

@@ -10,12 +10,15 @@ export const useSession: () => [UserSession | undefined, (v: UserSession) => voi
   const removeSessionCB = useCallback(() => {
     removeSession();
     sessionChangeListener.forEach((fn) => fn(undefined));
-  }, []);
+  }, [removeSession]);
 
-  const setSessionCB = useCallback((value) => {
-    setSession(value);
-    sessionChangeListener.forEach((fn) => fn(value));
-  }, []);
+  const setSessionCB = useCallback(
+    (value) => {
+      setSession(value);
+      sessionChangeListener.forEach((fn) => fn(value));
+    },
+    [setSession]
+  );
 
   useEffect(() => {
     const fn = (value: UserSession | undefined) => {

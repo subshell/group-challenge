@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
 import useWebSocket from 'react-use-websocket';
-import {
-  PartyResponse,
-  PartyStatusResponse,
-  PartySubmissionFormData,
-  PartySubmissionResponse,
-  UserSession,
-  WSEvent,
-} from './api-models';
+import { PartyResponse, PartyStatusResponse, PartySubmissionFormData, UserSession, WSEvent } from './api-models';
 import { PartyFormData } from './party/PartyForm';
 import { useSession } from './user/session';
 
@@ -49,7 +42,7 @@ export function useWSEvents() {
     (event: WSEvent) => {
       ws.sendJsonMessage(event);
     },
-    [ws.sendJsonMessage]
+    [ws]
   );
   useEffect(() => {
     if (!ws.getWebSocket()) {

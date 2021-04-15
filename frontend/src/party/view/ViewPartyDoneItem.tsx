@@ -20,7 +20,11 @@ function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
             <div className="text-4xl mr-8">{i + 1}.</div>
             <div>{i === 0 && <FaCrown size={64} />}</div>
             <div className="flex items-center">
-              <img className="object-contain w-96 h-60 rounded" src={getImageUrl(submission.imageId)} />
+              <img
+                className="object-contain w-96 h-60 rounded"
+                src={getImageUrl(submission.imageId)}
+                alt={submission.name}
+              />
             </div>
             <div className="flex flex-col justify-between h-full">
               <div>

@@ -11,7 +11,7 @@ interface FormData {
 
 function SignUpForm() {
   const [, setSession] = useSession();
-  const { watch, register, handleSubmit, errors } = useForm<FormData>();
+  const { watch, register, handleSubmit, formState } = useForm<FormData>();
   const onSubmit = async ({ username, password, email }: FormData) => {
     const user = await signUp(username, password, email);
     if (!user) {
@@ -36,12 +36,10 @@ function SignUpForm() {
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-          id="username"
-          name="username"
           type="text"
-          ref={register({ required: true })}
+          {...register('username', { required: true })}
         />
-        <p>{errors.username && <span>This field is required</span>}</p>
+        <p>{formState.errors.username && <span>This field is required</span>}</p>
       </div>
       <div className="mb-4">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
@@ -49,12 +47,10 @@ function SignUpForm() {
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-          id="email"
-          name="email"
           type="email"
-          ref={register()}
+          {...register('email')}
         />
-        <p>{errors.email && <span>Error</span>}</p>
+        <p>{formState.errors.email && <span>Error</span>}</p>
       </div>
       <div className="mb-4">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
@@ -62,12 +58,10 @@ function SignUpForm() {
         </label>
         <input
           className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
-          id="password"
-          name="password"
           type="password"
-          ref={register({ required: true })}
+          {...register('password', { required: true })}
         />
-        <p>{errors.password && <span>This field is required</span>}</p>
+        <p>{formState.errors.password && <span>This field is required</span>}</p>
       </div>
       <div className="mb-4">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
@@ -75,13 +69,11 @@ function SignUpForm() {
         </label>
         <input
           className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
-          id="confirmpassword"
-          name="confirmpassword"
           type="password"
-          ref={register({ required: true, validate: (value) => watch('password') === value })}
+          {...register('confirmpassword', { required: true, validate: (value) => watch('password') === value })}
         />
-        <p>{errors.confirmpassword?.type === 'required' && <span>This field is required</span>}</p>
-        <p>{errors.confirmpassword?.type === 'validate' && <span>The passwords don't match</span>}</p>
+        <p>{formState.errors.confirmpassword?.type === 'required' && <span>This field is required</span>}</p>
+        <p>{formState.errors.confirmpassword?.type === 'validate' && <span>The passwords don't match</span>}</p>
       </div>
       <div className="flex items-center justify-between">
         <input

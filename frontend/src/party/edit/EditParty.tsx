@@ -13,10 +13,10 @@ function EditParty() {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const { data: party, isError, isLoading } = useParty(id);
-  const { mutateAsync } = useMutation(editParty);
+  const { mutateAsync: mutatePartyAsync } = useMutation(editParty);
   const deletePartyMutation = useMutation(deleteParty);
   const onSubmit = async (partyFormData: PartyFormData) => {
-    const party = await mutateAsync({ party: partyFormData, partyId: id, sessionToken: session!.token });
+    const party = await mutatePartyAsync({ party: partyFormData, partyId: id, sessionToken: session!.token });
     toast(`party '${party.name}' edited 😁`, { type: 'success' });
   };
 
@@ -24,7 +24,7 @@ function EditParty() {
     if (!party && isError) {
       history.push('/');
     }
-  }, [party, isLoading]);
+  }, [party, isError, history]);
 
   if (isError) return <span>Error</span>;
   if (!party || isLoading) return <span>Loading</span>;

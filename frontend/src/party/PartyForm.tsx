@@ -33,10 +33,8 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-          ref={register({ required: true })}
           type="text"
-          id="name"
-          name="name"
+          {...register('name', { required: true })}
         />
       </div>
 
@@ -47,9 +45,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
 
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-          ref={register({ required: true })}
-          id="description"
-          name="description"
+          {...register('description', { required: true })}
         />
       </div>
 
@@ -59,10 +55,8 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
         </label>
 
         <select
-          ref={register({ required: true })}
-          id="category"
-          name="category"
           className="shadow border rounded w-full py-2 px-3 text-grey-darker"
+          {...register('category', { required: true })}
         >
           <option value="photo">Photo Challenge</option>
         </select>
@@ -77,11 +71,11 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
             <Controller
               name="startDate"
               control={control}
-              render={({ onChange, value }) => (
+              render={({ field }) => (
                 <ReactDatePicker
                   className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-                  selected={new Date(value)}
-                  onChange={onChange}
+                  selected={new Date(field.value)}
+                  onChange={field.onChange}
                 />
               )}
             />
@@ -93,11 +87,11 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
             <Controller
               name="endDate"
               control={control}
-              render={({ onChange, value }) => (
+              render={({ field }) => (
                 <ReactDatePicker
                   className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-                  selected={new Date(value)}
-                  onChange={onChange}
+                  selected={new Date(field.value)}
+                  onChange={field.onChange}
                 />
               )}
             />

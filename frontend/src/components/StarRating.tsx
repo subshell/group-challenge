@@ -17,7 +17,7 @@ function StarRating({ stars, onRating }: { stars: number; onRating: (rating: num
     if (rating) {
       onRating(rating);
     }
-  }, [rating]);
+  }, [rating, onRating]);
 
   return (
     <div className="flex flex-row">

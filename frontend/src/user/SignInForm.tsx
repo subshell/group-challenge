@@ -6,7 +6,7 @@ import { useSession } from './session';
 function SignInForm() {
   const [, setSession] = useSession();
 
-  const { register, handleSubmit, errors } = useForm<{ username: string; password: string }>();
+  const { register, handleSubmit, formState } = useForm<{ username: string; password: string }>();
   const onSubmit = async ({ username, password }: { username: string; password: string }) => {
     try {
       const session = await signIn(username, password);
@@ -30,12 +30,10 @@ function SignInForm() {
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-          id="username"
-          name="username"
           type="text"
-          ref={register({ required: true })}
+          {...register('username', { required: true })}
         />
-        <p>{errors.username && <span>This field is required</span>}</p>
+        <p>{formState.errors.username && <span>This field is required</span>}</p>
       </div>
       <div className="mb-6">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
@@ -43,12 +41,10 @@ function SignInForm() {
         </label>
         <input
           className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
-          id="password"
-          name="password"
           type="password"
-          ref={register({ required: true })}
+          {...register('password', { required: true })}
         />
-        <p>{errors.password && <span>This field is required</span>}</p>
+        <p>{formState.errors.password && <span>This field is required</span>}</p>
       </div>
       <div className="flex items-center justify-between">
         <input

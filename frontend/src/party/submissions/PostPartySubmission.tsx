@@ -13,13 +13,14 @@ function PostPartySubmission() {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const [imgPrevSrc, setImgPrevSrc] = useState<string | undefined>();
-  const [evaluateImage, setEvaluateImage] = useState<boolean>(false);
   const party = useParty(id);
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
 
+  const files = form.watch('files');
+  const hasFile = () => !!imgPrevSrc;
+
   useEffect(() => {
-    const files = form.watch().files;
     if (!files || (files && files.length === 0)) {
       return;
     }
@@ -29,8 +30,7 @@ function PostPartySubmission() {
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-    setEvaluateImage(false);
-  }, [evaluateImage, setImgPrevSrc]);
+  }, [form, setImgPrevSrc, files]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
@@ -42,8 +42,6 @@ function PostPartySubmission() {
 
   if (party.isError) return <p>Error</p>;
   if (party.isLoading || party.isIdle) return <p>Loading...</p>;
-
-  const hasFile = () => !!imgPrevSrc;
 
   return (
     <div>
@@ -59,17 +57,10 @@ function PostPartySubmission() {
             >
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal">Select a file</span>
-              <input
-                name="files"
-                ref={form.register({ required: true })}
-                onChange={() => setEvaluateImage(true)}
-                type="file"
-                accept="image/*"
-                className="hidden"
-              />
+              <input className="hidden" type="file" accept="image/*" {...form.register('files', { required: true })} />
             </label>
             <div className="w-96 p-6 rounded-lg" hidden={!hasFile()}>
-              <img className="rounded w-full mb-6" src={imgPrevSrc} />
+              <img className="rounded w-full mb-6" src={imgPrevSrc} alt="preview" />
             </div>
           </div>
         </div>
@@ -80,10 +71,8 @@ function PostPartySubmission() {
           </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-            ref={form.register()}
             type="text"
-            id="name"
-            name="name"
+            {...form.register('name')}
           />
         </div>
 
@@ -94,9 +83,7 @@ function PostPartySubmission() {
 
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-            ref={form.register()}
-            id="description"
-            name="description"
+            {...form.register('description')}
           />
         </div>
 

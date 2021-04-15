@@ -11,18 +11,18 @@ export interface ViewPartySubmissionProps {
   onRating?: (rating: number) => any;
 }
 
-const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡'];
+// const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡'];
 // <ReactionPicker reactions={REACTIONS} />
 
 function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }: ViewPartySubmissionProps) {
   const [rating, setRating] = useState(0);
   const onTimer = useCallback(() => {
     onDone?.(rating);
-  }, [rating]);
+  }, [rating, onDone]);
 
   useEffect(() => {
     onRating?.(rating);
-  }, [rating]);
+  }, [rating, onRating]);
 
   return (
     <section className="text-gray-600 body-font space-y-2">
@@ -40,6 +40,7 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
                 maxHeight: '80vh',
               }}
               src={getImageUrl(partySubmission.imageId)}
+              alt={partySubmission.name}
             />
           </a>
         </div>

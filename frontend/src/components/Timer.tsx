@@ -35,7 +35,7 @@ const Timer = ({
       onFinish?.();
       clearInterval(timerInterval.current);
     }
-  }, [timerDone]);
+  }, [timerDone, onFinish]);
 
   return (
     <div className="relative">

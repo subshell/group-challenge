@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { FaTv } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router';
-import { joinParty, startParty, useParty, usePartyStatus } from '../api';
+import { startParty, useParty, usePartyStatus } from '../api';
 import Button from '../components/Button';
 import LinkButton from '../components/LinkButton';
 import { useSession } from '../user/session';
@@ -12,25 +12,23 @@ function PartiesOverviewItem({ partyId }: { partyId: string }) {
   const { data: party, isError, isLoading, refetch: refetchParty } = useParty(partyId);
   const partyStatus = usePartyStatus(partyId);
   const { mutateAsync: startMutateAsync } = useMutation(startParty);
-  const { mutateAsync: joinMutateAsync } = useMutation(joinParty);
   const history = useHistory();
   const onStartPartyButton = async () => {
     await startMutateAsync({ partyId: partyId, sessionToken: session!.token });
     history.push('/party/view/' + partyId);
   };
   const onJoinPartyButton = async () => {
-    await joinMutateAsync({ partyId: partyId, sessionToken: session!.token });
     history.push('/party/view/' + partyId);
   };
 
+  const isLive = partyStatus.isSuccess && partyStatus.data.isLive;
+
   useEffect(() => {
     refetchParty();
-  }, [partyStatus.data?.isLive, partyStatus.data?.current]);
+  }, [refetchParty, isLive]);
 
   if (isError) return <span>ERROR</span>;
   if (isLoading || !party) return <span>LOADING</span>;
-
-  const isLive = partyStatus.isSuccess && partyStatus.data.isLive;
 
   return (
     <div
