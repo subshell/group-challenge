@@ -10,4 +10,4 @@ db:
   logQueries: false
 challenges:
   liveParty:
-    defaultDimePerSubmissionSeconds: 45
+    defaultTimePerSubmissionSeconds: 45

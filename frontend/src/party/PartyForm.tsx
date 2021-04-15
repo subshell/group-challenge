@@ -20,8 +20,8 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
   const { register, handleSubmit, formState, control } = useForm<PartyFormData>({
     defaultValues: {
       ...initialData,
-      startDate: initialData.startDate ?? new Date(),
-      endDate: initialData.endDate ?? new Date(),
+      startDate: initialData.startDate ? new Date(initialData.startDate) : new Date(),
+      endDate: initialData.endDate ? new Date(initialData.endDate) : new Date(),
     },
   });
 

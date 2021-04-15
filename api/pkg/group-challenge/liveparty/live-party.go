@@ -39,7 +39,7 @@ func createLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.Liv
 		Status: &PartyStatus{
 			Current:          nil,
 			PartyStartTime:   time.Now(),
-			SubmissionTimeMs: livePartyConfig.DefaultDimePerSubmissionSeconds * 1000,
+			SubmissionTimeMs: livePartyConfig.DefaultTimePerSubmissionSeconds * 1000,
 			Participants:     1,
 			IsLive:           true,
 		},

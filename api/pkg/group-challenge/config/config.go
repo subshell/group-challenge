@@ -29,5 +29,5 @@ type ChallengesConfig struct {
 }
 
 type LivePartyConfig struct {
-	DefaultDimePerSubmissionSeconds int
+	DefaultTimePerSubmissionSeconds int
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUpload } from 'react-icons/fa';
 import { useMutation } from 'react-query';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { addSubmission, useParty } from '../../api';
 import { PartySubmissionFormData } from '../../api-models';
@@ -10,6 +10,7 @@ import { useSession } from '../../user/session';
 
 function PostPartySubmission() {
   const [session] = useSession();
+  const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const [imgPrevSrc, setImgPrevSrc] = useState<string | undefined>();
   const [evaluateImage, setEvaluateImage] = useState<boolean>(false);
@@ -35,6 +36,7 @@ function PostPartySubmission() {
     await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
     form.reset();
     setImgPrevSrc(undefined);
+    history.push(`/party/my-submissions/${id}`);
     toast('Your submission has been added!');
   };
 

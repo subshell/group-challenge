@@ -42,6 +42,9 @@ db:
   host: "localhost:5432"
   poolSize: 50
   logQueries: false
+challenges:
+  liveParty:
+    defaultTimePerSubmissionSeconds: 45
 ```
 
 ## Deploy to k8s with Helm
