@@ -123,11 +123,6 @@ func deletePartySubmissionHandler(c *gin.Context) {
 	}
 	party.Select(con)
 
-	if party.UserID != session.User {
-		c.Status(403)
-		return
-	}
-
 	for _, submissionInParty := range party.Submissions {
 		if submissionID == submissionInParty.ID && submissionInParty.UserID == session.User {
 			err = party.DeleteSubmission(submissionInParty, con)
