@@ -86,6 +86,26 @@ func (liveParty *LiveParty) Stop() {
 	liveParty.Party.Update(liveParty.Con)
 }
 
+func (liveParty *LiveParty) Previous() {
+	var previousSubmissionIndex = liveParty.Status.Current.Index - 1
+
+	if previousSubmissionIndex < 0 {
+		return
+	}
+
+	var previousSubmission = liveParty.Party.Submissions[previousSubmissionIndex]
+	var previousRatings = []int{}
+	for _, vote := range previousSubmission.Votes {
+		previousRatings = append(previousRatings, vote.Rating)
+	}
+
+	liveParty.Status.Current = &SubmissionStatus{
+		Index:     previousSubmissionIndex,
+		StartTime: time.Now(),
+		Votes:     previousRatings,
+	}
+}
+
 func (liveParty *LiveParty) Next() {
 	var nextSubmissionIndex = 0
 

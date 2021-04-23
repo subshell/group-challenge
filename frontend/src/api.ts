@@ -250,6 +250,21 @@ export async function nextPartySubmissions({
   }).then((r) => r.json());
 }
 
+export async function previousPartySubmissions({
+  partyId,
+  sessionToken,
+}: {
+  partyId: string;
+  sessionToken: string;
+}): Promise<PartyStatusResponse> {
+  return await fetch(`${API_URL}/parties/${partyId}/live/previous`, {
+    method: 'POST',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((r) => r.json());
+}
+
 export async function votePartySubmissions({
   partyId,
   rating,

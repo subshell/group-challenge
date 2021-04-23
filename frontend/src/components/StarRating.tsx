@@ -9,34 +9,48 @@ function Star({ active, preview, className = '' }: { active: boolean; preview: b
   );
 }
 
-function StarRating({ stars, onRating }: { stars: number; onRating: (rating: number) => void }) {
+function StarRating({
+  stars,
+  onRating,
+  disabled,
+}: {
+  stars: number;
+  onRating: (rating: number) => void;
+  disabled: boolean;
+}) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
 
   useEffect(() => {
-    if (rating) {
+    if (rating && !disabled) {
       onRating(rating);
     }
-  }, [rating, onRating]);
+  }, [rating, disabled, onRating]);
 
   return (
     <div className="flex flex-row">
       {Array(stars)
         .fill(0)
-        .map((_, i) => (
-          <div
-            key={i}
-            onMouseOver={() => setHoverRating(i + 1)}
-            onMouseLeave={() => setHoverRating(0)}
-            onClick={() => setRating(i + 1)}
-          >
-            <Star
-              className="transition ease-in-out duration-100 transform hover:scale-125 select-none cursor-pointer"
-              active={rating > i}
-              preview={hoverRating > i}
-            ></Star>
-          </div>
-        ))}
+        .map((_, i) =>
+          disabled ? (
+            <div key={i}>
+              <Star className="select-none cursor-not-allowed" active={rating > i} preview={false}></Star>
+            </div>
+          ) : (
+            <div
+              key={i}
+              onMouseOver={() => setHoverRating(i + 1)}
+              onMouseLeave={() => setHoverRating(0)}
+              onClick={() => setRating(i + 1)}
+            >
+              <Star
+                className="select-none transition ease-in-out duration-100 transform hover:scale-125 cursor-pointer"
+                active={rating > i}
+                preview={hoverRating > i}
+              ></Star>
+            </div>
+          )
+        )}
     </div>
   );
 }

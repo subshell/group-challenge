@@ -37,12 +37,22 @@ const Timer = ({
     }
   }, [timerDone, onFinish]);
 
+  const progress = (forSeconds - remainingSeconds) / forSeconds;
+  let color: string;
+  if (progress < 0.75) {
+    color = 'bg-blue-500';
+  } else if (progress < 1) {
+    color = 'bg-yellow-500';
+  } else {
+    color = 'bg-red-500';
+  }
+
   return (
     <div className="relative">
       <div className="overflow-hidden h-2 text-xs flex bg-blue-200">
         <div
-          style={{ width: `${Math.round(((forSeconds - remainingSeconds) / forSeconds) * 100)}%` }}
-          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
+          style={{ width: `${Math.round(progress * 100)}%` }}
+          className={`shadow-none flex flex-col justify-center ${color}`}
         ></div>
       </div>
     </div>

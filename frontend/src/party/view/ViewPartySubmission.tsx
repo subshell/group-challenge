@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getImageUrl } from '../../api';
 import { PartyStatusResponse, PartySubmissionResponse } from '../../api-models';
 import StarRating from '../../components/StarRating';
@@ -16,8 +17,11 @@ export interface ViewPartySubmissionProps {
 
 function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }: ViewPartySubmissionProps) {
   const [rating, setRating] = useState(0);
+  const [done, setDone] = useState(false);
   const onTimer = useCallback(() => {
+    toast('⏰ Time is up!', {});
     onDone?.(rating);
+    setDone(true);
   }, [rating, onDone]);
 
   useEffect(() => {
@@ -51,7 +55,7 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
             <p className="text-gray-600">{partySubmission.description}</p>
           </div>
           <div className="flex justify-center flex-col items-start">
-            <StarRating stars={10} onRating={setRating} />
+            <StarRating stars={5} onRating={setRating} disabled={done} />
             <div className="mt-4">
               <span className="text-gray-600 text-xl">{partyStatus.current!.votes.length}</span>
               <span className="text-gray-300 ml-2 mr-2 text-xl">/</span>

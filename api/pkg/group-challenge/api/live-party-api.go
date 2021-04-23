@@ -50,6 +50,25 @@ func livePartyNextHandler(c *gin.Context) {
 	c.JSON(200, liveParty.Status)
 }
 
+func livePartyPreviousHandler(c *gin.Context) {
+	party, err := parseParty(c)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	liveParty, ok := livePartyHub.GetLiveParty(party.ID)
+	if !ok {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	liveParty.Previous()
+
+	c.JSON(200, liveParty.Status)
+}
+
 func livePartyStartHandler(c *gin.Context) {
 	_session, _ := c.Get("session")
 	session := _session.(*models.Session)
