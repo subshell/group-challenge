@@ -15,6 +15,16 @@ function EditParty() {
   const { data: party, isError, isLoading } = useParty(id);
   const { mutateAsync: mutatePartyAsync } = useMutation(editParty);
   const deletePartyMutation = useMutation(deleteParty);
+
+  const onDeleteBtn = async () => {
+    const result = window.confirm(`Are you sure you want to delete ${party?.name}`);
+    if (result) {
+      toast.info(`Party ${party?.name} has been deleted`);
+      await deletePartyMutation.mutate({ partyId: id, sessionToken: session!.token });
+      history.push('/');
+    }
+  };
+
   const onSubmit = async (partyFormData: PartyFormData) => {
     const party = await mutatePartyAsync({ party: partyFormData, partyId: id, sessionToken: session!.token });
     toast(`party '${party.name}' edited 😁`, { type: 'success' });
@@ -40,13 +50,7 @@ function EditParty() {
       <div className="flex w-full place-content-between">
         <h1 className="text-2xl mb-8">Edit Party</h1>
         <div>
-          <button
-            className="bg-red-800 hover:bg-red-500 text-white font-bold py-2 px-4 rounded"
-            onClick={() => {
-              deletePartyMutation.mutate({ partyId: id, sessionToken: session!.token });
-              history.push('/');
-            }}
-          >
+          <button className="bg-red-800 hover:bg-red-500 text-white font-bold py-2 px-4 rounded" onClick={onDeleteBtn}>
             Delete
           </button>
         </div>

@@ -15,6 +15,7 @@ import Button from '../../components/Button';
 import { useMutation } from 'react-query';
 import { useSession } from '../../user/session';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import ViewPartyStartPage from './ViewPartyStartPage';
 
 // TODO optimize periodic fetching with WebSockets
 function ViewParty() {
@@ -33,6 +34,7 @@ function ViewParty() {
 
   const partyUserId = party.data?.userId;
   const currentPartyStatus = party.data && partyStatus.data?.current;
+  const liveStatus = party.data && partyStatus.data?.isLive;
   const submissions = party.data?.submissions;
   const refetchParty = party.refetch;
   const refetchStatus = partyStatus.refetch;
@@ -46,8 +48,9 @@ function ViewParty() {
   }, [mutateJoinParty, id, session]);
 
   useEffect(() => {
+    console.log('fetch party');
     refetchParty();
-  }, [refetchParty, currentPartyStatus]);
+  }, [refetchParty, currentPartyStatus, liveStatus]);
 
   useEffect(() => {
     if (!currentPartyStatus || !submissions) return;
@@ -92,10 +95,11 @@ function ViewParty() {
 
   if (!currentPartyStatus) {
     return (
-      <div className="flex flex-col items-center justify-center align-middle space-y-8">
-        {session?.userId === partyUserId && <Button onClick={onNextButton}>Start</Button>}
-        {session?.userId !== partyUserId && <div>Wating for party host to press start...</div>}
-      </div>
+      <ViewPartyStartPage
+        isHost={session?.userId === partyUserId}
+        participants={partyStatus.data.participants}
+        onPartyStart={onNextButton}
+      />
     );
   }
 
@@ -105,9 +109,10 @@ function ViewParty() {
         <ViewPartySubmission
           key={partySubmission.id}
           partySubmission={partySubmission}
+          partyStatus={partyStatus.data}
+          numSubmissions={submissions?.length || 0}
           onDone={onSubmissionDone}
           onRating={onSubmissionRating}
-          partyStatus={partyStatus.data}
         />
       )}
       {session?.userId === partyUserId && (

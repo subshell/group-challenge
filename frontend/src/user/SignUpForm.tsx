@@ -1,4 +1,6 @@
 import { useForm } from 'react-hook-form';
+import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
 import { signIn, signUp } from '../api';
 import { useSession } from './session';
 
@@ -11,17 +13,25 @@ interface FormData {
 
 function SignUpForm() {
   const [, setSession] = useSession();
-  const { watch, register, handleSubmit, formState } = useForm<FormData>();
+  const signUpMutation = useMutation(signUp);
+  const { watch, register, handleSubmit, formState, setError, setFocus } = useForm<FormData>();
+
   const onSubmit = async ({ username, password, email }: FormData) => {
-    const user = await signUp(username, password, email);
-    if (!user) {
-      alert('Sign Up error');
+    const userResponse = await signUpMutation.mutateAsync({ username, password, email });
+    if (userResponse.status !== 200) {
+      if (userResponse.status === 422) {
+        toast(`Sorry, the user ${username} already exists`, { type: 'error' });
+        setError('username', { type: 'notAvailable' });
+        setFocus('username');
+      } else {
+        toast('Sign up error', { type: 'error' });
+      }
       return;
     }
 
     const userWithToken = await signIn(username, password);
     if (!userWithToken) {
-      alert('Sign In error');
+      toast('Sign in error', { type: 'error' });
       return;
     }
 
@@ -37,9 +47,18 @@ function SignUpForm() {
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
           type="text"
-          {...register('username', { required: true })}
+          {...register('username', { required: true, pattern: /^[a-zA-Z0-9]{2,}$/ })}
         />
-        <p>{formState.errors.username && <span>This field is required</span>}</p>
+        <p>
+          {formState.errors.username && (
+            <>
+              {formState.errors.username.type !== 'notAvailable' && (
+                <span>This field is required and must only use alphanumerical characters (a-z, A-Z, 0-9)</span>
+              )}
+              {formState.errors.username.type === 'notAvailable' && <span>Username is not available</span>}
+            </>
+          )}
+        </p>
       </div>
       <div className="mb-4">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
@@ -57,18 +76,18 @@ function SignUpForm() {
           Password *
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker"
           type="password"
-          {...register('password', { required: true })}
+          {...register('password', { required: true, minLength: 2 })}
         />
-        <p>{formState.errors.password && <span>This field is required</span>}</p>
+        <p>{formState.errors.password && <span>This field is required and must be longer than 2 characters</span>}</p>
       </div>
       <div className="mb-4">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
           Repeat Password *
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker"
           type="password"
           {...register('confirmpassword', { required: true, validate: (value) => watch('password') === value })}
         />

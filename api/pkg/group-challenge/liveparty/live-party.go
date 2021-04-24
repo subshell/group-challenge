@@ -125,9 +125,9 @@ func (liveParty *LiveParty) Next() {
 	}
 }
 
-// rating 1 - 10
+// rating 1 - 5
 func (liveParty *LiveParty) Vote(userID uuid.UUID, rating int) {
-	if liveParty.Status.Current == nil {
+	if liveParty.Status.Current == nil || rating < 1 || rating > 5 {
 		return
 	}
 

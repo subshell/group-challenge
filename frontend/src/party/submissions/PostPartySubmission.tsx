@@ -67,7 +67,7 @@ function PostPartySubmission() {
 
         <div>
           <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="name">
-            Name
+            Image Title <span className="text-gray-600">(optional)</span>
           </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
@@ -78,7 +78,7 @@ function PostPartySubmission() {
 
         <div>
           <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="description">
-            Description
+            Image Description (optional)
           </label>
 
           <input

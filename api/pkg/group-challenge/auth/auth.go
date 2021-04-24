@@ -98,7 +98,7 @@ func parseToken(token string) (string, string, error) {
 		return "", "", errors.New("token is not base64 encoded")
 	}
 
-	usernamePasswordArr := strings.Split(string(usernamePassword), ":")
+	usernamePasswordArr := strings.SplitN(string(usernamePassword), ":", 2)
 	if len(usernamePasswordArr) != 2 {
 		return "", "", errors.New("token is invalid")
 	}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 	"github.com/gofrs/uuid"
 	"github.com/xis/baraka/v2"
 )
@@ -40,32 +41,16 @@ func partiesHandler(c *gin.Context) {
 	c.JSON(200, parties)
 }
 
-func requestBodyToParty(c *gin.Context) *models.Party {
-	_session, _ := c.Get("session")
-	session := _session.(*models.Session)
-
-	// TODO validation
-	body := partyRequestBody{}
-	c.BindJSON(&body)
-
-	imageUUID, _ := uuid.NewV4()
-
-	return &models.Party{
-		Name:        body.Name,
-		Slug:        body.Name, // TODO escape name
-		UserID:      session.User,
-		Description: body.Description,
-		Category:    body.Category,
-		StartDate:   body.StartDate,
-		EndDate:     body.EndDate,
-		ImageID:     imageUUID, // TODO
-	}
-}
-
 func addPartyHandler(c *gin.Context) {
-	party := requestBodyToParty(c)
+	party, err := requestBodyToParty(c, con, true)
 
-	err := party.Insert(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	err = party.Insert(con)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(500)
@@ -217,16 +202,13 @@ func partyByIDHandler(c *gin.Context) {
 }
 
 func editPartyByIDHandler(c *gin.Context) {
-	partyID, ok := c.Params.Get("id")
-	if !ok {
+	party, err := requestBodyToParty(c, con, false)
+	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	party := requestBodyToParty(c)
-	party.ID, _ = uuid.FromString(partyID)
-
-	err := party.Update(con)
+	err = party.Update(con)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusInternalServerError)
@@ -255,6 +237,43 @@ func parseParty(c *gin.Context) (*models.Party, error) {
 	uuid, err := parseFormId(c, "id")
 	party.ID = uuid
 	return party, err
+}
+
+// TODO: better validation
+func requestBodyToParty(c *gin.Context, con *pg.DB, isNew bool) (*models.Party, error) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+
+	party := &models.Party{}
+	if !isNew {
+		partyID, err := parseFormId(c, "id")
+		if err != nil {
+			return nil, err
+		}
+
+		party.ID = partyID
+		party.Select(con)
+	}
+
+	body := partyRequestBody{}
+	c.BindJSON(&body)
+
+	imageUUID, _ := uuid.NewV4()
+
+	party.Name = body.Name
+	party.Slug = body.Name // TODO escape name
+	party.Description = body.Description
+	party.Category = body.Category
+	party.StartDate = body.StartDate
+	party.EndDate = body.EndDate
+	party.ImageID = imageUUID // TODO
+
+	// not editable, only applies to new parties
+	if party.UserID == uuid.Nil {
+		party.UserID = session.User
+	}
+
+	return party, nil
 }
 
 func readFormData(c *gin.Context, key string, meta interface{}) (*baraka.Part, error) {

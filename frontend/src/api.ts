@@ -130,13 +130,11 @@ export async function signOut(): Promise<boolean> {
   return response.status === 200;
 }
 
-export async function signUp(username: string, password: string, email: string): Promise<UserSession | undefined> {
-  const response = await fetch(`${AUTH_URL}/register`, {
+export async function signUp(user: {username: string, password: string, email: string}): Promise<Response> {
+  return await fetch(`${AUTH_URL}/register`, {
     method: 'POST',
-    body: JSON.stringify({ username, password, email }),
+    body: JSON.stringify(user),
   });
-
-  return response.status === 200 ? response.json() : undefined;
 }
 
 export async function createParty({

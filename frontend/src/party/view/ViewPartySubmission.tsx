@@ -8,6 +8,7 @@ import Timer from '../../components/Timer';
 export interface ViewPartySubmissionProps {
   partySubmission: PartySubmissionResponse;
   partyStatus: PartyStatusResponse;
+  numSubmissions: number;
   onDone?: (rating: number) => any;
   onRating?: (rating: number) => any;
 }
@@ -15,7 +16,13 @@ export interface ViewPartySubmissionProps {
 // const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡'];
 // <ReactionPicker reactions={REACTIONS} />
 
-function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }: ViewPartySubmissionProps) {
+function ViewPartySubmission({
+  partySubmission,
+  partyStatus,
+  numSubmissions,
+  onDone,
+  onRating,
+}: ViewPartySubmissionProps) {
   const [rating, setRating] = useState(0);
   const [done, setDone] = useState(false);
   const onTimer = useCallback(() => {
@@ -36,7 +43,7 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
           startAt={new Date(partyStatus.current!.startTime)}
           onFinish={onTimer}
         />
-        <div className="bg-gray-100">
+        <div className="bg-gray-100 relative">
           <a href={getImageUrl(partySubmission.imageId)} target="_blank" rel="noopener noreferrer">
             <img
               className="object-contain w-full rounded"
@@ -51,14 +58,21 @@ function ViewPartySubmission({ partySubmission, onDone, onRating, partyStatus }:
 
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
-            <h3 className="text-2xl font-medium text-gray-900">{partySubmission.name}</h3>
-            <p className="text-gray-600">{partySubmission.description}</p>
+            <h3 className="text-2xl font-medium text-gray-900">
+              <span className="text-gray-800 text-xl">{(partyStatus.current?.index ?? 0) + 1}</span>
+              <span className="text-gray-400 ml-2 mr-2 text-xl">of</span>
+              <span className="text-gray-800 text-xl">{numSubmissions}</span>
+            </h3>
+            <p>
+              <span className="text-gray-800 text-xl mr-4">{partySubmission.name}</span>
+              <span className="text-gray-600">{partySubmission.description}</span>
+            </p>
           </div>
           <div className="flex justify-center flex-col items-start">
             <StarRating stars={5} onRating={setRating} disabled={done} />
             <div className="mt-4">
               <span className="text-gray-600 text-xl">{partyStatus.current!.votes.length}</span>
-              <span className="text-gray-300 ml-2 mr-2 text-xl">/</span>
+              <span className="text-gray-400 ml-2 mr-2 text-xl">/</span>
               <span className="text-gray-800 text-2xl">{partyStatus.participants}</span>
               <span className="text-gray-600 ml-4 text-xl">votes</span>
             </div>

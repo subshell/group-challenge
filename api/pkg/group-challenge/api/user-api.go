@@ -2,8 +2,8 @@ package api
 
 import (
 	"group-challenge/pkg/group-challenge/auth"
-	"group-challenge/pkg/group-challenge/ws"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,11 +14,17 @@ type userSession struct {
 	Token    string `json:"token"`
 }
 
+type userSignUpRequestBody struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
 func registerHandler(c *gin.Context) {
 	body := userSignUpRequestBody{}
 	c.BindJSON(&body)
 
-	if body.Username == "" || body.Password == "" {
+	if !isUserValid(&body) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "invalid user data",
 		})
@@ -26,18 +32,24 @@ func registerHandler(c *gin.Context) {
 	}
 
 	user := auth.CreateUser(body.Username, body.Password, body.Email)
-	user.Insert(con)
-	c.JSON(200, user)
-}
 
-func createWsHandler() gin.HandlerFunc {
-	hub := ws.NewHub()
-	go hub.Run()
-	go hub.LogClients()
-
-	return func(c *gin.Context) {
-		ws.ServeWs(hub, c.Writer, c.Request)
+	if err := user.SelectByUsername(con); err == nil {
+		c.AbortWithStatusJSON(422, gin.H{
+			"error": "user already exists up error",
+		})
+		return
 	}
+
+	err := user.Insert(con)
+
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": "sign up error",
+		})
+		return
+	}
+
+	c.JSON(200, user)
 }
 
 func signinHandler(c *gin.Context) {
@@ -65,8 +77,16 @@ func signoutHandler(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-type userSignUpRequestBody struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
+var usernameRegex = regexp.MustCompile("^[a-zA-Z0-9]+$")
+
+func isUserValid(user *userSignUpRequestBody) bool {
+	if len(user.Password) < 2 || len(user.Username) < 2 {
+		return false
+	}
+
+	if !usernameRegex.Match([]byte(user.Username)) {
+		return false
+	}
+
+	return true
 }

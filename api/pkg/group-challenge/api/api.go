@@ -5,6 +5,7 @@ import (
 	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/liveparty"
+	"group-challenge/pkg/group-challenge/ws"
 	"path"
 	"time"
 
@@ -61,6 +62,16 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 		}
 
 		v1.GET("ws", createWsHandler())
+	}
+}
+
+func createWsHandler() gin.HandlerFunc {
+	hub := ws.NewHub()
+	go hub.Run()
+	go hub.LogClients()
+
+	return func(c *gin.Context) {
+		ws.ServeWs(hub, c.Writer, c.Request)
 	}
 }
 

@@ -11,14 +11,16 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
   const { refetch } = useParty(partyId);
 
   const onDeleteSubmission = async () => {
-    await mutateAsync({
-      partyId,
-      sessionToken: session!.token,
-      submissionId: partySubmission.id,
-    });
-    await refetch();
-
-    toast(`Removed submission ${partySubmission.name}`, { type: 'success' });
+    const result = window.confirm(`Are you sure you want to delete your submission ${partySubmission.name}?`);
+    if (result) {
+      toast.info(`Submission ${partySubmission.name} has been deleted`);
+      await mutateAsync({
+        partyId,
+        sessionToken: session!.token,
+        submissionId: partySubmission.id,
+      });
+      await refetch();
+    }
   };
 
   return (
