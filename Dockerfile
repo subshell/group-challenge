@@ -9,7 +9,7 @@ RUN make go-build-for-docker
 #########
 
 # React Frontend
-FROM node:15.10-alpine AS react-builder
+FROM node:16-alpine AS react-builder
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
