@@ -148,16 +148,10 @@ func (submission *PartySubmission) Update(con *pg.DB) error {
 
 // GetAllParties returns all parties
 func GetAllParties(parties *[]*Party, con *pg.DB) error {
-	err := con.Model(parties).Column("id").Limit(200).Select()
+	err := con.Model(parties).Limit(200).Select()
 
 	if err != nil {
 		return err
-	}
-
-	for _, party := range *parties {
-		if err = party.Select(con); err != nil {
-			return err
-		}
 	}
 
 	return nil

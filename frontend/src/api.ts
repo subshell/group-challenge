@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
 import useWebSocket from 'react-use-websocket';
-import { PartyResponse, PartyStatusResponse, PartySubmissionFormData, UserSession, WSEvent } from './api-models';
+import {
+  PartyResponse,
+  PartyStatusResponse,
+  PartySubmissionFormData,
+  UserResponse,
+  UserSession,
+  WSEvent,
+} from './api-models';
 import { PartyFormData } from './party/PartyForm';
 import { useSession } from './user/session';
 
@@ -103,13 +110,15 @@ function useCreateApiHook<T>({
 export const useParties = () => useCreateApiHook<PartyResponse[]>({ queryKey: ['parties'] });
 export const useParty = (id: string) => useCreateApiHook<PartyResponse>({ queryKey: ['parties', id] });
 export const usePartyStatus = (id: string) => {
-  // invalidate based on websockets
+  // TODO: invalidate based on websockets
   const useQueryHook = useCreateApiHook<PartyStatusResponse>({
     queryKey: ['parties', id, 'live', 'status'],
     options: { refetchInterval: 3000 },
   });
   return useQueryHook;
 };
+export const useUsers = () => useCreateApiHook<UserResponse[]>({ queryKey: ['users'] });
+export const useUser = (id: string) => useCreateApiHook<UserResponse>({ queryKey: ['users', id] });
 
 // other stuff
 

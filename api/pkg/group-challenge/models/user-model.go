@@ -27,6 +27,16 @@ type Session struct {
 // user
 //////////
 
+func GetAllUsers(users *[]*User, con *pg.DB) error {
+	err := con.Model(users).Limit(200).Select()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Insert inserts a new user into the databse
 func (user *User) Insert(con *pg.DB) (err error) {
 	_, err = con.Model(user).Insert()
@@ -35,7 +45,7 @@ func (user *User) Insert(con *pg.DB) (err error) {
 
 // Select selects the user by its user id
 func (user *User) Select(con *pg.DB) (err error) {
-	err = con.Model(user).Select()
+	err = con.Model(user).Where("id = ?0", user.ID).Select()
 	return
 }
 

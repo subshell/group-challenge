@@ -6,7 +6,7 @@ import { deleteParty, editParty, useParty } from '../../api';
 import { PartyResponse } from '../../api-models';
 import { useSession } from '../../user/session';
 import PartyForm, { PartyFormData } from '../PartyForm';
-import PartySubmissions from './PartySubmissions';
+import PartySubmissions from '../submissions/PartySubmissions';
 
 function EditParty() {
   const [session] = useSession();

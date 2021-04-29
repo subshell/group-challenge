@@ -1,8 +1,8 @@
 import { useParams } from 'react-router';
 import { useParty, usePartyStatus } from '../../api';
 import { useSession } from '../../user/session';
-import PartySubmissions from '../edit/PartySubmissions';
-import PostPartySubmission from '../submissions/PostPartySubmission';
+import PartySubmissions from './PartySubmissions';
+import PostPartySubmission from './PostPartySubmission';
 
 function OwnSubmissions() {
   const [session] = useSession();

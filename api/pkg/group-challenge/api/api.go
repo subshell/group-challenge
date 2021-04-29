@@ -61,6 +61,11 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 		{
 			image.GET("/:imageId", serveImageHandler)
 		}
+		user := v1.Group("/users")
+		{
+			user.GET("", usersHandler)
+			user.GET("/:id", userByIdHandler)
+		}
 
 		v1.GET("ws", createWsHandler())
 	}

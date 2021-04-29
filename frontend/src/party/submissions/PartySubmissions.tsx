@@ -1,7 +1,7 @@
 import { FaTrash } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
-import { deleteSubmission, getImageUrl, useParty, usePartyStatus } from '../../api';
+import { deleteSubmission, getImageUrl, useParty, usePartyStatus, useUser } from '../../api';
 import { PartySubmissionResponse } from '../../api-models';
 import { useSession } from '../../user/session';
 
@@ -10,6 +10,7 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
   const { mutateAsync } = useMutation(deleteSubmission);
   const { data: party, refetch } = useParty(partyId);
   const { data: partyStatus } = usePartyStatus(partyId);
+  const { data: user } = useUser(partySubmission.userId);
 
   const deletionDisabled = partyStatus?.isLive || party?.done;
 
@@ -32,16 +33,20 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
 
   return (
     <div className="p-4">
-      <div className="bg-gray-100 w-96 p-6 rounded-lg">
-        <img className="rounded w-full mb-6" src={getImageUrl(partySubmission.imageId)} alt={partySubmission.name} />
-        <h3 className="tracking-widest text-indigo-500 text-xs font-medium title-font">From: (...)</h3>
-        <h2 className="text-lg text-gray-900 font-medium title-font mb-4">{partySubmission.name}</h2>
-        <p className="leading-relaxed text-base">{partySubmission.description}</p>
-        {!deletionDisabled && (
-          <button className="bg-red-800 hover:bg-red-400 text-white py-2 px-4 rounded" onClick={onDeleteSubmission}>
-            <FaTrash />
-          </button>
-        )}
+      <div className="bg-gray-100 w-96 rounded-lg">
+        <img className="rounded w-full" src={getImageUrl(partySubmission.imageId)} alt={partySubmission.name} />
+        <div className="p-6">
+          <span className="flex space-x-4">
+            <span className="font-bold mb-4">{partySubmission.name || '-'}</span>
+            <span className="text-gray-700">by {user?.username}</span>
+          </span>
+          <p className="leading-relaxed text-base">{partySubmission.description}</p>
+          {!deletionDisabled && (
+            <button className="bg-red-800 hover:bg-red-400 text-white py-2 px-4 rounded" onClick={onDeleteSubmission}>
+              <FaTrash />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

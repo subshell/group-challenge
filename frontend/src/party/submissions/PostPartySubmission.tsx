@@ -45,7 +45,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
 
   return (
     <div>
-      <h1 className="text-2xl">Submit a new entry to {party.name}</h1>
+      <h1 className="text-2xl mb-8">Submit a new entry to {party.name}</h1>
 
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div>

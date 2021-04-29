@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"group-challenge/pkg/group-challenge/models"
 	"net/http"
@@ -29,8 +28,8 @@ type partySubmissionRequestBody struct {
 }
 
 func partiesHandler(c *gin.Context) {
-	parties := &[]*models.Party{}
-	err := models.GetAllParties(parties, con)
+	parties := []*models.Party{}
+	err := models.GetAllParties(&parties, con)
 
 	if err != nil {
 		fmt.Println(err)
@@ -264,18 +263,6 @@ func editPartyByIDHandler(c *gin.Context) {
 }
 
 // helper functions
-
-func parseFormId(c *gin.Context, idKey string) (uuid.UUID, error) {
-	id, ok := c.Params.Get(idKey)
-	if !ok {
-		return uuid.Nil, errors.New("no such id in parameters")
-	}
-	parsedUUID, err := uuid.FromString(id)
-	if err != nil {
-		return uuid.Nil, err
-	}
-	return parsedUUID, nil
-}
 
 func parseParty(c *gin.Context) (*models.Party, error) {
 	var party = &models.Party{}

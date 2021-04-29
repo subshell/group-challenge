@@ -28,7 +28,7 @@ function PartyList() {
         ))}
       </div>
 
-      <h1 className="text-2xl mt-20">📚 Archive</h1>
+      <h1 className="text-2xl mt-20 pl-4">📚 Archive</h1>
 
       <div className="flex flex-wrap">
         {closedParties.map((party) => (

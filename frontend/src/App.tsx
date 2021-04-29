@@ -11,7 +11,7 @@ import CreateParty from './party/create/CreateParty';
 import { toast, ToastContainer } from 'react-toastify';
 import { RequestError, useParties } from './api';
 import { useEffect } from 'react';
-import OwnSubmissions from './party/own-submissions/OwnSubmissions';
+import OwnSubmissions from './party/submissions/OwnSubmissions';
 
 function WithUser() {
   const parties = useParties();

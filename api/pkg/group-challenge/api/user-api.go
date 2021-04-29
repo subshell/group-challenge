@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"group-challenge/pkg/group-challenge/auth"
+	"group-challenge/pkg/group-challenge/models"
 	"net/http"
 	"regexp"
 
@@ -76,6 +78,32 @@ func signoutHandler(c *gin.Context) {
 	sessionStore.DeleteSession(c)
 	c.Status(http.StatusOK)
 }
+
+func usersHandler(c *gin.Context) {
+	users := []*models.User{}
+	models.GetAllUsers(&users, con)
+	c.JSON(200, users)
+}
+
+func userByIdHandler(c *gin.Context) {
+	var user = &models.User{}
+	uuid, err := parseFormId(c, "id")
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	user.ID = uuid
+	err = user.Select(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(500)
+		return
+	}
+	c.JSON(200, user)
+}
+
+// helper functions
 
 var usernameRegex = regexp.MustCompile("^[a-zA-Z0-9]+$")
 
