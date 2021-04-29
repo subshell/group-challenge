@@ -26,8 +26,9 @@ function EditParty() {
   };
 
   const onSubmit = async (partyFormData: PartyFormData) => {
-    const party = await mutatePartyAsync({ party: partyFormData, partyId: id, sessionToken: session!.token });
-    toast(`party '${party.name}' edited 😁`, { type: 'success' });
+    toast.success(`party '${partyFormData.name}' edited 😁`);
+    await mutatePartyAsync({ party: partyFormData, partyId: id, sessionToken: session!.token });
+    history.push('/');
   };
 
   useEffect(() => {

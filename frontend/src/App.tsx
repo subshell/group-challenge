@@ -11,7 +11,6 @@ import CreateParty from './party/create/CreateParty';
 import { toast, ToastContainer } from 'react-toastify';
 import { RequestError, useParties } from './api';
 import { useEffect } from 'react';
-import PostPartySubmission from './party/submissions/PostPartySubmission';
 import OwnSubmissions from './party/own-submissions/OwnSubmissions';
 
 function WithUser() {
@@ -36,9 +35,6 @@ function WithUser() {
       </Route>
       <Route path="/party/view/:id">
         <ViewParty />
-      </Route>
-      <Route path="/party/post/:id">
-        <PostPartySubmission />
       </Route>
       <Route path="/party/edit/:id">
         <EditParty />
@@ -93,7 +89,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <Navigation />
           <ToastContainer position="bottom-right" />
-          <div className="container mx-auto">{session ? <WithUser /> : <WithoutUser />}</div>
+          <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
         </QueryClientProvider>
       </Router>
     </div>

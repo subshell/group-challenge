@@ -130,7 +130,7 @@ export async function signOut(): Promise<boolean> {
   return response.status === 200;
 }
 
-export async function signUp(user: {username: string, password: string, email: string}): Promise<Response> {
+export async function signUp(user: { username: string; password: string; email: string }): Promise<Response> {
   return await fetch(`${AUTH_URL}/register`, {
     method: 'POST',
     body: JSON.stringify(user),
@@ -199,6 +199,21 @@ export async function joinParty({
       'X-AuthToken': sessionToken,
     },
   }).then((r) => r.json());
+}
+
+export async function reopenParty({
+  partyId,
+  sessionToken,
+}: {
+  partyId: string;
+  sessionToken: string;
+}): Promise<Response> {
+  return await fetch(`${API_URL}/parties/${partyId}/reopen`, {
+    method: 'POST',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  });
 }
 
 export async function deleteParty({

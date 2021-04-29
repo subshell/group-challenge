@@ -3,7 +3,7 @@ import { useParties } from '../api';
 import PartiesOverviewItem from './PartyListItem';
 
 function PartyList() {
-  const { data: parties, isError, isLoading } = useParties();
+  const { data: parties, isError, isLoading, refetch } = useParties();
 
   if (isError) return <p>ERROR!</p>;
   if (isLoading) return <p>loading parties...</p>;
@@ -21,16 +21,18 @@ function PartyList() {
   const closedParties = reversedParties.filter((party) => party.done);
 
   return (
-    <div className="container px-5 pt-5 mx-auto">
-      <div className="my-8 divide-y-2 divide-gray-100">
+    <div className="container mx-auto">
+      <div className="my-8 flex flex-wrap">
         {openAndLiveParties.map((party) => (
-          <PartiesOverviewItem key={party.id} partyId={party.id} />
+          <PartiesOverviewItem key={party.id} partyId={party.id} onPartyChange={refetch} />
         ))}
       </div>
-      <div className="my-8 divide-y-2 divide-gray-100">
-        <h1 className="text-lg">Closed Parties</h1>
+
+      <h1 className="text-2xl mt-20">📚 Archive</h1>
+
+      <div className="flex flex-wrap">
         {closedParties.map((party) => (
-          <PartiesOverviewItem key={party.id} partyId={party.id} />
+          <PartiesOverviewItem key={party.id} partyId={party.id} onPartyChange={refetch} />
         ))}
       </div>
     </div>

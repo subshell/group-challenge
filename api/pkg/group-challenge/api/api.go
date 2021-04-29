@@ -33,6 +33,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			party.GET("/:id", partyByIDHandler)
 			party.POST("/:id", editPartyByIDHandler)
 			party.DELETE("/:id", deletePartyHandler)
+			party.POST("/:id/reopen", reopenPartyHandler)
 
 			submissions := party.Group("/:id/submissions")
 			{

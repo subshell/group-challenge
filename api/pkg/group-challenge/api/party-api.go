@@ -60,6 +60,43 @@ func addPartyHandler(c *gin.Context) {
 	c.JSON(200, party)
 }
 
+func reopenPartyHandler(c *gin.Context) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+	partyID, err := parseFormId(c, "id")
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	party := &models.Party{
+		ID: partyID,
+	}
+	party.Select(con)
+
+	if party.UserID != session.User {
+		c.Status(403)
+		return
+	}
+
+	if !party.Done {
+		c.Status(400)
+		return
+	}
+
+	party.Done = false
+	livePartyHub.RemoveLiveParty(partyID)
+
+	err = party.Update(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(500)
+		return
+	}
+
+	c.JSON(200, party)
+}
+
 func deletePartyHandler(c *gin.Context) {
 	_session, _ := c.Get("session")
 	session := _session.(*models.Session)
@@ -79,6 +116,7 @@ func deletePartyHandler(c *gin.Context) {
 		return
 	}
 
+	livePartyHub.RemoveLiveParty(partyID)
 	err = party.Delete(con)
 	if err != nil {
 		fmt.Println(err)
@@ -135,6 +173,13 @@ func addPartySubmissionHandler(c *gin.Context) {
 		return
 	}
 
+	// verify if a new submission is still allowed
+	liveParty, livePartyExists := livePartyHub.GetLiveParty(party.ID)
+	if party.Done || (livePartyExists && liveParty.Status.IsLive) {
+		c.Status(400)
+		return
+	}
+
 	var meta = &partySubmissionRequestBody{}
 	uploadedImage, err := readFormData(c, "image", meta)
 	if err != nil {
@@ -142,14 +187,14 @@ func addPartySubmissionHandler(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
+
+	// TODO check mime types
 	mimeType, err := GetFileContentType(&uploadedImage.Content)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
-
-	fmt.Println(mimeType)
 
 	image := &models.Image{
 		ImageData:     uploadedImage.Content,

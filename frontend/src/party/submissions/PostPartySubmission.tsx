@@ -2,18 +2,16 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUpload } from 'react-icons/fa';
 import { useMutation } from 'react-query';
-import { useHistory, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { addSubmission, useParty } from '../../api';
-import { PartySubmissionFormData } from '../../api-models';
+import { addSubmission } from '../../api';
+import { PartyResponse, PartySubmissionFormData } from '../../api-models';
 import { useSession } from '../../user/session';
 
-function PostPartySubmission() {
+function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();
-  const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const [imgPrevSrc, setImgPrevSrc] = useState<string | undefined>();
-  const party = useParty(id);
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
 
@@ -30,22 +28,24 @@ function PostPartySubmission() {
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [form, setImgPrevSrc, files]);
+  }, [setImgPrevSrc, files]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
-    await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
-    form.reset();
+    try {
+      await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
+    } catch {
+      toast.error('Submission failed, is the party over or live?');
+      return;
+    }
     setImgPrevSrc(undefined);
-    history.push(`/party/my-submissions/${id}`);
+    form.reset();
     toast('Your submission has been added!');
+    afterUpload?.();
   };
-
-  if (party.isError) return <p>Error</p>;
-  if (party.isLoading || party.isIdle) return <p>Loading...</p>;
 
   return (
     <div>
-      <h1 className="text-xl">Submit a new entry to {party.data.name}</h1>
+      <h1 className="text-2xl">Submit a new entry to {party.name}</h1>
 
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div>
@@ -88,9 +88,9 @@ function PostPartySubmission() {
         </div>
 
         <input
-          className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:opacity-75 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           value="Submit"
-          disabled={form.formState.isSubmitting}
+          disabled={form.formState.isSubmitting || !imgPrevSrc}
           type="submit"
         />
       </form>
