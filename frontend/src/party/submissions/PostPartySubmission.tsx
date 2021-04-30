@@ -28,7 +28,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [setImgPrevSrc, files]);
+  }, [setImgPrevSrc, files?.length]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     try {
