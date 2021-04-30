@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 )
 
 func serveImageHandler(c *gin.Context) {
@@ -19,18 +20,15 @@ func serveImageHandler(c *gin.Context) {
 		return
 	}
 
-	image := &models.Image{
-		ID: imageUUID,
-	}
-
-	if err = image.Select(con); err != nil {
-		fmt.Println(err)
-		c.Status(http.StatusNotFound)
+	image, err := imgCache.load(imageUUID.String())
+	if err != nil {
+		c.Status(500)
 		return
 	}
 
 	c.Header("Content-Type", image.MimeType)
 	c.Header("Content-Length", strconv.Itoa(len(image.ImageData)))
+	c.Header("Cache-Control", "max-age=31536000")
 	if _, err := c.Writer.Write(image.ImageData); err != nil {
 		log.Println("unable to write image.")
 	}
@@ -50,4 +48,17 @@ func GetFileContentType(content *[]byte) (string, error) {
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
+}
+
+func imageLoader(id string) (*models.Image, error) {
+	idAsUUID, _ := uuid.FromString(id)
+	image := &models.Image{
+		ID: idAsUUID,
+	}
+
+	if err := image.Select(con); err != nil {
+		return nil, err
+	}
+
+	return image, nil
 }

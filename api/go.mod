@@ -9,6 +9,7 @@ require (
 	github.com/go-pg/pg/v10 v10.7.7
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/gorilla/websocket v1.4.2
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/spf13/viper v1.7.1
 	github.com/xis/baraka/v2 v2.0.2
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83

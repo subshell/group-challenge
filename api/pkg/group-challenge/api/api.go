@@ -21,6 +21,7 @@ var (
 	sessionStore *auth.PGSessionStore
 	formParser   *baraka.Parser
 	livePartyHub *liveparty.LivePartyHub
+	imgCache     *memoryCache
 )
 
 func configureAPIRouter(router *gin.Engine, con *pg.DB) {
@@ -87,6 +88,7 @@ RunServer starts the server
 func RunServer(serverConfig config.ServerConfig, challengesConfig config.ChallengesConfig, _con *pg.DB) {
 	con = _con
 	livePartyHub = liveparty.CreateLivePartyHub(challengesConfig.LiveParty, con)
+	imgCache = newCache(30*time.Minute, 45*time.Minute, imageLoader)
 
 	// formdata
 	formParser = baraka.DefaultParser()

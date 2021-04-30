@@ -41,7 +41,7 @@ function ViewPartyStartPage({
           </div>
         </>
       )}
-      {!isHost && <div>Wating for party host to press start...</div>}
+      {!isHost && <div>Waiting for party host to press start...</div>}
 
       <div className="flex flex-col items-center space-y-4" title="participants">
         <span className="text-xl font-bold">{participants} participant(s)</span>
