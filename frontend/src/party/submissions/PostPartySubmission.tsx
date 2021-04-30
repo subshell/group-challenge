@@ -15,20 +15,19 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
 
-  const files = form.watch('files');
-  const hasFile = () => !!imgPrevSrc;
+  const file = form.watch('files')?.[0];
+  const hasFile = () => !!file;
 
   useEffect(() => {
-    if (!files || (files && files.length === 0)) {
+    if (!file) {
       return;
     }
-    const file = files[0];
     const reader = new FileReader();
     reader.onload = function (e: ProgressEvent<FileReader>) {
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [setImgPrevSrc, files?.length]);
+  }, [file]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     try {
