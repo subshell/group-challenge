@@ -9,6 +9,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -17,11 +18,13 @@ import (
 )
 
 var (
-	con          *pg.DB
-	sessionStore *auth.PGSessionStore
-	formParser   *baraka.Parser
-	livePartyHub *liveparty.LivePartyHub
-	imgCache     *memoryCache
+	con                      *pg.DB
+	sessionStore             *auth.PGSessionStore
+	formParser               *baraka.Parser
+	livePartyHub             *liveparty.LivePartyHub
+	imgCache                 *ttlcache.Cache
+	maxImageFileSize         = 5 << 20
+	imagesInMemomryCacheSize = 35
 )
 
 func configureAPIRouter(router *gin.Engine, con *pg.DB) {
@@ -88,10 +91,21 @@ RunServer starts the server
 func RunServer(serverConfig config.ServerConfig, challengesConfig config.ChallengesConfig, _con *pg.DB) {
 	con = _con
 	livePartyHub = liveparty.CreateLivePartyHub(challengesConfig.LiveParty, con)
-	imgCache = newCache(30*time.Minute, 45*time.Minute, imageLoader)
+
+	// in-memory image cache
+	imgCache = ttlcache.NewCache()
+	imgCache.SetTTL(time.Duration(8 * time.Hour))
+	imgCache.SetLoaderFunction(imageLoader)
+	imgCache.SetCacheSizeLimit(imagesInMemomryCacheSize)
 
 	// formdata
-	formParser = baraka.DefaultParser()
+	options := baraka.ParserOptions{
+		MaxFileSize:       maxImageFileSize + 1,
+		MaxFileCount:      0,
+		MaxParseCount:     20,
+		MaxAvailableSlice: 2,
+	}
+	formParser = baraka.NewParser(options)
 
 	// router setup
 	router := gin.Default()

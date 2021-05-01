@@ -313,7 +313,7 @@ export async function addSubmission({
   partyId: string;
   submission: PartySubmissionFormData;
   sessionToken: string;
-}): Promise<PartyResponse> {
+}): Promise<Response> {
   const formData = new FormData();
   formData.append('image', submission.files[0]);
   const meta: any = {
@@ -328,5 +328,5 @@ export async function addSubmission({
     headers: {
       'X-AuthToken': sessionToken,
     },
-  }).then((r) => r.json());
+  });
 }

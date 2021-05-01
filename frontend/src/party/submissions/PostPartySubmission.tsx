@@ -8,6 +8,8 @@ import { addSubmission } from '../../api';
 import { PartyResponse, PartySubmissionFormData } from '../../api-models';
 import { useSession } from '../../user/session';
 
+const MAX_FILE_SIZE = 5 << 20;
+
 function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();
   const { id } = useParams<{ id: string }>();
@@ -16,10 +18,11 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
   const { mutateAsync } = useMutation(addSubmission);
 
   const file = form.watch('files')?.[0];
-  const hasFile = () => !!file;
+  const fileTooLarge = file?.size > MAX_FILE_SIZE;
+  const hasPreview = () => !!imgPrevSrc;
 
   useEffect(() => {
-    if (!file) {
+    if (!file || fileTooLarge) {
       return;
     }
     const reader = new FileReader();
@@ -27,15 +30,20 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [file]);
+  }, [file, fileTooLarge]);
 
   const onSubmit = async (data: PartySubmissionFormData) => {
-    try {
-      await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
-    } catch {
+    const req = await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
+    if (req.status === 413) {
+      toast.error('Submission failed: image size too large!');
+      return;
+    }
+
+    if (req.status >= 400 && req.status <= 599) {
       toast.error('Submission failed, is the party over or live?');
       return;
     }
+
     setImgPrevSrc(undefined);
     form.reset();
     toast('Your submission has been added!');
@@ -50,15 +58,22 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
         <div>
           <div className="flex items-center justify-center bg-grey-lighter">
             <label
-              className={`w-64 flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border cursor-pointer hover:bg-blue-500 hover:text-white ${
-                hasFile() ? 'hidden' : 'flex'
+              className={`w-64 flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide border cursor-pointer hover:bg-blue-500 hover:text-white ${
+                hasPreview() ? 'hidden' : 'flex'
               }`}
             >
               <FaUpload size={26} />
-              <span className="mt-2 text-base leading-normal">Select a file</span>
-              <input className="hidden" type="file" accept="image/*" {...form.register('files', { required: true })} />
+              <span className="mt-2 text-base leading-normal uppercase">Select a file</span>
+              <span className="font-light">max {MAX_FILE_SIZE >> 20}MB</span>
+              <input
+                className="hidden"
+                type="file"
+                accept="image/*"
+                {...form.register('files', { required: true, validate: () => !fileTooLarge })}
+              />
+              {fileTooLarge && <span className="font-bold">File too large!</span>}
             </label>
-            <div className="w-96 p-6 rounded-lg" hidden={!hasFile()}>
+            <div className="w-96 p-6 rounded-lg" hidden={!hasPreview()}>
               <img className="rounded w-full mb-6" src={imgPrevSrc} alt="preview" />
             </div>
           </div>
@@ -77,7 +92,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
 
         <div>
           <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="description">
-            Image Description (optional)
+            Image Description <span className="text-gray-600">(optional)</span>
           </label>
 
           <input

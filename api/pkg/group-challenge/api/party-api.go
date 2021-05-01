@@ -181,9 +181,15 @@ func addPartySubmissionHandler(c *gin.Context) {
 
 	var meta = &partySubmissionRequestBody{}
 	uploadedImage, err := readFormData(c, "image", meta)
+
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	if uploadedImage.Size > maxImageFileSize {
+		c.Status(http.StatusRequestEntityTooLarge)
 		return
 	}
 

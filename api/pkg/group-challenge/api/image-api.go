@@ -6,7 +6,9 @@ import (
 	"group-challenge/pkg/group-challenge/models"
 	"log"
 	"net/http"
+	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
@@ -20,18 +22,21 @@ func serveImageHandler(c *gin.Context) {
 		return
 	}
 
-	image, err := imgCache.load(imageUUID.String())
+	_image, err := imgCache.Get(imageUUID.String())
 	if err != nil {
 		c.Status(500)
 		return
 	}
 
+	image := _image.(*models.Image)
 	c.Header("Content-Type", image.MimeType)
 	c.Header("Content-Length", strconv.Itoa(len(image.ImageData)))
 	c.Header("Cache-Control", "max-age=31536000")
 	if _, err := c.Writer.Write(image.ImageData); err != nil {
 		log.Println("unable to write image.")
 	}
+
+	PrintMemUsage()
 }
 
 func GetFileContentType(content *[]byte) (string, error) {
@@ -50,15 +55,28 @@ func GetFileContentType(content *[]byte) (string, error) {
 	return contentType, nil
 }
 
-func imageLoader(id string) (*models.Image, error) {
+func imageLoader(id string) (interface{}, time.Duration, error) {
+	ttl := time.Hour * 8
 	idAsUUID, _ := uuid.FromString(id)
-	image := &models.Image{
+	image := models.Image{
 		ID: idAsUUID,
 	}
+	err := image.Select(con)
+	return &image, ttl, err
+}
 
-	if err := image.Select(con); err != nil {
-		return nil, err
-	}
+// PrintMemUsage outputs the current, total and OS memory being used. As well as the number
+// of garage collection cycles completed.
+func PrintMemUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
 
-	return image, nil
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
 }
