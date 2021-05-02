@@ -7,10 +7,10 @@ import {
   useParty,
   usePartyStatus,
   votePartySubmissions,
-} from '../../api';
+} from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyDoneItem from './ViewPartyDoneItem';
-import { PartySubmissionResponse } from '../../api-models';
+import { PartySubmissionResponse } from '../../api/api-models';
 import Button from '../../components/Button';
 import { useMutation } from 'react-query';
 import { useSession } from '../../user/session';
@@ -34,10 +34,7 @@ function ViewParty() {
 
   const partyUserId = party.data?.userId;
   const currentPartyStatus = party.data && partyStatus.data?.current;
-  const liveStatus = party.data && partyStatus.data?.isLive;
   const submissions = party.data?.submissions;
-  const refetchParty = party.refetch;
-  const refetchStatus = partyStatus.refetch;
 
   useEffect(() => {
     if (!id || !session?.token) {
@@ -48,41 +45,26 @@ function ViewParty() {
   }, [mutateJoinParty, id, session]);
 
   useEffect(() => {
-    console.log('fetch party');
-    refetchParty();
-  }, [refetchParty, currentPartyStatus, liveStatus]);
-
-  useEffect(() => {
     if (!currentPartyStatus || !submissions) return;
     console.log('fetching submission');
     setPartySubmission(submissions[currentPartyStatus.index]);
-    refetchParty();
-  }, [submissions, currentPartyStatus, refetchParty, setPartySubmission]);
-
-  const onSubmissionDone = useCallback(async () => {
-    console.log('submission done');
-    await refetchStatus();
-    await refetchParty();
-  }, [refetchStatus, refetchParty]);
+  }, [submissions, currentPartyStatus, setPartySubmission]);
 
   const onSubmissionRating = useCallback(
     async (rating: number) => {
       if (!rating) return;
       console.log('onRating', rating);
       await mutateVote({ partyId: id, rating, sessionToken: session!.token });
-      await refetchStatus();
     },
-    [session, id, refetchStatus, mutateVote]
+    [session, id, mutateVote]
   );
 
   const onNextButton = async () => {
     await mutateNextSubmission({ partyId: id, sessionToken: session!.token });
-    await refetchStatus();
   };
 
   const onPreviousButton = async () => {
     await mutatePreviousSubmission({ partyId: id, sessionToken: session!.token });
-    await refetchStatus();
   };
 
   if (party.isError || partyStatus.isError) return <span>error</span>;
@@ -111,7 +93,6 @@ function ViewParty() {
           partySubmission={partySubmission}
           partyStatus={partyStatus.data}
           numSubmissions={submissions?.length || 0}
-          onDone={onSubmissionDone}
           onRating={onSubmissionRating}
         />
       )}

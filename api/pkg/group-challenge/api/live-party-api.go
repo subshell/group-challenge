@@ -1,16 +1,36 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"group-challenge/pkg/group-challenge/liveparty"
 	"group-challenge/pkg/group-challenge/models"
+	"group-challenge/pkg/group-challenge/ws"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 )
 
 type voteRequest struct {
 	Rating int `json:"rating"`
+}
+
+func triggerLivePartyWebSocketEvent(partyID uuid.UUID, partyStatus *liveparty.PartyStatus) {
+	wsEvent := &ws.GCWebSocketEvent{
+		Key:       []string{"parties", partyID.String(), "live", "status"},
+		Operation: "update",
+		Data:      partyStatus,
+	}
+
+	if msg, err := json.Marshal(wsEvent); err == nil {
+		wsHub.Broadcast <- msg
+	}
+}
+
+func broadcastPartyStatus(partyID uuid.UUID, partyStatus *liveparty.PartyStatus, c *gin.Context) {
+	triggerLivePartyWebSocketEvent(partyID, partyStatus)
+	c.JSON(200, partyStatus)
 }
 
 func livePartyStatusHandler(c *gin.Context) {
@@ -46,8 +66,9 @@ func livePartyNextHandler(c *gin.Context) {
 
 	// TODO restrict .Next calls
 	liveParty.Next()
-
-	c.JSON(200, liveParty.Status)
+	broadcastPartyStatus(party.ID, liveParty.Status, c)
+	party.Update(con)
+	broadcastParty("update", party, c)
 }
 
 func livePartyPreviousHandler(c *gin.Context) {
@@ -65,8 +86,7 @@ func livePartyPreviousHandler(c *gin.Context) {
 	}
 
 	liveParty.Previous()
-
-	c.JSON(200, liveParty.Status)
+	broadcastPartyStatus(party.ID, liveParty.Status, c)
 }
 
 func livePartyStartHandler(c *gin.Context) {
@@ -106,7 +126,7 @@ func livePartyStartHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, liveParty.Status)
+	broadcastPartyStatus(party.ID, liveParty.Status, c)
 }
 
 func livePartyVoteHandler(c *gin.Context) {
@@ -134,7 +154,7 @@ func livePartyVoteHandler(c *gin.Context) {
 
 	liveParty.Vote(session.User, body.Rating)
 
-	c.JSON(200, liveParty.Status)
+	broadcastPartyStatus(party.ID, liveParty.Status, c)
 }
 
 func livePartyJoinHandler(c *gin.Context) {
@@ -156,5 +176,5 @@ func livePartyJoinHandler(c *gin.Context) {
 
 	liveParty.AddParticipant(&session.User)
 
-	c.JSON(200, liveParty.Status)
+	broadcastPartyStatus(party.ID, liveParty.Status, c)
 }

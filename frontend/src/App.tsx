@@ -9,9 +9,10 @@ import Home from './home/Home';
 import EditProfile from './user/EditProfile';
 import CreateParty from './party/create/CreateParty';
 import { toast, ToastContainer } from 'react-toastify';
-import { RequestError, useParties } from './api';
-import { useEffect } from 'react';
+import { RequestError, useParties } from './api/api';
+import { useEffect, useState } from 'react';
 import OwnSubmissions from './party/submissions/OwnSubmissions';
+import { createWebSocket, WebSocketContext } from './api/api-websockets';
 
 function WithUser() {
   const parties = useParties();
@@ -27,7 +28,7 @@ function WithUser() {
 
   return (
     <Switch>
-      <Route exact path="/">
+      <Route path="/" exact>
         <Home />
       </Route>
       <Route path="/party/create">
@@ -55,7 +56,7 @@ function WithUser() {
 function WithoutUser() {
   return (
     <Switch>
-      <Route exact path="/">
+      <Route path="/" exact>
         <Home />
       </Route>
       <Route path="/signin">
@@ -82,14 +83,17 @@ const queryClient = new QueryClient({
 
 function App() {
   const [session] = useSession();
+  const [webSocket] = useState(createWebSocket);
 
   return (
     <div className="App mb-16">
       <Router>
         <QueryClientProvider client={queryClient}>
-          <Navigation />
-          <ToastContainer position="bottom-right" />
-          <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+          <WebSocketContext.Provider value={{ webSocket }}>
+            <Navigation />
+            <ToastContainer position="bottom-right" />
+            <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+          </WebSocketContext.Provider>
         </QueryClientProvider>
       </Router>
     </div>

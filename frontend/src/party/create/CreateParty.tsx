@@ -1,5 +1,5 @@
 import { useMutation } from 'react-query';
-import { createParty } from '../../api';
+import { createParty } from '../../api/api';
 import { useSession } from '../../user/session';
 import { useHistory } from 'react-router';
 import { toast } from 'react-toastify';

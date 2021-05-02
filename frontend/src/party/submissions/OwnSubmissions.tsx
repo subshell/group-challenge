@@ -1,5 +1,5 @@
 import { useParams } from 'react-router';
-import { useParty, usePartyStatus } from '../../api';
+import { useParty, usePartyStatus } from '../../api/api';
 import { useSession } from '../../user/session';
 import PartySubmissions from './PartySubmissions';
 import PostPartySubmission from './PostPartySubmission';

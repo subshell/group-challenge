@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { FaArrowRight, FaCameraRetro, FaEdit, FaTv } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router';
-import { reopenParty, startParty, useParty, usePartyStatus } from '../api';
+import { reopenParty, startParty, useParty, usePartyStatus } from '../api/api';
 import { useSession } from '../user/session';
 
 function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPartyChange?: () => any }) {

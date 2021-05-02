@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { getImageUrl } from '../../api';
-import { PartyStatusResponse, PartySubmissionResponse } from '../../api-models';
+import { getImageUrl } from '../../api/api';
+import { PartyStatusResponse, PartySubmissionResponse } from '../../api/api-models';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
 

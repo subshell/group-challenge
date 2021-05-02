@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { signIn } from '../api';
+import { signIn } from '../api/api';
 import { useSession } from './session';
 
 function SignInForm() {

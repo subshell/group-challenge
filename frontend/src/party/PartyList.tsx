@@ -1,5 +1,5 @@
 import { FaInfo } from 'react-icons/fa';
-import { useParties } from '../api';
+import { useParties } from '../api/api';
 import PartiesOverviewItem from './PartyListItem';
 
 function PartyList() {
