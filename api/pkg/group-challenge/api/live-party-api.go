@@ -110,14 +110,13 @@ func livePartyStartHandler(c *gin.Context) {
 		return
 	}
 
-	if party.Done {
-		livePartyHub.RemoveLiveParty(party.ID)
-		party.Done = false
-		for _, submission := range party.Submissions {
-			submission.DeleteVotes(con)
-		}
-		party.Update(con)
+	// reset live party
+	livePartyHub.RemoveLiveParty(party.ID)
+	party.Done = false
+	for _, submission := range party.Submissions {
+		submission.DeleteVotes(con)
 	}
+	party.Update(con)
 
 	liveParty, err := livePartyHub.CreateLiveParty(party)
 	if err != nil {
@@ -127,6 +126,7 @@ func livePartyStartHandler(c *gin.Context) {
 	}
 
 	broadcastPartyStatus(party.ID, liveParty.Status, c)
+	broadcastParty("update", party, c)
 }
 
 func livePartyVoteHandler(c *gin.Context) {
@@ -152,6 +152,8 @@ func livePartyVoteHandler(c *gin.Context) {
 		return
 	}
 
+	// ensure user has joined
+	liveParty.AddParticipant(&session.User)
 	liveParty.Vote(session.User, body.Rating)
 
 	broadcastPartyStatus(party.ID, liveParty.Status, c)

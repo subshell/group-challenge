@@ -37,7 +37,15 @@ function useContextWebSocket() {
   return webSocket as WebSocket;
 }
 
-export function useWebSocket(queryKey: string[], onEvent?: WSListener) {
+export function useWebSocket({
+  queryKey,
+  onEvent,
+  includeChildQueryKeys = false,
+}: {
+  queryKey: string[];
+  onEvent?: (e: GCWebSocketEvent, isChild: boolean) => any;
+  includeChildQueryKeys?: boolean;
+}) {
   const queryKeyJSON = JSON.stringify(queryKey);
   const webSocket = useContextWebSocket();
 
@@ -50,9 +58,18 @@ export function useWebSocket(queryKey: string[], onEvent?: WSListener) {
 
   useEffect(() => {
     const wsListener = (msg: MessageEvent<string>) => {
+      const queryKey: string[] = JSON.parse(queryKeyJSON);
       const gcWebSocketEvent = parseWebSocketMsg(msg.data);
-      if (gcWebSocketEvent && JSON.stringify(gcWebSocketEvent.key) === queryKeyJSON) {
-        onEvent?.(gcWebSocketEvent);
+
+      if (!gcWebSocketEvent) {
+        return;
+      }
+
+      const eventQueryKeyJSON = JSON.stringify(gcWebSocketEvent.key);
+      const startsWithChildQueryKey =
+        includeChildQueryKeys && queryKey.every((key, i) => key === gcWebSocketEvent.key[i]);
+      if (eventQueryKeyJSON === queryKeyJSON || startsWithChildQueryKey) {
+        onEvent?.(gcWebSocketEvent, startsWithChildQueryKey);
       }
     };
 
@@ -62,7 +79,7 @@ export function useWebSocket(queryKey: string[], onEvent?: WSListener) {
       console.debug('remove ws listener', queryKeyJSON);
       webSocket.removeEventListener('message', wsListener);
     };
-  }, [webSocket, onEvent, queryKeyJSON]);
+  }, [webSocket, onEvent, queryKeyJSON, includeChildQueryKeys]);
 
   return {
     sendEvent,

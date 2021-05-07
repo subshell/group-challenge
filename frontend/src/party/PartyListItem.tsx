@@ -69,6 +69,8 @@ function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPa
   if (isError) return <span>ERROR</span>;
   if (isLoading || !party) return <span>LOADING</span>;
 
+  party.submissions = party?.submissions ?? [];
+
   return (
     <div className="p-4 xl:w-1/3 md:w-1/2 w-full relative">
       {isLive && (

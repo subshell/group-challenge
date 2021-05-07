@@ -19,50 +19,31 @@ export class RequestError extends Error {
   }
 }
 
-function createPartyUpdater(e: GCWebSocketEvent) {
-  const partyResponse = e.data as PartyResponse;
-  return (parties: PartyResponse[] | undefined) => {
-    const index = (parties ?? []).findIndex((party) => party.id === partyResponse.id);
-    const result: PartyResponse[] = [...(parties ?? [])];
-
-    switch (e.operation ?? 'update') {
-      // TODO
-      case 'add':
-        result.push(partyResponse);
-        break;
-      case 'update':
-        if (index !== -1) result[index] = partyResponse;
-        break;
-      case 'delete':
-        if (index !== -1) result.splice(index, 1);
-        break;
-    }
-
-    return result;
-  };
-}
-
 function useLiveApiHook<T>({
   queryKey,
+  includeChildQueryKeys = false,
   url = `${API_URLS.API}/${queryKey.join('/')}`,
-  options,
+  useQueryOptions,
 }: {
   queryKey: string[];
+  includeChildQueryKeys?: boolean;
   url?: string;
-  options?: UseQueryOptions<T, unknown, T>;
+  useQueryOptions?: UseQueryOptions<T, unknown, T>;
 }) {
-  useUpdateQueryDataFromEvents(queryKey);
-  return useApiHook({ queryKey, url, options });
+  const apiHook = useApiHook({ queryKey, url, useQueryOptions });
+  useUpdateQueryDataFromEvents({ queryKey, includeChildQueryKeys, refetch: apiHook.refetch });
+
+  return apiHook;
 }
 
 function useApiHook<T>({
   queryKey,
   url = `${API_URLS.API}/${queryKey.join('/')}`,
-  options,
+  useQueryOptions,
 }: {
   queryKey: string[];
   url?: string;
-  options?: UseQueryOptions<T, unknown, T>;
+  useQueryOptions?: UseQueryOptions<T, unknown, T>;
 }) {
   const [session] = useSession();
 
@@ -81,30 +62,41 @@ function useApiHook<T>({
 
       return res.json();
     },
-    options
+    useQueryOptions
   );
 }
 
-const useUpdateQueryDataFromEvents = (queryKey: string[]) => {
+const useUpdateQueryDataFromEvents = ({
+  queryKey,
+  includeChildQueryKeys,
+  refetch,
+}: {
+  queryKey: string[];
+  includeChildQueryKeys: boolean;
+  refetch: () => any;
+}) => {
   const queryKeyJSON = JSON.stringify(queryKey);
   const queryClient = useQueryClient();
   const onEvent = useCallback(
-    (e: GCWebSocketEvent) => {
+    (e: GCWebSocketEvent, isChild: boolean) => {
       const queryKey: string[] = JSON.parse(queryKeyJSON);
-      console.log('received ws event:', queryKey.join('/'), e.data);
-      queryClient.setQueryData(queryKey, e.data);
-      if (queryKey.length === 2 && queryKey[0] === 'parties') {
-        queryClient.setQueryData(['parties'], createPartyUpdater(e));
+      console.log('received ws event:', queryKey.join('/'));
+
+      if (isChild) {
+        console.log('refetch list for ' + queryKey);
+        refetch();
+      } else {
+        queryClient.setQueryData(queryKey, e.data);
       }
     },
-    [queryClient, queryKeyJSON]
+    [queryClient, queryKeyJSON, refetch]
   );
-  useWebSocket(queryKey, onEvent);
+  useWebSocket({ queryKey, onEvent, includeChildQueryKeys });
 };
 
 export const getImageUrl = (imageId: string) => `${API_URLS.API}/images/${imageId}`;
 
-export const useParties = () => useApiHook<PartyResponse[]>({ queryKey: ['parties'] });
+export const useParties = () => useLiveApiHook<PartyResponse[]>({ queryKey: ['parties'], includeChildQueryKeys: true });
 export const useParty = (id: string) => useLiveApiHook<PartyResponse>({ queryKey: ['parties', id] });
 export const usePartyStatus = (id: string) =>
   useLiveApiHook<PartyStatusResponse>({ queryKey: ['parties', id, 'live', 'status'] });

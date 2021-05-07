@@ -41,6 +41,7 @@ func triggerPartyWebSocketEvent(operation string, party *models.Party) {
 }
 
 func broadcastParty(operation string, party *models.Party, c *gin.Context) {
+	party.Select(con)
 	triggerPartyWebSocketEvent(operation, party)
 	c.JSON(200, party)
 }
