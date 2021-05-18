@@ -23,7 +23,8 @@ var (
 	formParser               *baraka.Parser
 	livePartyHub             *liveparty.LivePartyHub
 	imgCache                 *ttlcache.Cache
-	maxImageFileSize         = 5 << 20
+	wsHub                    *ws.Hub
+	maxImageFileSize         = 4 << 20
 	imagesInMemomryCacheSize = 35
 )
 
@@ -76,12 +77,12 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 }
 
 func createWsHandler() gin.HandlerFunc {
-	hub := ws.NewHub()
-	go hub.Run()
-	go hub.LogClients()
+	wsHub = ws.NewHub()
+	go wsHub.Run()
+	go wsHub.LogClients(60 * time.Second)
 
 	return func(c *gin.Context) {
-		ws.ServeWs(hub, c.Writer, c.Request)
+		ws.ServeWs(wsHub, c.Writer, c.Request)
 	}
 }
 

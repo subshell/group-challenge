@@ -1,9 +1,16 @@
 package ws
 
 import (
+	"fmt"
 	"log"
 	"time"
 )
+
+type GCWebSocketEvent struct {
+	Key       []string    `json:"key"`
+	Operation string      `json:"operation"`
+	Data      interface{} `json:"data"`
+}
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -12,7 +19,7 @@ type Hub struct {
 	clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	broadcast chan []byte
+	Broadcast chan []byte
 
 	// Register requests from the clients.
 	register chan *Client
@@ -24,7 +31,7 @@ type Hub struct {
 // NewHub create a new ws hub
 func NewHub() *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
+		Broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
@@ -32,9 +39,9 @@ func NewHub() *Hub {
 }
 
 // LogClients logs all clients pericdically
-func (hub *Hub) LogClients() {
+func (hub *Hub) LogClients(tick time.Duration) {
 	func() {
-		for range time.Tick(60 * time.Second) {
+		for range time.Tick(tick) {
 			log.Printf("connected ws clients: %d", len(hub.clients))
 		}
 	}()
@@ -51,7 +58,8 @@ func (hub *Hub) Run() {
 				delete(hub.clients, client)
 				close(client.send)
 			}
-		case message := <-hub.broadcast:
+		case message := <-hub.Broadcast:
+			fmt.Println(string(message))
 			for client := range hub.clients {
 				select {
 				case client.send <- message:

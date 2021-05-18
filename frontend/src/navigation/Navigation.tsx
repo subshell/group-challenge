@@ -1,7 +1,7 @@
 import { FaUserAstronaut } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-import { signOut } from '../api';
+import { signOut } from '../api/api';
 import { useSession } from '../user/session';
 
 function Navigation() {

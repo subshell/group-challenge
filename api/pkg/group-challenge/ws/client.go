@@ -69,7 +69,7 @@ func (c *Client) readPump() {
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 
 		// broadcast to all connected clients
-		c.hub.broadcast <- message
+		c.hub.Broadcast <- message
 	}
 }
 
@@ -99,13 +99,6 @@ func (c *Client) writePump() {
 				return
 			}
 			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
 
 			if err := w.Close(); err != nil {
 				return

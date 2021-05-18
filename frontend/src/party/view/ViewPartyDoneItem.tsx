@@ -1,6 +1,6 @@
 import { FaCrown, FaStar } from 'react-icons/fa';
-import { getImageUrl } from '../../api';
-import { PartyResponse, PartySubmissionResponse } from '../../api-models';
+import { getImageUrl } from '../../api/api';
+import { PartyResponse, PartySubmissionResponse } from '../../api/api-models';
 
 function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
   const totalRating = (submission: PartySubmissionResponse) => submission.votes.reduce((x1, x2) => x1 + x2.rating, 0);

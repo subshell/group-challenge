@@ -1,6 +1,6 @@
 import ReactDatePicker from 'react-datepicker';
 import { Controller, useForm } from 'react-hook-form';
-import { PartyResponse } from '../api-models';
+import { PartyResponse } from '../api/api-models';
 
 export interface PartyFormData {
   name: string;

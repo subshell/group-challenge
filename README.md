@@ -59,7 +59,7 @@ postgresqlPassword: postgres
 postgresqlUsername: postgres
 ```
 
-You definitely want to change the password using `global.postgresql.postgresqlPassword`.
+You definitely want to change the password using `global.postgresql.postgresqlPassword`. You have to install the `pgcrypto` extension manually.
 
 ### GroupChallenge Chart
 

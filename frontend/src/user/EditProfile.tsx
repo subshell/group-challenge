@@ -1,4 +1,4 @@
-import { useUser } from '../api';
+import { useUser } from '../api/api';
 import { useSession } from './session';
 
 function EditProfile() {

@@ -1,75 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useQuery, UseQueryOptions } from 'react-query';
-import useWebSocket from 'react-use-websocket';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient, UseQueryOptions } from 'react-query';
 import {
   PartyResponse,
   PartyStatusResponse,
   PartySubmissionFormData,
   UserResponse,
   UserSession,
-  WSEvent,
+  GCWebSocketEvent,
 } from './api-models';
-import { PartyFormData } from './party/PartyForm';
-import { useSession } from './user/session';
-
-// constants
-
-const API_CUSTOM = {
-  SECURE: false,
-  HOST: 'localhost:8080',
-  PATH: '/_api/v1',
-};
-
-const API_AUTO = {
-  SECURE: window.location.protocol.startsWith('https'),
-  HOST: window.location.host,
-  PATH: '/_api/v1',
-};
-
-// determine api config dynamically
-const API = window.location.host === 'localhost:3000' ? API_CUSTOM : API_AUTO;
-const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
-const AUTH_URL = `${API_URL}/auth`;
-const WS_URL = `${API.SECURE ? 'wss' : 'ws'}://${API.HOST}${API.PATH}/ws`;
-
-export const getImageUrl = (imageId: string) => `${API_URL}/images/${imageId}`;
-
-// api hooks
-
-export function useWSEvents() {
-  const ws = useWebSocket(WS_URL, {
-    onMessage: (msg) => console.log(msg),
-    onOpen: () => console.log('ws session created'),
-    onClose: () => console.log('ws session closed'),
-    onError: (err) => console.error(err),
-    shouldReconnect: (_) => true,
-  });
-  const [lastEvent, setLastEvent] = useState<WSEvent>();
-  const sendEvent = useCallback(
-    (event: WSEvent) => {
-      ws.sendJsonMessage(event);
-    },
-    [ws]
-  );
-  useEffect(() => {
-    if (!ws.getWebSocket()) {
-      return;
-    }
-
-    const webSocket: WebSocket = ws.getWebSocket() as WebSocket;
-    const onMessage = (msg: MessageEvent) => {
-      setLastEvent(JSON.parse(msg.data));
-    };
-    webSocket.addEventListener('message', onMessage);
-
-    return () => webSocket.removeEventListener('message', onMessage);
-  }, [ws]);
-
-  return {
-    sendEvent,
-    lastEvent,
-  };
-}
+import { PartyFormData } from '../party/PartyForm';
+import { useSession } from '../user/session';
+import { API_URLS } from './api-config';
+import { useWebSocket } from './api-websockets';
 
 export class RequestError extends Error {
   constructor(public readonly status: number) {
@@ -77,14 +19,31 @@ export class RequestError extends Error {
   }
 }
 
-function useCreateApiHook<T>({
+function useLiveApiHook<T>({
   queryKey,
-  url = `${API_URL}/${queryKey.join('/')}`,
-  options,
+  includeChildQueryKeys = false,
+  url = `${API_URLS.API}/${queryKey.join('/')}`,
+  useQueryOptions,
+}: {
+  queryKey: string[];
+  includeChildQueryKeys?: boolean;
+  url?: string;
+  useQueryOptions?: UseQueryOptions<T, unknown, T>;
+}) {
+  const apiHook = useApiHook({ queryKey, url, useQueryOptions });
+  useUpdateQueryDataFromEvents({ queryKey, includeChildQueryKeys, refetch: apiHook.refetch });
+
+  return apiHook;
+}
+
+function useApiHook<T>({
+  queryKey,
+  url = `${API_URLS.API}/${queryKey.join('/')}`,
+  useQueryOptions,
 }: {
   queryKey: string[];
   url?: string;
-  options?: UseQueryOptions<T, unknown, T>;
+  useQueryOptions?: UseQueryOptions<T, unknown, T>;
 }) {
   const [session] = useSession();
 
@@ -103,28 +62,50 @@ function useCreateApiHook<T>({
 
       return res.json();
     },
-    options
+    useQueryOptions
   );
 }
 
-export const useParties = () => useCreateApiHook<PartyResponse[]>({ queryKey: ['parties'] });
-export const useParty = (id: string) => useCreateApiHook<PartyResponse>({ queryKey: ['parties', id] });
-export const usePartyStatus = (id: string) => {
-  // TODO: invalidate based on websockets
-  const useQueryHook = useCreateApiHook<PartyStatusResponse>({
-    queryKey: ['parties', id, 'live', 'status'],
-    options: { refetchInterval: 3000 },
-  });
-  return useQueryHook;
-};
-export const useUsers = () => useCreateApiHook<UserResponse[]>({ queryKey: ['users'] });
-export const useUser = (id: string) => useCreateApiHook<UserResponse>({ queryKey: ['users', id] });
+const useUpdateQueryDataFromEvents = ({
+  queryKey,
+  includeChildQueryKeys,
+  refetch,
+}: {
+  queryKey: string[];
+  includeChildQueryKeys: boolean;
+  refetch: () => any;
+}) => {
+  const queryKeyJSON = JSON.stringify(queryKey);
+  const queryClient = useQueryClient();
+  const onEvent = useCallback(
+    (e: GCWebSocketEvent, isChild: boolean) => {
+      const queryKey: string[] = JSON.parse(queryKeyJSON);
+      console.log('received ws event:', queryKey.join('/'));
 
-// other stuff
+      if (isChild) {
+        console.log('refetch list for ' + queryKey);
+        refetch();
+      } else {
+        queryClient.setQueryData(queryKey, e.data);
+      }
+    },
+    [queryClient, queryKeyJSON, refetch]
+  );
+  useWebSocket({ queryKey, onEvent, includeChildQueryKeys });
+};
+
+export const getImageUrl = (imageId: string) => `${API_URLS.API}/images/${imageId}`;
+
+export const useParties = () => useLiveApiHook<PartyResponse[]>({ queryKey: ['parties'], includeChildQueryKeys: true });
+export const useParty = (id: string) => useLiveApiHook<PartyResponse>({ queryKey: ['parties', id] });
+export const usePartyStatus = (id: string) =>
+  useLiveApiHook<PartyStatusResponse>({ queryKey: ['parties', id, 'live', 'status'] });
+export const useUsers = () => useApiHook<UserResponse[]>({ queryKey: ['users'] });
+export const useUser = (id: string) => useApiHook<UserResponse>({ queryKey: ['users', id] });
 
 export async function signIn(username: string, password: string): Promise<UserSession | undefined> {
   const rawHeader = `${username}:${password}`;
-  const response = await fetch(`${AUTH_URL}/signin`, {
+  const response = await fetch(`${API_URLS.AUTH}/signin`, {
     headers: {
       Authorization: `Bearer ${window.btoa(rawHeader)}`,
     },
@@ -135,12 +116,12 @@ export async function signIn(username: string, password: string): Promise<UserSe
 }
 
 export async function signOut(): Promise<boolean> {
-  const response = await fetch(`${AUTH_URL}/signout`, { method: 'POST' });
+  const response = await fetch(`${API_URLS.AUTH}/signout`, { method: 'POST' });
   return response.status === 200;
 }
 
 export async function signUp(user: { username: string; password: string; email: string }): Promise<Response> {
-  return await fetch(`${AUTH_URL}/register`, {
+  return await fetch(`${API_URLS.AUTH}/register`, {
     method: 'POST',
     body: JSON.stringify(user),
   });
@@ -153,7 +134,7 @@ export async function createParty({
   party: PartyFormData;
   sessionToken: string;
 }): Promise<PartyResponse> {
-  return await fetch(`${API_URL}/parties`, {
+  return await fetch(`${API_URLS.API}/parties`, {
     method: 'POST',
     body: JSON.stringify(party),
     headers: {
@@ -171,7 +152,7 @@ export async function editParty({
   partyId: string;
   sessionToken: string;
 }): Promise<PartyResponse> {
-  return await fetch(`${API_URL}/parties/${partyId}`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}`, {
     method: 'POST',
     body: JSON.stringify(party),
     headers: {
@@ -187,7 +168,7 @@ export async function startParty({
   partyId: string;
   sessionToken: string;
 }): Promise<PartyStatusResponse> {
-  return await fetch(`${API_URL}/parties/${partyId}/live/start`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/live/start`, {
     method: 'POST',
     headers: {
       'X-AuthToken': sessionToken,
@@ -202,7 +183,7 @@ export async function joinParty({
   partyId: string;
   sessionToken: string;
 }): Promise<PartyStatusResponse> {
-  return await fetch(`${API_URL}/parties/${partyId}/live/join`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/live/join`, {
     method: 'POST',
     headers: {
       'X-AuthToken': sessionToken,
@@ -217,7 +198,7 @@ export async function reopenParty({
   partyId: string;
   sessionToken: string;
 }): Promise<Response> {
-  return await fetch(`${API_URL}/parties/${partyId}/reopen`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/reopen`, {
     method: 'POST',
     headers: {
       'X-AuthToken': sessionToken,
@@ -232,7 +213,7 @@ export async function deleteParty({
   partyId: string;
   sessionToken: string;
 }): Promise<Response> {
-  return await fetch(`${API_URL}/parties/${partyId}`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}`, {
     method: 'DELETE',
     headers: {
       'X-AuthToken': sessionToken,
@@ -249,7 +230,7 @@ export async function deleteSubmission({
   submissionId: string;
   sessionToken: string;
 }): Promise<Response> {
-  return await fetch(`${API_URL}/parties/${partyId}/submissions/${submissionId}`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/submissions/${submissionId}`, {
     method: 'DELETE',
     headers: {
       'X-AuthToken': sessionToken,
@@ -264,7 +245,7 @@ export async function nextPartySubmissions({
   partyId: string;
   sessionToken: string;
 }): Promise<PartyStatusResponse> {
-  return await fetch(`${API_URL}/parties/${partyId}/live/next`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/live/next`, {
     method: 'POST',
     headers: {
       'X-AuthToken': sessionToken,
@@ -279,7 +260,7 @@ export async function previousPartySubmissions({
   partyId: string;
   sessionToken: string;
 }): Promise<PartyStatusResponse> {
-  return await fetch(`${API_URL}/parties/${partyId}/live/previous`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/live/previous`, {
     method: 'POST',
     headers: {
       'X-AuthToken': sessionToken,
@@ -296,7 +277,7 @@ export async function votePartySubmissions({
   rating: number;
   sessionToken: string;
 }): Promise<PartyStatusResponse> {
-  return await fetch(`${API_URL}/parties/${partyId}/live/vote`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/live/vote`, {
     method: 'POST',
     body: JSON.stringify({ rating }),
     headers: {
@@ -322,7 +303,7 @@ export async function addSubmission({
   delete meta.files;
   formData.append('meta', JSON.stringify(meta));
 
-  return await fetch(`${API_URL}/parties/${partyId}/submissions`, {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/submissions`, {
     method: 'POST',
     body: formData,
     headers: {

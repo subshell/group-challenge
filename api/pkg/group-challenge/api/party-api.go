@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"group-challenge/pkg/group-challenge/models"
+	"group-challenge/pkg/group-challenge/ws"
 	"net/http"
 	"time"
 
@@ -25,6 +26,24 @@ type partySubmissionRequestBody struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	ImageURL    string `json:"imageUrl"`
+}
+
+func triggerPartyWebSocketEvent(operation string, party *models.Party) {
+	wsEvent := &ws.GCWebSocketEvent{
+		Key:       []string{"parties", party.ID.String()},
+		Operation: operation,
+		Data:      party,
+	}
+
+	if msg, err := json.Marshal(wsEvent); err == nil {
+		wsHub.Broadcast <- msg
+	}
+}
+
+func broadcastParty(operation string, party *models.Party, c *gin.Context) {
+	party.Select(con)
+	triggerPartyWebSocketEvent(operation, party)
+	c.JSON(200, party)
 }
 
 func partiesHandler(c *gin.Context) {
@@ -56,7 +75,7 @@ func addPartyHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, party)
+	broadcastParty("add", party, c)
 }
 
 func reopenPartyHandler(c *gin.Context) {
@@ -93,7 +112,7 @@ func reopenPartyHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, party)
+	broadcastParty("update", party, c)
 }
 
 func deletePartyHandler(c *gin.Context) {
@@ -123,7 +142,7 @@ func deletePartyHandler(c *gin.Context) {
 		return
 	}
 
-	c.Status(200)
+	broadcastParty("delete", party, c)
 }
 
 func deletePartySubmissionHandler(c *gin.Context) {
@@ -153,7 +172,7 @@ func deletePartySubmissionHandler(c *gin.Context) {
 				c.Status(500)
 				return
 			}
-			c.Status(200)
+			broadcastParty("update", party, c)
 			return
 		}
 	}
@@ -228,7 +247,7 @@ func addPartySubmissionHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, partySubmission)
+	broadcastParty("update", party, c)
 }
 
 func partyByIDHandler(c *gin.Context) {
@@ -265,7 +284,7 @@ func editPartyByIDHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, party)
+	broadcastParty("update", party, c)
 }
 
 // helper functions

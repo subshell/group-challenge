@@ -4,11 +4,11 @@ import { FaUpload } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { addSubmission } from '../../api';
-import { PartyResponse, PartySubmissionFormData } from '../../api-models';
+import { addSubmission } from '../../api/api';
+import { PartyResponse, PartySubmissionFormData } from '../../api/api-models';
 import { useSession } from '../../user/session';
 
-const MAX_FILE_SIZE = 5 << 20;
+const MAX_FILE_SIZE = 4 << 20;
 
 function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();

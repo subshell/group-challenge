@@ -1,8 +1,8 @@
 import { FaTrash } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
-import { deleteSubmission, getImageUrl, useParty, usePartyStatus, useUser } from '../../api';
-import { PartySubmissionResponse } from '../../api-models';
+import { deleteSubmission, getImageUrl, useParty, usePartyStatus, useUser } from '../../api/api';
+import { PartySubmissionResponse } from '../../api/api-models';
 import { useSession } from '../../user/session';
 
 function PartySubmission({ partyId, partySubmission }: { partyId: string; partySubmission: PartySubmissionResponse }) {

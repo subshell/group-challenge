@@ -64,11 +64,8 @@ export interface UserSession {
 
 // ws models
 
-export type WSEvent = WSRatingEvent;
-
-export interface WSRatingEvent {
-  type: 'rating';
-  data: {
-    rating: number;
-  };
+export interface GCWebSocketEvent {
+  key: string[];
+  operation: 'add' | 'delete' | 'update';
+  data: PartyStatusResponse | PartyResponse;
 }

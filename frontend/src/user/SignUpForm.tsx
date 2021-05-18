@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
-import { signIn, signUp } from '../api';
+import { signIn, signUp } from '../api/api';
 import { useSession } from './session';
 
 interface FormData {
