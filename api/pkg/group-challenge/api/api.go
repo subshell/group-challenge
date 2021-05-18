@@ -24,7 +24,7 @@ var (
 	livePartyHub             *liveparty.LivePartyHub
 	imgCache                 *ttlcache.Cache
 	wsHub                    *ws.Hub
-	maxImageFileSize         = 5 << 20
+	maxImageFileSize         = 4 << 20
 	imagesInMemomryCacheSize = 35
 )
 
