@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/tom-schoener/group-challenge
+  repository: ghcr.io/subshell/group-challenge
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
