@@ -3,6 +3,8 @@ import { createContext, useCallback, useContext, useEffect } from 'react';
 import { API_URLS } from './api-config';
 import { GCWebSocketEvent } from './api-models';
 
+export type EventQueryKeyMatcher = (queryKey: string[], eventQueryKey: string[]) => boolean;
+
 export type WSListener = (wsEvent: GCWebSocketEvent) => any;
 
 export const WebSocketContext = createContext<{ webSocket: WebSocket | null }>({
@@ -40,11 +42,11 @@ function useContextWebSocket() {
 export function useWebSocket({
   queryKey,
   onEvent,
-  includeChildQueryKeys = false,
+  matchesQueryKeyFn,
 }: {
   queryKey: string[];
   onEvent?: (e: GCWebSocketEvent, isChild: boolean) => any;
-  includeChildQueryKeys?: boolean;
+  matchesQueryKeyFn: EventQueryKeyMatcher;
 }) {
   const queryKeyJSON = JSON.stringify(queryKey);
   const webSocket = useContextWebSocket();
@@ -58,18 +60,17 @@ export function useWebSocket({
 
   useEffect(() => {
     const wsListener = (msg: MessageEvent<string>) => {
-      const queryKey: string[] = JSON.parse(queryKeyJSON);
       const gcWebSocketEvent = parseWebSocketMsg(msg.data);
 
       if (!gcWebSocketEvent) {
         return;
       }
 
+      const queryKey: string[] = JSON.parse(queryKeyJSON);
       const eventQueryKeyJSON = JSON.stringify(gcWebSocketEvent.key);
-      const startsWithChildQueryKey =
-        includeChildQueryKeys && queryKey.every((key, i) => key === gcWebSocketEvent.key[i]);
-      if (eventQueryKeyJSON === queryKeyJSON || startsWithChildQueryKey) {
-        onEvent?.(gcWebSocketEvent, startsWithChildQueryKey);
+      const matchesByFn = matchesQueryKeyFn(queryKey, gcWebSocketEvent.key);
+      if (eventQueryKeyJSON === queryKeyJSON || matchesByFn) {
+        onEvent?.(gcWebSocketEvent, matchesByFn);
       }
     };
 
@@ -79,7 +80,7 @@ export function useWebSocket({
       console.debug('remove ws listener', queryKeyJSON);
       webSocket.removeEventListener('message', wsListener);
     };
-  }, [webSocket, onEvent, queryKeyJSON, includeChildQueryKeys]);
+  }, [webSocket, onEvent, queryKeyJSON, matchesQueryKeyFn]);
 
   return {
     sendEvent,

@@ -11,7 +11,7 @@ import {
 import { PartyFormData } from '../party/PartyForm';
 import { useSession } from '../user/session';
 import { API_URLS } from './api-config';
-import { useWebSocket } from './api-websockets';
+import { EventQueryKeyMatcher, useWebSocket } from './api-websockets';
 
 export class RequestError extends Error {
   constructor(public readonly status: number) {
@@ -21,17 +21,17 @@ export class RequestError extends Error {
 
 function useLiveApiHook<T>({
   queryKey,
-  includeChildQueryKeys = false,
+  matchesQueryKeyFn = () => false,
   url = `${API_URLS.API}/${queryKey.join('/')}`,
   useQueryOptions,
 }: {
   queryKey: string[];
-  includeChildQueryKeys?: boolean;
+  matchesQueryKeyFn?: EventQueryKeyMatcher;
   url?: string;
   useQueryOptions?: UseQueryOptions<T, unknown, T>;
 }) {
   const apiHook = useApiHook({ queryKey, url, useQueryOptions });
-  useUpdateQueryDataFromEvents({ queryKey, includeChildQueryKeys, refetch: apiHook.refetch });
+  useUpdateQueryDataFromEvents({ queryKey, matchesQueryKeyFn, refetch: apiHook.refetch });
 
   return apiHook;
 }
@@ -68,11 +68,11 @@ function useApiHook<T>({
 
 const useUpdateQueryDataFromEvents = ({
   queryKey,
-  includeChildQueryKeys,
+  matchesQueryKeyFn,
   refetch,
 }: {
   queryKey: string[];
-  includeChildQueryKeys: boolean;
+  matchesQueryKeyFn: EventQueryKeyMatcher;
   refetch: () => any;
 }) => {
   const queryKeyJSON = JSON.stringify(queryKey);
@@ -91,12 +91,26 @@ const useUpdateQueryDataFromEvents = ({
     },
     [queryClient, queryKeyJSON, refetch]
   );
-  useWebSocket({ queryKey, onEvent, includeChildQueryKeys });
+  useWebSocket({ queryKey, onEvent, matchesQueryKeyFn });
 };
 
 export const getImageUrl = (imageId: string) => `${API_URLS.API}/images/${imageId}`;
 
-export const useParties = () => useLiveApiHook<PartyResponse[]>({ queryKey: ['parties'], includeChildQueryKeys: true });
+export const useParties = () =>
+  useLiveApiHook<PartyResponse[]>({
+    queryKey: ['parties'],
+    matchesQueryKeyFn: (queryKey, eventQueryKey) => {
+      if (eventQueryKey.length === 0 || eventQueryKey[0] !== 'parties') {
+        return false;
+      }
+
+      if (eventQueryKey.length > 2 && eventQueryKey[2] === 'live') {
+        return false;
+      }
+
+      return true;
+    },
+  });
 export const useParty = (id: string) => useLiveApiHook<PartyResponse>({ queryKey: ['parties', id] });
 export const usePartyStatus = (id: string) =>
   useLiveApiHook<PartyStatusResponse>({ queryKey: ['parties', id, 'live', 'status'] });

@@ -46,7 +46,7 @@ function ViewParty() {
 
   useEffect(() => {
     if (!currentPartyStatus || !submissions) return;
-    console.log('fetching submission');
+    console.log('updating submission');
     setPartySubmission(submissions[currentPartyStatus.index]);
   }, [submissions, currentPartyStatus, setPartySubmission]);
 
