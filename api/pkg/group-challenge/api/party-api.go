@@ -40,10 +40,8 @@ func triggerPartyWebSocketEvent(operation string, party *models.Party) {
 	}
 }
 
-func broadcastParty(operation string, party *models.Party, c *gin.Context) {
-	party.Select(con)
+func broadcastParty(operation string, party *models.Party) {
 	triggerPartyWebSocketEvent(operation, party)
-	c.JSON(200, party)
 }
 
 func partiesHandler(c *gin.Context) {
@@ -75,7 +73,9 @@ func addPartyHandler(c *gin.Context) {
 		return
 	}
 
-	broadcastParty("add", party, c)
+	party.Select(con)
+	broadcastParty("add", party)
+	c.JSON(200, party)
 }
 
 func reopenPartyHandler(c *gin.Context) {
@@ -112,7 +112,9 @@ func reopenPartyHandler(c *gin.Context) {
 		return
 	}
 
-	broadcastParty("update", party, c)
+	party.Select(con)
+	broadcastParty("update", party)
+	c.JSON(200, party)
 }
 
 func deletePartyHandler(c *gin.Context) {
@@ -142,7 +144,8 @@ func deletePartyHandler(c *gin.Context) {
 		return
 	}
 
-	broadcastParty("delete", party, c)
+	broadcastParty("delete", party)
+	c.JSON(200, party)
 }
 
 func deletePartySubmissionHandler(c *gin.Context) {
@@ -172,7 +175,10 @@ func deletePartySubmissionHandler(c *gin.Context) {
 				c.Status(500)
 				return
 			}
-			broadcastParty("update", party, c)
+
+			party.Select(con)
+			broadcastParty("update", party)
+			c.JSON(200, party)
 			return
 		}
 	}
@@ -247,7 +253,9 @@ func addPartySubmissionHandler(c *gin.Context) {
 		return
 	}
 
-	broadcastParty("update", party, c)
+	party.Select(con)
+	broadcastParty("update", party)
+	c.JSON(200, party)
 }
 
 func partyByIDHandler(c *gin.Context) {
@@ -284,7 +292,9 @@ func editPartyByIDHandler(c *gin.Context) {
 		return
 	}
 
-	broadcastParty("update", party, c)
+	party.Select(con)
+	broadcastParty("update", party)
+	c.JSON(200, party)
 }
 
 // helper functions

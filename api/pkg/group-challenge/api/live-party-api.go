@@ -28,9 +28,8 @@ func triggerLivePartyWebSocketEvent(partyID uuid.UUID, partyStatus *liveparty.Pa
 	}
 }
 
-func broadcastPartyStatus(partyID uuid.UUID, partyStatus *liveparty.PartyStatus, c *gin.Context) {
+func broadcastPartyStatus(partyID uuid.UUID, partyStatus *liveparty.PartyStatus) {
 	triggerLivePartyWebSocketEvent(partyID, partyStatus)
-	c.JSON(200, partyStatus)
 }
 
 func livePartyStatusHandler(c *gin.Context) {
@@ -66,9 +65,12 @@ func livePartyNextHandler(c *gin.Context) {
 
 	// TODO restrict .Next calls
 	liveParty.Next()
-	broadcastPartyStatus(party.ID, liveParty.Status, c)
+	broadcastPartyStatus(party.ID, liveParty.Status)
 	party.Update(con)
-	broadcastParty("update", party, c)
+	party.Select(con)
+	broadcastParty("update", party)
+
+	c.JSON(200, liveParty.Status)
 }
 
 func livePartyPreviousHandler(c *gin.Context) {
@@ -86,7 +88,8 @@ func livePartyPreviousHandler(c *gin.Context) {
 	}
 
 	liveParty.Previous()
-	broadcastPartyStatus(party.ID, liveParty.Status, c)
+	broadcastPartyStatus(party.ID, liveParty.Status)
+	c.JSON(200, liveParty.Status)
 }
 
 func livePartyStartHandler(c *gin.Context) {
@@ -125,8 +128,10 @@ func livePartyStartHandler(c *gin.Context) {
 		return
 	}
 
-	broadcastPartyStatus(party.ID, liveParty.Status, c)
-	broadcastParty("update", party, c)
+	party.Select(con)
+	broadcastPartyStatus(party.ID, liveParty.Status)
+	broadcastParty("update", party)
+	c.JSON(200, liveParty.Status)
 }
 
 func livePartyVoteHandler(c *gin.Context) {
@@ -156,7 +161,8 @@ func livePartyVoteHandler(c *gin.Context) {
 	liveParty.AddParticipant(&session.User)
 	liveParty.Vote(session.User, body.Rating)
 
-	broadcastPartyStatus(party.ID, liveParty.Status, c)
+	broadcastPartyStatus(party.ID, liveParty.Status)
+	c.JSON(200, liveParty.Status)
 }
 
 func livePartyJoinHandler(c *gin.Context) {
@@ -178,5 +184,6 @@ func livePartyJoinHandler(c *gin.Context) {
 
 	liveParty.AddParticipant(&session.User)
 
-	broadcastPartyStatus(party.ID, liveParty.Status, c)
+	broadcastPartyStatus(party.ID, liveParty.Status)
+	c.JSON(200, liveParty.Status)
 }

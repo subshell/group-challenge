@@ -4,8 +4,13 @@ import { PartyResponse, PartySubmissionResponse } from '../../api/api-models';
 import { ReactComponent as Trophy } from './rewards/trophy.svg';
 
 const totalRating = (submission: PartySubmissionResponse) => submission.votes.reduce((x1, x2) => x1 + x2.rating, 0);
-const avgRating = (submission: PartySubmissionResponse) =>
-  (submission.votes.reduce((x1, x2) => x1 + x2.rating, 0) / submission.votes.length).toFixed(1);
+const avgRating = (submission: PartySubmissionResponse) => {
+  if (submission.votes?.length === 0) {
+    return 0;
+  }
+
+  return (submission.votes.reduce((x1, x2) => x1 + x2.rating, 0) / submission.votes.length).toFixed(1);
+};
 
 function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
   const sortedSubmissions = party.submissions.sort((a, b) => {
