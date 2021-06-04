@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import {
   joinParty,
   nextPartySubmissions,
@@ -9,16 +9,17 @@ import {
   votePartySubmissions,
 } from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
-import ViewPartyDoneItem from './ViewPartyDoneItem';
+import ViewPartyLeaderboard from './ViewPartyLeaderboard';
 import { PartySubmissionResponse } from '../../api/api-models';
 import Button from '../../components/Button';
 import { useMutation } from 'react-query';
 import { useSession } from '../../user/session';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ViewPartyStartPage from './ViewPartyStartPage';
+import ViewPartyReveal from './ViewPartyReveal';
 
-// TODO optimize periodic fetching with WebSockets
 function ViewParty() {
+  const history = useHistory();
   const [session] = useSession();
   const { id } = useParams<{ id: string }>();
 
@@ -35,6 +36,7 @@ function ViewParty() {
   const partyUserId = party.data?.userId;
   const currentPartyStatus = party.data && partyStatus.data?.current;
   const submissions = party.data?.submissions;
+  const partyStatusState = partyStatus.data?.state;
 
   useEffect(() => {
     if (!id || !session?.token) {
@@ -71,11 +73,29 @@ function ViewParty() {
   if (party.isLoading || party.isIdle) return <span>Loading</span>;
   if (partyStatus.isLoading || partyStatus.isIdle) return <span>Loading party status</span>;
 
-  if (party.data.done) {
-    return <ViewPartyDoneItem party={party.data} />;
+  const controlButtons = () => (
+    <>
+      {currentPartyStatus!.index !== partyStatus.data.sequence[0] && (
+        <div className="fixed left-8 top-1/2">
+          <Button onClick={onPreviousButton}>
+            <FaArrowLeft />
+          </Button>
+        </div>
+      )}
+      <div className="fixed right-8 top-1/2">
+        <Button onClick={onNextButton}>
+          <FaArrowRight />
+        </Button>
+      </div>
+    </>
+  );
+
+  if (partyStatusState === 'open') {
+    history.push('/');
+    return null;
   }
 
-  if (!currentPartyStatus) {
+  if (partyStatusState === 'start') {
     return (
       <ViewPartyStartPage
         isHost={session?.userId === partyUserId}
@@ -85,35 +105,37 @@ function ViewParty() {
     );
   }
 
-  return (
-    <div>
-      {partySubmission && (
-        <ViewPartySubmission
-          key={partySubmission.id}
-          partySubmission={partySubmission}
-          partyStatus={partyStatus.data}
-          numSubmissions={submissions?.length || 0}
-          onRating={onSubmissionRating}
-        />
-      )}
-      {session?.userId === partyUserId && (
-        <>
-          {currentPartyStatus.index > 0 && (
-            <div className="fixed left-8 top-1/2">
-              <Button onClick={onPreviousButton}>
-                <FaArrowLeft />
-              </Button>
-            </div>
-          )}
-          <div className="fixed right-8 top-1/2">
-            <Button onClick={onNextButton}>
-              <FaArrowRight />
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
-  );
+  if (partyStatusState === 'submissions') {
+    return (
+      <div>
+        {partySubmission && (
+          <ViewPartySubmission
+            key={partySubmission.id}
+            partySubmission={partySubmission}
+            partyStatus={partyStatus.data}
+            numSubmissions={submissions?.length || 0}
+            onRating={onSubmissionRating}
+          />
+        )}
+        {session?.userId === partyUserId && controlButtons()}
+      </div>
+    );
+  }
+
+  if (partyStatusState === 'reveal') {
+    return (
+      <div>
+        <ViewPartyReveal party={party.data} partyStatus={partyStatus.data} />
+        {session?.userId === partyUserId && controlButtons()}
+      </div>
+    );
+  }
+
+  if (partyStatusState === 'done') {
+    return <ViewPartyLeaderboard party={party.data} />;
+  }
+
+  return <h2>UNKNOWN PARTY STATE: {partyStatusState}</h2>;
 }
 
 export default ViewParty;

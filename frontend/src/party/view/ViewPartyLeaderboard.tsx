@@ -1,21 +1,11 @@
 import { FaMedal, FaStar } from 'react-icons/fa';
 import { getImageUrl } from '../../api/api';
-import { PartyResponse, PartySubmissionResponse } from '../../api/api-models';
+import { PartyResponse } from '../../api/api-models';
 import { ReactComponent as Trophy } from './rewards/trophy.svg';
+import { totalRating, avgRating, sortSubmissions } from './util';
 
-const totalRating = (submission: PartySubmissionResponse) => submission.votes.reduce((x1, x2) => x1 + x2.rating, 0);
-const avgRating = (submission: PartySubmissionResponse) => {
-  if (submission.votes?.length === 0) {
-    return 0;
-  }
-
-  return (submission.votes.reduce((x1, x2) => x1 + x2.rating, 0) / submission.votes.length).toFixed(1);
-};
-
-function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
-  const sortedSubmissions = party.submissions.sort((a, b) => {
-    return totalRating(b) - totalRating(a);
-  });
+function ViewPartyLeaderboard({ party }: { party: PartyResponse }) {
+  const sortedSubmissions = sortSubmissions(party.submissions);
 
   return (
     <section className="text-gray-600 body-font">
@@ -56,4 +46,4 @@ function ViewPartyDoneItem({ party }: { party: PartyResponse }) {
   );
 }
 
-export default ViewPartyDoneItem;
+export default ViewPartyLeaderboard;

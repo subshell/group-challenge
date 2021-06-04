@@ -4,6 +4,7 @@ import { getImageUrl } from '../../api/api';
 import { PartyStatusResponse, PartySubmissionResponse } from '../../api/api-models';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
+import { getCurrentIndex } from './util';
 
 export interface ViewPartySubmissionProps {
   partySubmission: PartySubmissionResponse;
@@ -59,7 +60,7 @@ function ViewPartySubmission({
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
             <h3 className="text-2xl font-medium text-gray-900">
-              <span className="text-gray-800 text-xl">{(partyStatus.current?.index ?? 0) + 1}</span>
+              <span className="text-gray-800 text-xl">{getCurrentIndex(partyStatus) + 1}</span>
               <span className="text-gray-400 ml-2 mr-2 text-xl">of</span>
               <span className="text-gray-800 text-xl">{numSubmissions}</span>
             </h3>

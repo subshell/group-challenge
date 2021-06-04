@@ -2,7 +2,7 @@ import { FaTrash } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
 import { deleteSubmission, getImageUrl, useParty, usePartyStatus, useUser } from '../../api/api';
-import { PartySubmissionResponse } from '../../api/api-models';
+import { isPartyLive, PartySubmissionResponse } from '../../api/api-models';
 import { useSession } from '../../user/session';
 
 function PartySubmission({ partyId, partySubmission }: { partyId: string; partySubmission: PartySubmissionResponse }) {
@@ -12,7 +12,7 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
   const { data: partyStatus } = usePartyStatus(partyId);
   const { data: user } = useUser(partySubmission.userId);
 
-  const deletionDisabled = partyStatus?.isLive || party?.done;
+  const deletionDisabled = isPartyLive(partyStatus) || party?.done;
 
   const onDeleteSubmission = async () => {
     if (deletionDisabled) {

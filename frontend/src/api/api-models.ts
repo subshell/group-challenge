@@ -48,10 +48,15 @@ export interface PartyStatusResponse {
     startTime: string;
     votes: number[];
   };
+  sequence: number[];
   partyStartTime: string;
   submissionTimeMs: number;
   participants: number;
-  isLive: boolean;
+  state: 'open' | 'start' | 'submissions' | 'reveal' | 'done';
+}
+
+export function isPartyLive(partyStatus?: PartyStatusResponse) {
+  return partyStatus?.state !== 'open' && partyStatus?.state !== 'done';
 }
 
 // session

@@ -10,17 +10,27 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+var (
+	LivePartyStateOpen        = "open"
+	LivePartyStateStart       = "start"
+	LivePartyStateSubmissions = "submissions"
+	LivePartyStateReveal      = "reveal"
+	LivePartyStateDone        = "done"
+)
+
 type SubmissionStatus struct {
 	Index     int       `json:"index"`
 	StartTime time.Time `json:"startTime"`
 	Votes     []int     `json:"votes"`
 }
+
 type PartyStatus struct {
 	Current          *SubmissionStatus `json:"current"`
+	Sequence         []int             `json:"sequence"`
 	PartyStartTime   time.Time         `json:"partyStartTime"`
 	SubmissionTimeMs int               `json:"submissionTimeMs"`
 	Participants     int               `json:"participants"`
-	IsLive           bool              `json:"isLive"`
+	State            string            `json:"state"`
 }
 
 type LiveParty struct {
@@ -38,10 +48,11 @@ func createLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.Liv
 	liveParty := &LiveParty{
 		Status: &PartyStatus{
 			Current:          nil,
+			Sequence:         generateRandomSequence(len(party.Submissions)),
 			PartyStartTime:   time.Now(),
 			SubmissionTimeMs: livePartyConfig.DefaultTimePerSubmissionSeconds * 1000,
 			Participants:     1,
-			IsLive:           true,
+			State:            LivePartyStateStart,
 		},
 		ParticipantsUserIDs: []uuid.UUID{party.UserID},
 		Party:               party,
@@ -66,62 +77,10 @@ func CreateNonLivePartyStatus() *PartyStatus {
 	return &PartyStatus{
 		Current:          nil,
 		PartyStartTime:   time.Now(),
+		Sequence:         []int{},
 		SubmissionTimeMs: 0,
 		Participants:     0,
-		IsLive:           false,
-	}
-}
-
-func (liveParty *LiveParty) Stop() {
-	liveParty.Status.Current = nil
-	liveParty.Status.IsLive = false
-	liveParty.Party.Done = true
-
-	// save results to db
-	for _, submission := range liveParty.Party.Submissions {
-		for _, vote := range submission.Votes {
-			submission.AddVote(vote, liveParty.Con)
-		}
-	}
-	liveParty.Party.Update(liveParty.Con)
-}
-
-func (liveParty *LiveParty) Previous() {
-	var previousSubmissionIndex = liveParty.Status.Current.Index - 1
-
-	if previousSubmissionIndex < 0 {
-		return
-	}
-
-	var previousSubmission = liveParty.Party.Submissions[previousSubmissionIndex]
-	var previousRatings = []int{}
-	for _, vote := range previousSubmission.Votes {
-		previousRatings = append(previousRatings, vote.Rating)
-	}
-
-	liveParty.Status.Current = &SubmissionStatus{
-		Index:     previousSubmissionIndex,
-		StartTime: time.Now(),
-		Votes:     previousRatings,
-	}
-}
-
-func (liveParty *LiveParty) Next() {
-	var nextSubmissionIndex = 0
-
-	if liveParty.Status.Current != nil {
-		nextSubmissionIndex = liveParty.Status.Current.Index + 1
-	}
-
-	if len(liveParty.Party.Submissions) == nextSubmissionIndex {
-		liveParty.Stop()
-		return
-	}
-
-	liveParty.Status.Current = &SubmissionStatus{
-		Index:     nextSubmissionIndex,
-		StartTime: time.Now(),
-		Votes:     []int{},
+		State:            LivePartyStateOpen,
 	}
 }
 
