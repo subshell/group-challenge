@@ -65,9 +65,12 @@ func livePartyNextHandler(c *gin.Context) {
 
 	// TODO restrict .Next calls
 	liveParty.Next()
+	party = liveParty.Party
 	broadcastPartyStatus(party.ID, liveParty.Status)
+
 	party.Update(con)
 	party.Select(con)
+
 	broadcastParty("update", party)
 
 	c.JSON(200, liveParty.Status)

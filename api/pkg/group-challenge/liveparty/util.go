@@ -5,15 +5,6 @@ import (
 	"time"
 )
 
-func indexOf(element int, data []int) int {
-	for k, v := range data {
-		if element == v {
-			return k
-		}
-	}
-	return -1
-}
-
 func makeRange(min, max int) []int {
 	a := make([]int, max-min)
 	for i := range a {

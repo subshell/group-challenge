@@ -34,8 +34,8 @@ type Vote struct {
 	tableName    struct{}  `json:"-" pg:"submission_votes,alias:svote"`
 	ID           uuid.UUID `json:"id" pg:"id,pk,type:uuid,default:gen_random_uuid()"`
 	Rating       int       `json:"rating" pg:"rating"`
-	UserID       uuid.UUID `json:"user" pg:"user_id,type:uuid"`
-	SubmissionID uuid.UUID `pg:"submission_id,type:uuid"`
+	UserID       uuid.UUID `json:"userId" pg:"user_id,type:uuid"`
+	SubmissionID uuid.UUID `json:"submissionId" pg:"submission_id,type:uuid"`
 }
 
 type PartySubmission struct {
@@ -140,7 +140,7 @@ func (party *Party) Update(con *pg.DB) error {
 	return err
 }
 
-// Update updates the vote
+// Update updates the submission
 func (submission *PartySubmission) Update(con *pg.DB) error {
 	_, err := con.Model(submission).Where("id = ?0", submission.ID).Update()
 	return err

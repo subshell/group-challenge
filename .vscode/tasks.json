@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "launch-postgres",
+      "command": "docker-compose",
+      "type": "shell",
+      "args": ["up", "--detach"],
+      "presentation": {
+        "reveal": "never"
+      }
+    }
+  ]
+}

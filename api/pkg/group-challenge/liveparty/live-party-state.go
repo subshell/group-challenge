@@ -1,17 +1,16 @@
 package liveparty
 
 import (
-	"fmt"
 	"time"
 )
 
 func (liveParty *LiveParty) Reveal() {
 	liveParty.Status.Current = nil
-	liveParty.Status.State = LivePartyStateReveal
+	liveParty.Status.State = LivePartyStatePreReveal
 
-	// save results to db
+	// save votes to db model
 	for _, submission := range liveParty.Party.Submissions {
-		for _, vote := range submission.Votes {
+		for _, vote := range liveParty.Status.Votes {
 			submission.AddVote(vote, liveParty.Con)
 		}
 	}
@@ -24,70 +23,54 @@ func (liveParty *LiveParty) Stop() {
 }
 
 func (liveParty *LiveParty) Previous() {
-	if liveParty.Status.State == LivePartyStateSubmissions && liveParty.Status.Current != nil && liveParty.Status.Current.Index != liveParty.Status.Sequence[0] {
+	if liveParty.Status.Current == nil {
+		return
+	}
+
+	if liveParty.Status.State == LivePartyStateSubmissions {
 		liveParty.prevSubmission()
 		return
 	}
 
-	if liveParty.Status.State == LivePartyStateReveal && liveParty.Status.Current.Index != liveParty.Status.Sequence[0] {
+	if liveParty.Status.State == LivePartyStateReveal {
 		liveParty.prevReveal()
 		return
 	}
 }
 
-func (liveParty *LiveParty) getPrevIndex() (int, bool) {
-	if len(liveParty.Party.Submissions) == 0 {
-		return -1, false
-	}
-
-	if liveParty.Status.Current != nil {
-		currentSequenceIndex := indexOf(liveParty.Status.Current.Index, liveParty.Status.Sequence)
-
-		if currentSequenceIndex == 0 {
-			return -1, false
-		}
-
-		return liveParty.Status.Sequence[currentSequenceIndex-1], true
-	}
-
-	return liveParty.Status.Sequence[0], true
-}
-
 func (liveParty *LiveParty) prevSubmission() {
-	prevSubmissionIndex, ok := liveParty.getPrevIndex()
-	if !ok {
+	if liveParty.Status.Current.Position <= 0 {
 		return
 	}
 
-	var previousSubmission = liveParty.Party.Submissions[prevSubmissionIndex]
-	var previousRatings = []int{}
-	for _, vote := range previousSubmission.Votes {
-		previousRatings = append(previousRatings, vote.Rating)
-	}
-
+	prevPosition := liveParty.Status.Current.Position - 1
 	liveParty.Status.Current = &SubmissionStatus{
-		Index:     prevSubmissionIndex,
+		Index:     liveParty.Status.Sequence[prevPosition],
+		Position:  prevPosition,
 		StartTime: time.Now(),
-		Votes:     previousRatings,
 	}
 }
 
 func (liveParty *LiveParty) prevReveal() {
-	prevSubmissionIndex, ok := liveParty.getPrevIndex()
-	if !ok {
+	if liveParty.Status.Current.Position <= 0 {
 		return
 	}
 
+	prevPosition := liveParty.Status.Current.Position - 1
 	liveParty.Status.Current = &SubmissionStatus{
-		Index:     prevSubmissionIndex,
+		Index:     liveParty.Status.Sequence[prevPosition],
+		Position:  prevPosition,
 		StartTime: time.Now(),
-		Votes:     []int{},
 	}
 }
 
 func (liveParty *LiveParty) Next() {
-	if liveParty.Status.State == LivePartyStateStart {
+	if liveParty.Status.State == LivePartyStateWaitingLobby {
 		liveParty.Status.State = LivePartyStateSubmissions
+	}
+
+	if liveParty.Status.State == LivePartyStatePreReveal {
+		liveParty.Status.State = LivePartyStateReveal
 	}
 
 	if liveParty.Status.State == LivePartyStateSubmissions {
@@ -101,48 +84,38 @@ func (liveParty *LiveParty) Next() {
 	}
 }
 
-func (liveParty *LiveParty) getNextIndex() (int, bool) {
-	if len(liveParty.Party.Submissions) == 0 {
-		return -1, false
-	}
-
-	if liveParty.Status.Current != nil {
-		currentSequenceIndex := indexOf(liveParty.Status.Current.Index, liveParty.Status.Sequence)
-		fmt.Println(currentSequenceIndex)
-		if len(liveParty.Party.Submissions) == currentSequenceIndex+1 {
-			return -1, false
-		}
-
-		return liveParty.Status.Sequence[currentSequenceIndex+1], true
-	}
-
-	return liveParty.Status.Sequence[0], true
-}
-
 func (liveParty *LiveParty) nextSubmission() {
-	nextSubmissionIndex, ok := liveParty.getNextIndex()
-	if !ok {
+	nextPosition := 0
+	if liveParty.Status.Current != nil {
+		nextPosition = liveParty.Status.Current.Position + 1
+	}
+
+	if nextPosition == len(liveParty.Party.Submissions) {
 		liveParty.Reveal()
 		return
 	}
 
 	liveParty.Status.Current = &SubmissionStatus{
-		Index:     nextSubmissionIndex,
+		Index:     liveParty.Status.Sequence[nextPosition],
+		Position:  nextPosition,
 		StartTime: time.Now(),
-		Votes:     []int{},
 	}
 }
 
 func (liveParty *LiveParty) nextReveal() {
-	nextSubmissionIndex, ok := liveParty.getNextIndex()
-	if !ok {
+	nextPosition := 0
+	if liveParty.Status.Current != nil {
+		nextPosition = liveParty.Status.Current.Position + 1
+	}
+
+	if nextPosition == len(liveParty.Party.Submissions) {
 		liveParty.Stop()
 		return
 	}
 
 	liveParty.Status.Current = &SubmissionStatus{
-		Index:     nextSubmissionIndex,
+		Index:     liveParty.Status.Sequence[nextPosition],
+		Position:  nextPosition,
 		StartTime: time.Now(),
-		Votes:     []int{},
 	}
 }

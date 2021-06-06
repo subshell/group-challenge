@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router';
 import {
   joinParty,
@@ -10,13 +10,85 @@ import {
 } from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyLeaderboard from './ViewPartyLeaderboard';
-import { PartySubmissionResponse } from '../../api/api-models';
+import { PartyResponse, PartyStatusResponse } from '../../api/api-models';
 import Button from '../../components/Button';
 import { useMutation } from 'react-query';
 import { useSession } from '../../user/session';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaMedal } from 'react-icons/fa';
 import ViewPartyStartPage from './ViewPartyStartPage';
 import ViewPartyReveal from './ViewPartyReveal';
+import Stepper from '../../components/Stepper';
+
+const ViewPartyContent = ({
+  partyStatus,
+  isHost,
+  party,
+  onRating,
+  onNextButton,
+  onRedirect,
+}: {
+  partyStatus: PartyStatusResponse;
+  isHost: boolean;
+  party: PartyResponse;
+  onRating: (rating: number) => any;
+  onNextButton: () => any;
+  onRedirect: () => any;
+}) => {
+  if (!partyStatus || !party) {
+    return <div>Unknown party or party status</div>;
+  }
+
+  if (partyStatus.state === 'open') {
+    onRedirect();
+    return null;
+  }
+
+  if (partyStatus.state === 'waitinglobby') {
+    return <ViewPartyStartPage isHost={isHost} participants={partyStatus.participants} onPartyStart={onNextButton} />;
+  }
+
+  if (partyStatus.state === 'submissions') {
+    const partySubmission = party.submissions[partyStatus.current!.index];
+    return (
+      <div>
+        {partySubmission && (
+          <ViewPartySubmission
+            key={partySubmission.id}
+            partySubmission={partySubmission}
+            partyStatus={partyStatus}
+            numSubmissions={party.submissions?.length || 0}
+            onRating={onRating}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (partyStatus.state === 'prereveal') {
+    return (
+      <div>
+        <div className="flex flex-col items-center space-y-4 mt-20">
+          <FaMedal size={128} />
+          <span className="text-2xl">Let's see who won!</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (partyStatus.state === 'reveal') {
+    return (
+      <div>
+        <ViewPartyReveal party={party} partyStatus={partyStatus} />
+      </div>
+    );
+  }
+
+  if (partyStatus.state === 'done') {
+    return <ViewPartyLeaderboard party={party} />;
+  }
+
+  return <h2>UNKNOWN PARTY STATE: {partyStatus.state}</h2>;
+};
 
 function ViewParty() {
   const history = useHistory();
@@ -26,8 +98,6 @@ function ViewParty() {
   const party = useParty(id);
   const partyStatus = usePartyStatus(id);
 
-  const [partySubmission, setPartySubmission] = useState<PartySubmissionResponse | undefined>(undefined);
-
   const { mutate: mutateJoinParty } = useMutation(joinParty);
   const { mutateAsync: mutateNextSubmission } = useMutation(nextPartySubmissions);
   const { mutateAsync: mutatePreviousSubmission } = useMutation(previousPartySubmissions);
@@ -35,7 +105,6 @@ function ViewParty() {
 
   const partyUserId = party.data?.userId;
   const currentPartyStatus = party.data && partyStatus.data?.current;
-  const submissions = party.data?.submissions;
   const partyStatusState = partyStatus.data?.state;
 
   useEffect(() => {
@@ -47,10 +116,8 @@ function ViewParty() {
   }, [mutateJoinParty, id, session]);
 
   useEffect(() => {
-    if (!currentPartyStatus || !submissions) return;
-    console.log('updating submission');
-    setPartySubmission(submissions[currentPartyStatus.index]);
-  }, [submissions, currentPartyStatus, setPartySubmission]);
+    console.log(`Current party state: ${partyStatusState}`);
+  }, [partyStatusState]);
 
   const onSubmissionRating = useCallback(
     async (rating: number) => {
@@ -73,69 +140,53 @@ function ViewParty() {
   if (party.isLoading || party.isIdle) return <span>Loading</span>;
   if (partyStatus.isLoading || partyStatus.isIdle) return <span>Loading party status</span>;
 
-  const controlButtons = () => (
-    <>
-      {currentPartyStatus!.index !== partyStatus.data.sequence[0] && (
-        <div className="fixed left-8 top-1/2">
-          <Button onClick={onPreviousButton}>
-            <FaArrowLeft />
-          </Button>
+  const isHost = session!.userId === partyUserId;
+  const showControlButtons =
+    isHost && (partyStatusState === 'submissions' || partyStatusState === 'reveal' || partyStatusState === 'prereveal');
+  let stepIndex: number;
+  if (partyStatusState === 'waitinglobby') {
+    stepIndex = 1;
+  } else if (partyStatusState === 'submissions') {
+    stepIndex = 2;
+  } else if (partyStatusState === 'prereveal' || partyStatusState === 'reveal') {
+    stepIndex = 3;
+  } else {
+    stepIndex = 4;
+  }
+
+  return (
+    <div>
+      <div className="p-4 -mt-8 mb-8">
+        <Stepper currentStepNumber={stepIndex} steps={['Lobby', 'Voting', 'Awards']} />
+      </div>
+
+      <ViewPartyContent
+        partyStatus={partyStatus.data}
+        party={party.data}
+        isHost={isHost}
+        onRating={onSubmissionRating}
+        onNextButton={onNextButton}
+        onRedirect={() => history.push('/')}
+      />
+
+      {showControlButtons && (
+        <div>
+          {currentPartyStatus && currentPartyStatus.position !== 0 && (
+            <div className="fixed left-8 top-1/2">
+              <Button onClick={onPreviousButton}>
+                <FaArrowLeft />
+              </Button>
+            </div>
+          )}
+          <div className="fixed right-8 top-1/2">
+            <Button onClick={onNextButton}>
+              <FaArrowRight />
+            </Button>
+          </div>
         </div>
       )}
-      <div className="fixed right-8 top-1/2">
-        <Button onClick={onNextButton}>
-          <FaArrowRight />
-        </Button>
-      </div>
-    </>
+    </div>
   );
-
-  if (partyStatusState === 'open') {
-    history.push('/');
-    return null;
-  }
-
-  if (partyStatusState === 'start') {
-    return (
-      <ViewPartyStartPage
-        isHost={session?.userId === partyUserId}
-        participants={partyStatus.data.participants}
-        onPartyStart={onNextButton}
-      />
-    );
-  }
-
-  if (partyStatusState === 'submissions') {
-    return (
-      <div>
-        {partySubmission && (
-          <ViewPartySubmission
-            key={partySubmission.id}
-            partySubmission={partySubmission}
-            partyStatus={partyStatus.data}
-            numSubmissions={submissions?.length || 0}
-            onRating={onSubmissionRating}
-          />
-        )}
-        {session?.userId === partyUserId && controlButtons()}
-      </div>
-    );
-  }
-
-  if (partyStatusState === 'reveal') {
-    return (
-      <div>
-        <ViewPartyReveal party={party.data} partyStatus={partyStatus.data} />
-        {session?.userId === partyUserId && controlButtons()}
-      </div>
-    );
-  }
-
-  if (partyStatusState === 'done') {
-    return <ViewPartyLeaderboard party={party.data} />;
-  }
-
-  return <h2>UNKNOWN PARTY STATE: {partyStatusState}</h2>;
 }
 
 export default ViewParty;

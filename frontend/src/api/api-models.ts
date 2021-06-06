@@ -24,6 +24,7 @@ export interface Vote {
   id: string;
   userId: string;
   rating: number;
+  submissionId: string;
 }
 
 export interface PartySubmissionResponse {
@@ -42,17 +43,20 @@ export interface PartySubmissionFormData {
   description: string;
 }
 
+export type PartyStatusState = 'open' | 'waitinglobby' | 'submissions' | 'prereveal' | 'reveal' | 'done';
+
 export interface PartyStatusResponse {
   current?: {
     index: number;
+    position: number;
     startTime: string;
-    votes: number[];
   };
   sequence: number[];
   partyStartTime: string;
   submissionTimeMs: number;
   participants: number;
-  state: 'open' | 'start' | 'submissions' | 'reveal' | 'done';
+  state: PartyStatusState;
+  votes: Vote[];
 }
 
 export function isPartyLive(partyStatus?: PartyStatusResponse) {

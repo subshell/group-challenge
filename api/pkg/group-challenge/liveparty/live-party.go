@@ -11,21 +11,25 @@ import (
 )
 
 var (
-	LivePartyStateOpen        = "open"
-	LivePartyStateStart       = "start"
-	LivePartyStateSubmissions = "submissions"
-	LivePartyStateReveal      = "reveal"
-	LivePartyStateDone        = "done"
+	LivePartyStateOpen         = "open"
+	LivePartyStateWaitingLobby = "waitinglobby"
+	LivePartyStateSubmissions  = "submissions"
+	LivePartyStatePreReveal    = "prereveal"
+	LivePartyStateReveal       = "reveal"
+	LivePartyStateDone         = "done"
 )
 
 type SubmissionStatus struct {
-	Index     int       `json:"index"`
+	// index respecting the random submission sequence
+	Index int `json:"index"`
+	// ordered index/position 0 to n
+	Position  int       `json:"position"`
 	StartTime time.Time `json:"startTime"`
-	Votes     []int     `json:"votes"`
 }
 
 type PartyStatus struct {
 	Current          *SubmissionStatus `json:"current"`
+	Votes            []*models.Vote    `json:"votes"`
 	Sequence         []int             `json:"sequence"`
 	PartyStartTime   time.Time         `json:"partyStartTime"`
 	SubmissionTimeMs int               `json:"submissionTimeMs"`
@@ -52,7 +56,8 @@ func createLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.Liv
 			PartyStartTime:   time.Now(),
 			SubmissionTimeMs: livePartyConfig.DefaultTimePerSubmissionSeconds * 1000,
 			Participants:     1,
-			State:            LivePartyStateStart,
+			State:            LivePartyStateWaitingLobby,
+			Votes:            []*models.Vote{},
 		},
 		ParticipantsUserIDs: []uuid.UUID{party.UserID},
 		Party:               party,
@@ -78,6 +83,7 @@ func CreateNonLivePartyStatus() *PartyStatus {
 		Current:          nil,
 		PartyStartTime:   time.Now(),
 		Sequence:         []int{},
+		Votes:            []*models.Vote{},
 		SubmissionTimeMs: 0,
 		Participants:     0,
 		State:            LivePartyStateOpen,
@@ -90,21 +96,20 @@ func (liveParty *LiveParty) Vote(userID uuid.UUID, rating int) {
 		return
 	}
 
-	var vote, ok = liveParty.findUserVote(userID)
-	if !ok {
-		vote = &models.Vote{
-			Rating: rating,
-			UserID: userID,
+	submission := liveParty.Party.Submissions[liveParty.Status.Current.Index]
+
+	for _, savedVote := range liveParty.Status.Votes {
+		if savedVote.UserID == userID && savedVote.SubmissionID == submission.ID {
+			savedVote.Rating = rating
+			return
 		}
-		liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes = append(liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes, vote)
-	} else {
-		vote.Rating = rating
 	}
 
-	liveParty.Status.Current.Votes = []int{}
-	for _, vote = range liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes {
-		liveParty.Status.Current.Votes = append(liveParty.Status.Current.Votes, int(vote.Rating))
-	}
+	liveParty.Status.Votes = append(liveParty.Status.Votes, &models.Vote{
+		Rating:       rating,
+		UserID:       userID,
+		SubmissionID: submission.ID,
+	})
 }
 
 func (liveParty *LiveParty) AddParticipant(userID *uuid.UUID) {
@@ -116,14 +121,4 @@ func (liveParty *LiveParty) AddParticipant(userID *uuid.UUID) {
 
 	liveParty.ParticipantsUserIDs = append(liveParty.ParticipantsUserIDs, *userID)
 	liveParty.Status.Participants = len(liveParty.ParticipantsUserIDs)
-}
-
-func (liveParty *LiveParty) findUserVote(userID uuid.UUID) (*models.Vote, bool) {
-	votes := liveParty.Party.Submissions[liveParty.Status.Current.Index].Votes
-	for _, vote := range votes {
-		if vote.UserID == userID {
-			return vote, true
-		}
-	}
-	return nil, false
 }

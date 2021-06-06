@@ -80,10 +80,8 @@ const useUpdateQueryDataFromEvents = ({
   const onEvent = useCallback(
     (e: GCWebSocketEvent, isChild: boolean) => {
       const queryKey: string[] = JSON.parse(queryKeyJSON);
-      console.log('received ws event:', queryKey.join('/'));
 
       if (isChild) {
-        console.log('refetch list for ' + queryKey);
         refetch();
       } else {
         queryClient.setQueryData(queryKey, e.data);
