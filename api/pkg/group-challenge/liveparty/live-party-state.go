@@ -10,8 +10,11 @@ func (liveParty *LiveParty) Reveal() {
 
 	// save votes to db model
 	for _, submission := range liveParty.Party.Submissions {
+		submission.DeleteVotes(liveParty.Con)
 		for _, vote := range liveParty.Status.Votes {
-			submission.AddVote(vote, liveParty.Con)
+			if vote.SubmissionID == submission.ID {
+				submission.AddVote(vote, liveParty.Con)
+			}
 		}
 	}
 	liveParty.Party.Update(liveParty.Con)
@@ -70,6 +73,7 @@ func (liveParty *LiveParty) Next() {
 	}
 
 	if liveParty.Status.State == LivePartyStatePreReveal {
+		sortSequenceByVotes(liveParty)
 		liveParty.Status.State = LivePartyStateReveal
 	}
 
