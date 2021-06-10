@@ -10,28 +10,14 @@ import {
 } from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyLeaderboard from './ViewPartyLeaderboard';
-import { PartyResponse, PartyStatusResponse, PartyStatusState } from '../../api/api-models';
+import { PartyResponse, PartyStatusResponse } from '../../api/api-models';
 import Button from '../../components/Button';
 import { useMutation } from 'react-query';
 import { useSession } from '../../user/session';
-import { FaArrowLeft, FaArrowRight, FaMedal } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ViewPartyStartPage from './ViewPartyStartPage';
 import ViewPartyReveal from './ViewPartyReveal';
-import Stepper from '../../components/Stepper';
-
-const getStepperIndex = (partyStatusState?: PartyStatusState) => {
-  if (partyStatusState === 'waitinglobby') {
-    return 1;
-  }
-  if (partyStatusState === 'submissions') {
-    return 2;
-  }
-  if (partyStatusState === 'prereveal' || partyStatusState === 'reveal') {
-    return 3;
-  }
-
-  return 4;
-};
+import EmojiBar from '../../components/EmojiBar';
 
 const ViewPartyContent = ({
   partyStatus,
@@ -82,8 +68,11 @@ const ViewPartyContent = ({
     return (
       <div>
         <div className="flex flex-col items-center space-y-4 mt-20">
-          <FaMedal size={128} />
-          <span className="text-2xl">Let's see who won!</span>
+          <p className="text-5xl">Thanks for voting!</p>
+          <p className="text-3xl text-gray-700">Waiting for host...</p>
+          <div className="py-8">
+            <EmojiBar count={partyStatus.participants} />
+          </div>
         </div>
       </div>
     );
@@ -160,10 +149,6 @@ function ViewParty() {
 
   return (
     <div>
-      <div className="p-4 -mt-8 mb-8">
-        <Stepper currentStepNumber={getStepperIndex(partyStatusState)} steps={['Lobby', 'Voting', 'Awards']} />
-      </div>
-
       <ViewPartyContent
         partyStatus={partyStatus.data}
         party={party.data}
@@ -172,7 +157,6 @@ function ViewParty() {
         onNextButton={onNextButton}
         onRedirect={() => history.push('/')}
       />
-
       {showControlButtons && (
         <div>
           {currentPartyStatus && currentPartyStatus.position !== 0 && (

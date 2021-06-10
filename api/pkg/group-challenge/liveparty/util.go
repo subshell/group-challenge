@@ -30,19 +30,25 @@ func generateRandomSequence(length int) []int {
 }
 
 func sortSequenceByVotes(liveParty *LiveParty) {
+	// reset sequence
 	liveParty.Status.Sequence = []int{}
-	votesBySubmission := map[uuid.UUID]int{}
-	for _, vote := range liveParty.Status.Votes {
-		if _, ok := votesBySubmission[vote.SubmissionID]; !ok {
-			votesBySubmission[vote.SubmissionID] = 0
-		}
 
+	// setup empty submissions map
+	votesBySubmission := map[uuid.UUID]int{}
+	for _, submission := range liveParty.Party.Submissions {
+		votesBySubmission[submission.ID] = 0
+	}
+
+	// count votes per submission
+	for _, vote := range liveParty.Status.Votes {
 		votesBySubmission[vote.SubmissionID] += vote.Rating
 	}
 
+	// create sequence from votes per submissions in correct order
 	for len(votesBySubmission) != 0 {
 		leastVotesID := uuid.Nil
 		leastVotesCount := 99999
+
 		for key, value := range votesBySubmission {
 			if leastVotesID == uuid.Nil || leastVotesCount > value {
 				leastVotesID = key
@@ -50,7 +56,6 @@ func sortSequenceByVotes(liveParty *LiveParty) {
 			}
 		}
 
-		// find submission index
 		var submissionIndex int
 		for i, submission := range liveParty.Party.Submissions {
 			if submission.ID == leastVotesID {

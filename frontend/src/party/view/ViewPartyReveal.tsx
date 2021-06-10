@@ -19,7 +19,7 @@ function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partySt
           <img
             className="object-contain w-full rounded"
             style={{
-              maxHeight: '80vh',
+              maxHeight: '75vh',
             }}
             src={getImageUrl(currentSumbission.imageId)}
             alt={currentSumbission.name}

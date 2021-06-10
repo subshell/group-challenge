@@ -54,7 +54,7 @@ function ViewPartySubmission({
             <img
               className="object-contain w-full rounded"
               style={{
-                maxHeight: '80vh',
+                maxHeight: '75vh',
               }}
               src={getImageUrl(partySubmission.imageId)}
               alt={partySubmission.name}
