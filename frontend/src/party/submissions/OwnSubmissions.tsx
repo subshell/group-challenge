@@ -1,5 +1,6 @@
 import { useParams } from 'react-router';
 import { useParty, usePartyStatus } from '../../api/api';
+import { isPartyLive } from '../../api/api-models';
 import { useSession } from '../../user/session';
 import PartySubmissions from './PartySubmissions';
 import PostPartySubmission from './PostPartySubmission';
@@ -16,7 +17,7 @@ function OwnSubmissions() {
 
   return (
     <div className="space-y-20">
-      {party.done || partyStatus?.isLive ? (
+      {party.done || isPartyLive(partyStatus) ? (
         <div className="text-2xl text-red-600">Party {party.name} is closed for submissions</div>
       ) : (
         <PostPartySubmission party={party} afterUpload={refetch} />

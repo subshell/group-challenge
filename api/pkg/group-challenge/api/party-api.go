@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"group-challenge/pkg/group-challenge/liveparty"
 	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
 	"net/http"
@@ -198,8 +199,8 @@ func addPartySubmissionHandler(c *gin.Context) {
 	}
 
 	// verify if a new submission is still allowed
-	liveParty, livePartyExists := livePartyHub.GetLiveParty(party.ID)
-	if party.Done || (livePartyExists && liveParty.Status.IsLive) {
+	existingLiveParty, livePartyExists := livePartyHub.GetLiveParty(party.ID)
+	if party.Done || (livePartyExists && existingLiveParty.Status.State != liveparty.LivePartyStateDone) {
 		c.Status(400)
 		return
 	}

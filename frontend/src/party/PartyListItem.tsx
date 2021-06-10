@@ -3,6 +3,7 @@ import { FaArrowRight, FaCameraRetro, FaEdit, FaTv } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router';
 import { reopenParty, startParty, useParty, usePartyStatus } from '../api/api';
+import { isPartyLive } from '../api/api-models';
 import { useSession } from '../user/session';
 
 function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPartyChange?: () => any }) {
@@ -13,7 +14,7 @@ function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPa
   const { mutateAsync: reopenPartyMutateAsync } = useMutation(reopenParty);
   const history = useHistory();
 
-  const isLive = partyStatus.isSuccess && partyStatus.data.isLive;
+  const isLive = partyStatus.isSuccess && isPartyLive(partyStatus.data);
   const isHost = party?.userId === session?.userId;
 
   const onReopenPartyButton = async () => {

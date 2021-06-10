@@ -11,14 +11,16 @@ function Star({ active, preview, className = '' }: { active: boolean; preview: b
 
 function StarRating({
   stars,
+  initialStars,
   onRating,
   disabled,
 }: {
   stars: number;
+  initialStars: number;
   onRating: (rating: number) => void;
   disabled: boolean;
 }) {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(initialStars);
   const [hoverRating, setHoverRating] = useState(0);
 
   useEffect(() => {

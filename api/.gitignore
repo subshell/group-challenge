@@ -18,5 +18,6 @@ vendor
 .idea
 *.iml
 
+__debug_bin
 tmp
 /group-challenge

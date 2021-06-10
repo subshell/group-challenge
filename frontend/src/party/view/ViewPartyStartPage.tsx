@@ -1,26 +1,5 @@
 import { FaInfo, FaLink } from 'react-icons/fa';
-
-const EMOJIS = [
-  '🥳',
-  '😎',
-  '🦄',
-  '👻',
-  '🙃',
-  '😡',
-  '📸',
-  '🌞',
-  '🤦‍♂️',
-  '🦋',
-  '😃',
-  '👩‍🎨',
-  '😷',
-  '🤡',
-  '🤖',
-  '👀',
-  '🐱',
-  '🤹‍♀️',
-  '🦦',
-];
+import EmojiBar from '../../components/EmojiBar';
 
 function ViewPartyStartPage({
   isHost,
@@ -65,13 +44,7 @@ function ViewPartyStartPage({
 
       <div className="flex flex-col items-center space-y-4" title="participants">
         <span className="text-xl font-bold">{participants} participant(s)</span>
-        <span className="flex flex-row text-4xl space-x-2">
-          {Array(participants)
-            .fill(0)
-            .map((_, i) => (
-              <span key={i}>{EMOJIS[i % EMOJIS.length]}</span>
-            ))}
-        </span>
+        <EmojiBar count={participants} />
       </div>
 
       {isHost && (

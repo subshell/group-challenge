@@ -4,6 +4,8 @@ import { getImageUrl } from '../../api/api';
 import { PartyStatusResponse, PartySubmissionResponse } from '../../api/api-models';
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
+import { useSession } from '../../user/session';
+import { getSubmissionVotes } from './util';
 
 export interface ViewPartySubmissionProps {
   partySubmission: PartySubmissionResponse;
@@ -23,7 +25,11 @@ function ViewPartySubmission({
   onDone,
   onRating,
 }: ViewPartySubmissionProps) {
-  const [rating, setRating] = useState(0);
+  const [session] = useSession();
+  const [rating, setRating] = useState(
+    () => getSubmissionVotes(partyStatus, partySubmission, session!.userId)[0]?.rating || 0
+  );
+
   const [done, setDone] = useState(false);
   const onTimer = useCallback(() => {
     toast('⏰ Time is up!', {});
@@ -48,7 +54,7 @@ function ViewPartySubmission({
             <img
               className="object-contain w-full rounded"
               style={{
-                maxHeight: '80vh',
+                maxHeight: '75vh',
               }}
               src={getImageUrl(partySubmission.imageId)}
               alt={partySubmission.name}
@@ -59,7 +65,7 @@ function ViewPartySubmission({
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
             <h3 className="text-2xl font-medium text-gray-900">
-              <span className="text-gray-800 text-xl">{(partyStatus.current?.index ?? 0) + 1}</span>
+              <span className="text-gray-800 text-xl">{partyStatus.current!.position + 1}</span>
               <span className="text-gray-400 ml-2 mr-2 text-xl">of</span>
               <span className="text-gray-800 text-xl">{numSubmissions}</span>
             </h3>
@@ -69,9 +75,9 @@ function ViewPartySubmission({
             </p>
           </div>
           <div className="flex justify-center flex-col items-start">
-            <StarRating stars={5} onRating={setRating} disabled={done} />
+            <StarRating stars={5} onRating={setRating} initialStars={rating} disabled={done} />
             <div className="mt-4">
-              <span className="text-gray-600 text-xl">{partyStatus.current!.votes.length}</span>
+              <span className="text-gray-600 text-xl">{getSubmissionVotes(partyStatus, partySubmission).length}</span>
               <span className="text-gray-400 ml-2 mr-2 text-xl">/</span>
               <span className="text-gray-800 text-2xl">{partyStatus.participants}</span>
               <span className="text-gray-600 ml-4 text-xl">votes</span>
