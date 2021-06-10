@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { signOut } from '../api/api';
 import { useSession } from '../user/session';
+import { VERSION } from '../version';
 
 function Navigation() {
   const [session, , removeSession] = useSession();
@@ -21,7 +22,7 @@ function Navigation() {
         <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-6">
           <Link to="/">
             <span className="text-xl hover:text-gray-300">
-              Group Challenge <span className="text-sm font-bold pr-4">BETA</span>
+              Group Challenge <span className="text-sm font-bold pr-4">{VERSION}</span>
             </span>
           </Link>
           {session && (
