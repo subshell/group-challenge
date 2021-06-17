@@ -38,6 +38,10 @@ const ViewPartyContent = ({
     return <div>Unknown party or party status</div>;
   }
 
+  if (party.done || partyStatus.state === 'done') {
+    return <ViewPartyLeaderboard party={party} />;
+  }
+
   if (partyStatus.state === 'open') {
     onRedirect();
     return null;
@@ -86,10 +90,6 @@ const ViewPartyContent = ({
     );
   }
 
-  if (partyStatus.state === 'done') {
-    return <ViewPartyLeaderboard party={party} />;
-  }
-
   return <h2>UNKNOWN PARTY STATE: {partyStatus.state}</h2>;
 };
 
@@ -109,14 +109,15 @@ function ViewParty() {
   const partyUserId = party.data?.userId;
   const currentPartyStatus = party.data && partyStatus.data?.current;
   const partyStatusState = partyStatus.data?.state;
+  const partyDone = party.data?.done;
 
   useEffect(() => {
-    if (!id || !session?.token) {
+    if (!id || !session?.token || partyDone) {
       return;
     }
     console.log('join party');
     mutateJoinParty({ partyId: id, sessionToken: session.token });
-  }, [mutateJoinParty, id, session]);
+  }, [mutateJoinParty, id, session, partyDone]);
 
   useEffect(() => {
     console.log(`Current party state: ${partyStatusState}`);
