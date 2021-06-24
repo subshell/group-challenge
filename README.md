@@ -8,19 +8,21 @@ contribute. Currently supported challenges are:
 
 ## Local development
 
-1. start a postgres db at port `5432`.
+This project includes pre-configured configuration files to launch the api, frontend, and postgres in VS Code. Alternatively you can start all services with the following commands:
+
+1. **Postgres:** start a postgres db at port `5432`.
 
 ```sh
   docker-compose up
 ```
 
-2. start the go api server at port `8080`.
+2. **API:** start the go api server at port `8080`.
 
 ```sh
-  cd api && make go-run
+  cd api && go run ./cmd/group-challenge/root.go
 ```
 
-3. start the frontend at port `3000`.
+3. **Frontend:** start the frontend at port `3000`.
 
 ```sh
   cd frontend && npm start
