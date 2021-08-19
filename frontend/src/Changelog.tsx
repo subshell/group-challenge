@@ -10,11 +10,8 @@ interface Change {
 
 const CHANGES: Change[] = [
   {
-    name: '0.1.0',
-    changes: [
-      { description: 'Initial non-alpha release', type: 'note' },
-      { description: 'Foto Challenge', type: 'feature' },
-    ],
+    name: '0.2.1',
+    changes: [{ description: 'Changelog flickers on browser focus.', type: 'fix' }],
   },
   {
     name: '0.2.0',
@@ -25,9 +22,16 @@ const CHANGES: Change[] = [
         type: 'feature',
       },
       {
-        description: 'new changelog 🗒 page.',
+        description: 'New changelog 🗒 page.',
         type: 'feature',
       },
+    ],
+  },
+  {
+    name: '0.1.0',
+    changes: [
+      { description: 'Initial non-alpha release.', type: 'note' },
+      { description: 'Foto Challenge.', type: 'feature' },
     ],
   },
 ];
@@ -36,7 +40,7 @@ export function Changelog() {
   return (
     <div>
       <h1 className="text-2xl">Changelog</h1>
-      {CHANGES.reverse().map((change) => (
+      {CHANGES.map((change) => (
         <div key={change.name} className="my-5">
           <h2 className="text-xl">{change.name}</h2>
           <ul className="list-disc">
