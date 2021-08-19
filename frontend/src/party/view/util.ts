@@ -7,12 +7,16 @@ export const avgRating = (votes: Vote[]) => {
     return 0;
   }
 
-  return (votes.reduce((x1, x2) => x1 + x2.rating, 0) / votes.length).toFixed(1);
+  return votes.reduce((x1, x2) => x1 + x2.rating, 0) / votes.length;
+};
+
+export const avgRatingTwoDecimals = (votes: Vote[]) => {
+  return avgRating(votes).toFixed(2);
 };
 
 export const sortSubmissions = (submissions: PartySubmissionResponse[]) => {
   const result = [...submissions].sort((a, b) => {
-    return totalRating(b.votes) - totalRating(a.votes);
+    return avgRating(b.votes) - avgRating(a.votes);
   });
 
   return result;

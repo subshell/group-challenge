@@ -1,9 +1,9 @@
-import { FaMedal, FaStar } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
 import { getImageUrl } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
 import PartyPosition from './rewards/PartyPosition';
 
-import { totalRating, avgRating, sortSubmissions } from './util';
+import { totalRating, avgRatingTwoDecimals, sortSubmissions } from './util';
 
 function ViewPartyLeaderboard({ party }: { party: PartyResponse }) {
   const sortedSubmissions = sortSubmissions(party.submissions);
@@ -26,9 +26,9 @@ function ViewPartyLeaderboard({ party }: { party: PartyResponse }) {
               <div>
                 <b>{submission.name}</b> {submission.description}
               </div>
-              <div className="flex items-center text-xl space-x-2">
+              <div className="text-2xl">Ø {avgRatingTwoDecimals(submission.votes)}</div>
+              <div className="flex items-center space-x-1">
                 <div>{totalRating(submission.votes)}</div>
-                <div>(Ø {avgRating(submission.votes)})</div>
                 <FaStar size={20} />
               </div>
               <div>{submission.votes.length} vote(s)</div>

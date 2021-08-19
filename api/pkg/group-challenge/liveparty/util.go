@@ -34,25 +34,33 @@ func sortSequenceByVotes(liveParty *LiveParty) {
 	liveParty.Status.Sequence = []int{}
 
 	// setup empty submissions map
-	votesBySubmission := map[uuid.UUID]int{}
+	avgVotesBySubmission := map[uuid.UUID]float64{}
+	numVotesBySubmission := map[uuid.UUID]int{}
 	for _, submission := range liveParty.Party.Submissions {
-		votesBySubmission[submission.ID] = 0
+		numVotesBySubmission[submission.ID] = 0
+		avgVotesBySubmission[submission.ID] = 0
 	}
 
 	// count votes per submission
 	for _, vote := range liveParty.Status.Votes {
-		votesBySubmission[vote.SubmissionID] += vote.Rating
+		numVotesBySubmission[vote.SubmissionID] += 1
+		avgVotesBySubmission[vote.SubmissionID] += float64(vote.Rating)
 	}
 
-	// create sequence from votes per submissions in correct order
-	for len(votesBySubmission) != 0 {
-		leastVotesID := uuid.Nil
-		leastVotesCount := 99999
+	// calculate the avg score per submission
+	for submissionID := range avgVotesBySubmission {
+		avgVotesBySubmission[submissionID] /= float64(numVotesBySubmission[submissionID])
+	}
 
-		for key, value := range votesBySubmission {
-			if leastVotesID == uuid.Nil || leastVotesCount > value {
+	// create sequence from avg votes per submissions in correct order
+	for len(avgVotesBySubmission) != 0 {
+		leastVotesID := uuid.Nil
+		leastAvgVotesCount := 99999.0
+
+		for key, value := range avgVotesBySubmission {
+			if leastVotesID == uuid.Nil || leastAvgVotesCount > value {
 				leastVotesID = key
-				leastVotesCount = value
+				leastAvgVotesCount = value
 			}
 		}
 
@@ -64,6 +72,6 @@ func sortSequenceByVotes(liveParty *LiveParty) {
 			}
 		}
 		liveParty.Status.Sequence = append(liveParty.Status.Sequence, submissionIndex)
-		delete(votesBySubmission, leastVotesID)
+		delete(avgVotesBySubmission, leastVotesID)
 	}
 }

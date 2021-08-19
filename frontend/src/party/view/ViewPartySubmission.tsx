@@ -75,7 +75,7 @@ function ViewPartySubmission({
             </p>
           </div>
           <div className="flex justify-center flex-col items-start">
-            <StarRating stars={5} onRating={setRating} initialStars={rating} disabled={done} />
+            <StarRating stars={6} onRating={setRating} initialStars={rating} disabled={done} />
             <div className="mt-4">
               <span className="text-gray-600 text-xl">{getSubmissionVotes(partyStatus, partySubmission).length}</span>
               <span className="text-gray-400 ml-2 mr-2 text-xl">/</span>

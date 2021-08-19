@@ -1,4 +1,4 @@
-import { FaInfo } from 'react-icons/fa';
+import { FaArrowRight, FaInfo } from 'react-icons/fa';
 import { useParties } from '../api/api';
 import PartiesOverviewItem from './PartyListItem';
 
@@ -18,7 +18,6 @@ function PartyList() {
 
   const reversedParties = [...parties].reverse();
   const openAndLiveParties = reversedParties.filter((party) => !party.done);
-  const closedParties = reversedParties.filter((party) => party.done);
 
   return (
     <div className="container mx-auto">
@@ -28,13 +27,10 @@ function PartyList() {
         ))}
       </div>
 
-      <h1 className="text-2xl mt-20 pl-4">📚 Archive</h1>
-
-      <div className="flex flex-wrap">
-        {closedParties.map((party) => (
-          <PartiesOverviewItem key={party.id} partyId={party.id} onPartyChange={refetch} />
-        ))}
-      </div>
+      <a href="/archive" className="flex place-items-center space-x-2 text-blue-700 hover:opacity-75 font-bold">
+        <span>📚 Go to Archive</span>
+        <FaArrowRight />
+      </a>
     </div>
   );
 }

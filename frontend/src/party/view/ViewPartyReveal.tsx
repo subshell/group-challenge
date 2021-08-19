@@ -2,7 +2,7 @@ import { FaStar } from 'react-icons/fa';
 import { getImageUrl } from '../../api/api';
 import { PartyResponse, PartyStatusResponse } from '../../api/api-models';
 import PartyPosition from './rewards/PartyPosition';
-import { totalRating, avgRating, getSubmissionVotes } from './util';
+import { totalRating, avgRatingTwoDecimals, getSubmissionVotes } from './util';
 
 function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partyStatus: PartyStatusResponse }) {
   if (!partyStatus.current) {
@@ -37,10 +37,14 @@ function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partySt
           <span className="border border-gray-700 px-4 py-2 flex items-center space-x-2">
             <PartyPosition position={partyStatus.sequence.length - partyStatus.current.position - 1} />
           </span>
-          <div className="border border-gray-700 rounded px-4 py-2 flex items-center space-x-2">
-            <span>{totalRating(votes)}</span> <FaStar size={14} />
+          <div className="border border-gray-700 rounded px-4 py-2 flex items-center">
+            <span>Ø {avgRatingTwoDecimals(votes)}</span>
           </div>
-          <span className="border border-gray-700 px-4 py-2 flex items-center space-x-2">Ø {avgRating(votes)}</span>
+          <span className="border border-gray-700 px-4 py-2 flex items-center space-x-1">
+            <span>{totalRating(votes)}</span>
+            <FaStar size={14} />
+          </span>
+
           <span className="border border-gray-700 px-4 py-2 flex items-center space-x-2">
             {currentSumbission.votes.length} vote(s)
           </span>

@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	MaxStars                   = 6
 	LivePartyStateOpen         = "open"
 	LivePartyStateWaitingLobby = "waitinglobby"
 	LivePartyStateSubmissions  = "submissions"
@@ -90,9 +91,9 @@ func CreateNonLivePartyStatus() *PartyStatus {
 	}
 }
 
-// rating 1 - 5
+// rating 1 - MaxStars
 func (liveParty *LiveParty) Vote(userID uuid.UUID, rating int) {
-	if liveParty.Status.Current == nil || rating < 1 || rating > 5 {
+	if liveParty.Status.Current == nil || rating < 1 || rating > MaxStars {
 		return
 	}
 

@@ -19,11 +19,12 @@ function Navigation() {
   return (
     <header className="text-gray-200  bg-gray-800 body-font">
       <div className="container mx-auto flex flex-wrap p-5 mb-8 flex-col md:flex-row items-center justify-between">
-        <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-6">
+        <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-2">
           <Link to="/">
-            <span className="text-xl hover:text-gray-300">
-              Group Challenge <span className="text-sm font-bold pr-4">{VERSION}</span>
-            </span>
+            <span className="text-xl hover:text-gray-300">Group Challenge</span>
+          </Link>
+          <Link to="/changelog" title="Changelog">
+            <span className="text-sm font-bold pr-4">{VERSION}</span>
           </Link>
           {session && (
             <Link className="hover:text-gray-300" to="/party/create">
