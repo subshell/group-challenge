@@ -6,11 +6,11 @@ import { useSession } from '../user/session';
 import { VERSION } from '../version';
 
 function Navigation() {
-  const [session, , removeSession] = useSession();
+  const [session, setSession] = useSession();
   const signOutAndRemoveSession = async () => {
     try {
       await signOut();
-      removeSession();
+      setSession(undefined);
     } catch (e) {
       console.error(e);
     }

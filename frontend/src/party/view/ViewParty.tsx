@@ -115,18 +115,18 @@ function ViewParty() {
     if (!id || !session?.token || partyDone) {
       return;
     }
-    console.log('join party');
+    console.trace('join party');
     mutateJoinParty({ partyId: id, sessionToken: session.token });
   }, [mutateJoinParty, id, session, partyDone]);
 
   useEffect(() => {
-    console.log(`Current party state: ${partyStatusState}`);
+    console.trace(`Current party state: ${partyStatusState}`);
   }, [partyStatusState]);
 
   const onSubmissionRating = useCallback(
     async (rating: number) => {
       if (!rating) return;
-      console.log('onRating', rating);
+      console.trace('onRating', rating);
       await mutateVote({ partyId: id, rating, sessionToken: session!.token });
     },
     [session, id, mutateVote]

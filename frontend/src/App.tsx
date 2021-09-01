@@ -18,15 +18,15 @@ import Changelog from './Changelog';
 
 function WithUser() {
   const parties = useParties();
-  const [, , removeSession] = useSession();
+  const [, setSession] = useSession();
 
   useEffect(() => {
     if (!parties.isLoading && (parties.error as RequestError)?.status === 401) {
       console.error(parties.error);
       toast('Your session has expired', { type: 'error' });
-      removeSession();
+      setSession(undefined);
     }
-  }, [parties.error, parties.isLoading, removeSession]);
+  }, [parties.error, parties.isLoading, setSession]);
 
   return (
     <Switch>

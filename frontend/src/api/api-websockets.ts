@@ -74,10 +74,8 @@ export function useWebSocket({
       }
     };
 
-    console.debug('register ws listener', queryKeyJSON);
     webSocket.addEventListener('message', wsListener);
     return () => {
-      console.debug('remove ws listener', queryKeyJSON);
       webSocket.removeEventListener('message', wsListener);
     };
   }, [webSocket, onEvent, queryKeyJSON, matchesQueryKeyFn]);

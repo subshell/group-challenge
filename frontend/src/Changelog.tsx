@@ -10,6 +10,16 @@ interface Change {
 
 const CHANGES: Change[] = [
   {
+    name: '0.2.2',
+    changes: [
+      { description: 'Session was not up to date after sign in.', type: 'fix' },
+      {
+        description: 'Intensive logging when multiple parites are present.',
+        type: 'fix',
+      },
+    ],
+  },
+  {
     name: '0.2.1',
     changes: [{ description: 'Changelog flickers on browser focus.', type: 'fix' }],
   },
