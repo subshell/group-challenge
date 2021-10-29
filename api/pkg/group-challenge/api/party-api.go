@@ -15,6 +15,10 @@ import (
 	"github.com/xis/baraka/v2"
 )
 
+type assignModeratorRequestBody struct {
+	UserId uuid.UUID `json:"userId"`
+}
+
 type partyRequestBody struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -105,6 +109,47 @@ func reopenPartyHandler(c *gin.Context) {
 
 	party.Done = false
 	livePartyHub.RemoveLiveParty(partyID)
+
+	err = party.Update(con)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(500)
+		return
+	}
+
+	party.Select(con)
+	broadcastParty("update", party)
+	c.JSON(200, party)
+}
+
+func assignModeratorHandler(c *gin.Context) {
+	_session, _ := c.Get("session")
+	session := _session.(*models.Session)
+	partyID, err := parseFormId(c, "id")
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	party := &models.Party{
+		ID: partyID,
+	}
+	party.Select(con)
+
+	if party.UserID != session.User {
+		c.Status(403)
+		return
+	}
+
+	body := assignModeratorRequestBody{}
+	c.BindJSON(&body)
+
+	if body.UserId == uuid.Nil {
+		c.Status(400)
+		return
+	}
+
+	party.UserID = body.UserId
 
 	err = party.Update(con)
 	if err != nil {

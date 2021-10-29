@@ -8,15 +8,19 @@ interface Change {
   changes: ChangeItem[];
 }
 
-export const VERSION = '0.2.2';
+export const VERSION = '0.3.0';
 
 export const CHANGES: Change[] = [
+  {
+    name: '0.3.0',
+    changes: [{ description: 'The party moderator is now able to elect a new moderator.', type: 'feature' }],
+  },
   {
     name: '0.2.2',
     changes: [
       { description: 'Session was not up to date after sign in.', type: 'fix' },
       {
-        description: 'Intensive logging when multiple parites are present.',
+        description: 'Intensive logging if multiple parties are present.',
         type: 'fix',
       },
     ],

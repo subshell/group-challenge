@@ -155,6 +155,24 @@ export async function createParty({
   }).then((r) => r.json());
 }
 
+export async function assignModerator({
+  partyId,
+  userId,
+  sessionToken,
+}: {
+  userId: string;
+  partyId: string;
+  sessionToken: string;
+}): Promise<Response> {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/assignModerator`, {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  });
+}
+
 export async function editParty({
   party,
   partyId,
