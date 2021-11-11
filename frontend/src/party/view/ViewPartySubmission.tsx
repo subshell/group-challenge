@@ -5,20 +5,20 @@ import { PartyStatusResponse, PartySubmissionResponse } from '../../api/api-mode
 import StarRating from '../../components/StarRating';
 import Timer from '../../components/Timer';
 import { useSession } from '../../user/session';
+import ReactionBubbles from './ReactionBubbles';
 import { getSubmissionVotes } from './util';
 
 export interface ViewPartySubmissionProps {
   partySubmission: PartySubmissionResponse;
+  partyId: string;
   partyStatus: PartyStatusResponse;
   numSubmissions: number;
   onDone?: (rating: number) => any;
   onRating?: (rating: number) => any;
 }
 
-// const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡'];
-// <ReactionPicker reactions={REACTIONS} />
-
 function ViewPartySubmission({
+  partyId,
   partySubmission,
   partyStatus,
   numSubmissions,
@@ -29,7 +29,6 @@ function ViewPartySubmission({
   const [rating, setRating] = useState(
     () => getSubmissionVotes(partyStatus, partySubmission, session!.userId)[0]?.rating || 0
   );
-
   const [done, setDone] = useState(false);
   const onTimer = useCallback(() => {
     toast('⏰ Time is up!', {});
@@ -60,8 +59,10 @@ function ViewPartySubmission({
               alt={partySubmission.name}
             />
           </a>
+          <div className="absolute right-2 bottom-2">
+            <ReactionBubbles partyId={partyId} />
+          </div>
         </div>
-
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
             <h3 className="text-2xl font-medium text-gray-900">

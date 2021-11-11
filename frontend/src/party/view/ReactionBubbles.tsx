@@ -1,0 +1,41 @@
+import { FunctionComponent, useState } from 'react';
+import { useInterval } from 'react-use';
+import { useReactions } from '../../api/api';
+
+interface TimedReaction {
+  reaction: string;
+  dieDate: number;
+}
+
+const MAX_REACTIONS = 8;
+const TTL = 6000;
+
+const ReactionBubbles: FunctionComponent<{ partyId: string }> = ({ partyId }) => {
+  const [reactions, setReactions] = useState<TimedReaction[]>([]);
+  useReactions(partyId, (reaction) => {
+    setReactions([
+      ...reactions,
+      {
+        reaction,
+        dieDate: Date.now() + TTL,
+      },
+    ]);
+  });
+
+  useInterval(() => {
+    const now = Date.now();
+    setReactions(reactions.filter((reaction) => reaction.dieDate > now).splice(0, MAX_REACTIONS));
+  }, 500);
+
+  return (
+    <div className="space-y-2 flex flex-col">
+      {reactions.map((reaction, i) => (
+        <div key={i} className="flex justify-end">
+          <div className="bg-black opacity-90 rounded p-2 text-2xl text-white">{reaction.reaction}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default ReactionBubbles;

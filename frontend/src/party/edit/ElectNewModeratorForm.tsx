@@ -18,7 +18,9 @@ const ElectNewModeratorForm: FunctionComponent<{ onSubmit: (data: ElectNewModera
     },
   });
 
-  const possibleModerators = (users || []).filter((user) => user.id !== session?.userId);
+  const possibleModerators = (users || [])
+    .filter((user) => user.id !== session?.userId)
+    .sort((a, b) => (a.username === b.username ? 0 : a.username < b.username ? -1 : 1));
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

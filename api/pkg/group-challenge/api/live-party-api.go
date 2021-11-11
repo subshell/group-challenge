@@ -16,6 +16,10 @@ type voteRequest struct {
 	Rating int `json:"rating"`
 }
 
+type reactionRequest struct {
+	Reaction string `json:"reaction"`
+}
+
 func triggerLivePartyWebSocketEvent(partyID uuid.UUID, partyStatus *liveparty.PartyStatus) {
 	wsEvent := &ws.GCWebSocketEvent{
 		Key:       []string{"parties", partyID.String(), "live", "status"},
@@ -165,6 +169,41 @@ func livePartyVoteHandler(c *gin.Context) {
 	liveParty.Vote(session.User, body.Rating)
 
 	broadcastPartyStatus(party.ID, liveParty.Status)
+	c.JSON(200, liveParty.Status)
+}
+
+// TODO
+func livePartyReactionHandler(c *gin.Context) {
+	party, err := parseParty(c)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	liveParty, ok := livePartyHub.GetLiveParty(party.ID)
+	if !ok {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	body := reactionRequest{}
+	if err := c.BindJSON(&body); err != nil {
+		fmt.Println("invalid body", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	wsEvent := &ws.GCWebSocketEvent{
+		Key:       []string{"parties", party.ID.String(), "live", "reaction"},
+		Operation: "live",
+		Data:      body,
+	}
+
+	if msg, err := json.Marshal(wsEvent); err == nil {
+		wsHub.Broadcast <- msg
+	}
+
 	c.JSON(200, liveParty.Status)
 }
 

@@ -4,6 +4,7 @@ import {
   joinParty,
   nextPartySubmissions,
   previousPartySubmissions,
+  sendReaction,
   useParty,
   usePartyStatus,
   votePartySubmissions,
@@ -18,6 +19,9 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ViewPartyStartPage from './ViewPartyStartPage';
 import ViewPartyReveal from './ViewPartyReveal';
 import EmojiBar from '../../components/EmojiBar';
+import ReactionPicker from '../../components/ReactionPicker';
+
+const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡', '🐶', '🐱'];
 
 const ViewPartyContent = ({
   partyStatus,
@@ -34,6 +38,16 @@ const ViewPartyContent = ({
   onNextButton: () => any;
   onRedirect: () => any;
 }) => {
+  const partyId = party.id;
+  const [session] = useSession();
+  const { mutateAsync: mutateReactionAsync } = useMutation(sendReaction);
+  const onReaction = useCallback(
+    (reaction: string) => {
+      mutateReactionAsync({ partyId, reaction, sessionToken: session!.token });
+    },
+    [mutateReactionAsync, partyId, session]
+  );
+
   if (!partyStatus || !party) {
     return <div>Unknown party or party status</div>;
   }
@@ -47,8 +61,21 @@ const ViewPartyContent = ({
     return null;
   }
 
+  const reactionPicker = (
+    <div className="block md:fixed mt-8 z-10 bottom-4 left-4">
+      <ReactionPicker reactions={REACTIONS} onReaction={onReaction} />
+    </div>
+  );
+
   if (partyStatus.state === 'waitinglobby') {
-    return <ViewPartyStartPage isHost={isHost} participants={partyStatus.participants} onPartyStart={onNextButton} />;
+    return (
+      <ViewPartyStartPage
+        isHost={isHost}
+        participants={partyStatus.participants}
+        partyName={party.name}
+        onPartyStart={onNextButton}
+      />
+    );
   }
 
   if (partyStatus.state === 'submissions') {
@@ -58,12 +85,14 @@ const ViewPartyContent = ({
         {partySubmission && (
           <ViewPartySubmission
             key={partySubmission.id}
+            partyId={party.id}
             partySubmission={partySubmission}
             partyStatus={partyStatus}
             numSubmissions={party.submissions?.length || 0}
             onRating={onRating}
           />
         )}
+        {reactionPicker}
       </div>
     );
   }
@@ -86,6 +115,8 @@ const ViewPartyContent = ({
     return (
       <div>
         <ViewPartyReveal party={party} partyStatus={partyStatus} />
+
+        {reactionPicker}
       </div>
     );
   }

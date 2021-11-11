@@ -73,8 +73,12 @@ export interface UserSession {
 
 // ws models
 
+export interface PartyReaction {
+  reaction: string;
+}
+
 export interface GCWebSocketEvent {
   key: string[];
-  operation: 'add' | 'delete' | 'update';
-  data: PartyStatusResponse | PartyResponse;
+  operation: 'add' | 'delete' | 'update' | 'live';
+  data: PartyStatusResponse | PartyResponse | PartyReaction;
 }

@@ -8,9 +8,18 @@ interface Change {
   changes: ChangeItem[];
 }
 
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 export const CHANGES: Change[] = [
+  {
+    name: '0.4.0',
+    changes: [
+      { description: 'Party reactions!', type: 'feature' },
+      { description: 'Show the party name on party start page.', type: 'feature' },
+      { description: 'elect new moderator: users should be sorted by name.', type: 'fix' },
+      { description: 'party archive: sort parties by date.', type: 'fix' },
+    ],
+  },
   {
     name: '0.3.0',
     changes: [{ description: 'The party moderator is now able to elect a new moderator.', type: 'feature' }],

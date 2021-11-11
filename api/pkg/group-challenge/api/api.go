@@ -54,6 +54,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 				live.POST("/next", livePartyNextHandler)
 				live.POST("/previous", livePartyPreviousHandler)
 				live.POST("/vote", livePartyVoteHandler)
+				live.POST("/reaction", livePartyReactionHandler)
 				live.POST("/join", livePartyJoinHandler)
 			}
 		}

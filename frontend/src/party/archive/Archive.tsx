@@ -8,7 +8,9 @@ function Archive() {
   if (isError) return <p>ERROR!</p>;
   if (isLoading) return <p>loading archive...</p>;
 
-  const closedParties = (parties || []).filter((party) => party.done);
+  const closedParties = (parties || [])
+    .filter((party) => party.done)
+    .sort((a, b) => new Date(a.startDate).getDate() - new Date(b.startDate).getDate());
 
   if (!closedParties?.length) {
     return (

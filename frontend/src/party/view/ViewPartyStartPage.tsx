@@ -4,14 +4,17 @@ import EmojiBar from '../../components/EmojiBar';
 function ViewPartyStartPage({
   isHost,
   participants,
+  partyName,
   onPartyStart,
 }: {
   isHost: boolean;
   participants: number;
+  partyName: string;
   onPartyStart: () => any;
 }) {
   return (
     <div className="flex flex-col items-center justify-between align-middle space-y-10">
+      <h2 className="text-4xl font-bold">- {partyName} -</h2>
       <div className="flex space-x-8 items-center bg-white">
         <p className="font-bold">Share link:</p>
         <span className="flex items-center border border-blue-500 rounded p-2 pl-4 pr-4 font-bold">

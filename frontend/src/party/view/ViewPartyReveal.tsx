@@ -1,6 +1,7 @@
 import { FaStar } from 'react-icons/fa';
 import { getImageUrl } from '../../api/api';
 import { PartyResponse, PartyStatusResponse } from '../../api/api-models';
+import ReactionBubbles from './ReactionBubbles';
 import PartyPosition from './rewards/PartyPosition';
 import { totalRating, avgRatingTwoDecimals, getSubmissionVotes } from './util';
 
@@ -25,6 +26,9 @@ function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partySt
             alt={currentSumbission.name}
           />
         </a>
+        <div className="absolute right-2 bottom-2">
+          <ReactionBubbles partyId={party.id} />
+        </div>
       </div>
       <div className="flex flex-row justify-between mt-8">
         <div className="space-y-2">

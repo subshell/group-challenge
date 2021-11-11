@@ -7,6 +7,7 @@ import {
   UserResponse,
   UserSession,
   GCWebSocketEvent,
+  PartyReaction,
 } from './api-models';
 import { PartyFormData } from '../party/PartyForm';
 import { useSession } from '../user/session';
@@ -93,6 +94,22 @@ const useUpdateQueryDataFromEvents = ({
 };
 
 export const getImageUrl = (imageId: string) => `${API_URLS.API}/images/${imageId}`;
+
+export const useReactions = (partyId: string, onIncomingReaction: (reaction: string) => void) => {
+  const queryKey = ['parties', partyId, 'live', 'reaction'];
+  const queryKeyJSON = JSON.stringify(queryKey);
+  const matchesQueryKeyFn = useCallback(() => false, []);
+  const onEvent = useCallback(
+    (e: GCWebSocketEvent) => {
+      if (JSON.stringify(e.key) === queryKeyJSON) {
+        const reaction = (e.data as PartyReaction).reaction;
+        onIncomingReaction(reaction);
+      }
+    },
+    [queryKeyJSON, onIncomingReaction]
+  );
+  useWebSocket({ queryKey, onEvent, matchesQueryKeyFn });
+};
 
 export const useParties = () =>
   useLiveApiHook<PartyResponse[]>({
@@ -262,6 +279,24 @@ export async function deleteSubmission({
 }): Promise<Response> {
   return await fetch(`${API_URLS.API}/parties/${partyId}/submissions/${submissionId}`, {
     method: 'DELETE',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  });
+}
+
+export async function sendReaction({
+  partyId,
+  sessionToken,
+  reaction,
+}: {
+  partyId: string;
+  sessionToken: string;
+  reaction: string;
+}): Promise<Response> {
+  return await fetch(`${API_URLS.API}/parties/${partyId}/live/reaction`, {
+    method: 'POST',
+    body: JSON.stringify({ reaction }),
     headers: {
       'X-AuthToken': sessionToken,
     },
