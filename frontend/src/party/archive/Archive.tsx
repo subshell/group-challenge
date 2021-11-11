@@ -10,7 +10,7 @@ function Archive() {
 
   const closedParties = (parties || [])
     .filter((party) => party.done)
-    .sort((a, b) => new Date(a.startDate).getDate() - new Date(b.startDate).getDate());
+    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
   if (!closedParties?.length) {
     return (
