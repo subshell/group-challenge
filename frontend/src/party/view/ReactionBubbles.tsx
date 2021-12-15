@@ -7,24 +7,29 @@ interface TimedReaction {
   dieDate: number;
 }
 
-const MAX_REACTIONS = 8;
+const MAX_REACTIONS = 5;
 const TTL = 6000;
 
 const ReactionBubbles: FunctionComponent<{ partyId: string }> = ({ partyId }) => {
   const [reactions, setReactions] = useState<TimedReaction[]>([]);
   useReactions(partyId, (reaction) => {
-    setReactions([
-      ...reactions,
-      {
-        reaction,
-        dieDate: Date.now() + TTL,
-      },
-    ]);
+    setReactions(
+      [
+        ...reactions,
+        {
+          reaction,
+          dieDate: Date.now() + TTL,
+        },
+      ]
+        .reverse()
+        .slice(0, MAX_REACTIONS)
+        .reverse()
+    );
   });
 
   useInterval(() => {
     const now = Date.now();
-    setReactions(reactions.filter((reaction) => reaction.dieDate > now).splice(0, MAX_REACTIONS));
+    setReactions(reactions.filter((reaction) => reaction.dieDate > now));
   }, 500);
 
   return (

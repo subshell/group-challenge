@@ -32,6 +32,10 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
     reader.readAsDataURL(file);
   }, [file, fileTooLarge]);
 
+  if (!id) {
+    return <div>No party id provided</div>;
+  }
+
   const onSubmit = async (data: PartySubmissionFormData) => {
     const req = await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
     if (req.status === 413) {

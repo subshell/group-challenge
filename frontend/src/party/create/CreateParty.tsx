@@ -1,18 +1,18 @@
 import { useMutation } from 'react-query';
 import { createParty } from '../../api/api';
 import { useSession } from '../../user/session';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import PartyForm, { PartyFormData } from '../PartyForm';
 
 function CreateParty() {
   const [session] = useSession();
   const { mutateAsync } = useMutation(createParty);
-  const history = useHistory();
+  const navigate = useNavigate();
   const onSubmit = async (data: PartyFormData) => {
     const party = await mutateAsync({ party: data, sessionToken: session!.token });
     toast(`new party '${party.name}' created 🥳`, { type: 'success' });
-    history.push('/');
+    navigate('/');
   };
 
   return (

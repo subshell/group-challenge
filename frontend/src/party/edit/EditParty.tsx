@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useMutation } from 'react-query';
-import { useHistory, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { deleteParty, editParty, assignModerator, useParty } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
@@ -11,9 +11,9 @@ import ElectNewModeratorForm, { ElectNewModeratorFormData } from './ElectNewMode
 
 function EditParty() {
   const [session] = useSession();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { data: party, isError, isLoading } = useParty(id);
+  const { data: party, isError, isLoading } = useParty(id as string);
   const { mutateAsync: mutatePartyAsync } = useMutation(editParty);
   const { mutateAsync: mutateNewModeratorAsync } = useMutation(assignModerator);
   const deletePartyMutation = useMutation(deleteParty);
@@ -22,15 +22,15 @@ function EditParty() {
     const result = window.confirm(`Are you sure you want to delete ${party?.name}`);
     if (result) {
       toast.info(`Party ${party?.name} has been deleted`);
-      await deletePartyMutation.mutate({ partyId: id, sessionToken: session!.token });
-      history.push('/');
+      await deletePartyMutation.mutate({ partyId: id as string, sessionToken: session!.token });
+      navigate('/');
     }
   };
 
   const onSubmit = async (partyFormData: PartyFormData) => {
     toast.success(`party '${partyFormData.name}' edited 😁`);
-    await mutatePartyAsync({ party: partyFormData, partyId: id, sessionToken: session!.token });
-    history.push('/');
+    await mutatePartyAsync({ party: partyFormData, partyId: id as string, sessionToken: session!.token });
+    navigate('/');
   };
 
   const onChangeModerator = async (data: ElectNewModeratorFormData) => {
@@ -40,13 +40,13 @@ function EditParty() {
     }
 
     const response = await mutateNewModeratorAsync({
-      partyId: id,
+      partyId: id as string,
       sessionToken: session!.token,
       userId: data.new_moderator,
     });
     if (response.status === 200) {
       toast.success(`${party?.name} has a new moderator!`);
-      history.push('/');
+      navigate('/');
     } else {
       toast.error(`something went wrong: ${response.status} ${response.statusText}!`);
     }
@@ -54,9 +54,9 @@ function EditParty() {
 
   useEffect(() => {
     if (!party && isError) {
-      history.push('/');
+      navigate('/');
     }
-  }, [party, isError, history]);
+  }, [party, isError, navigate]);
 
   if (isError) return <span>Error</span>;
   if (!party || isLoading) return <span>Loading</span>;
@@ -66,6 +66,10 @@ function EditParty() {
     startDate: new Date(party!.startDate).toISOString().split('T')[0],
     endDate: new Date(party!.endDate).toISOString().split('T')[0],
   };
+
+  if (!id) {
+    return <div>No party id provided</div>;
+  }
 
   return (
     <div>

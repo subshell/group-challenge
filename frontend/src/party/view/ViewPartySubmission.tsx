@@ -59,7 +59,7 @@ function ViewPartySubmission({
               alt={partySubmission.name}
             />
           </a>
-          <div className="absolute right-2 bottom-2">
+          <div className="absolute right-2 bottom-2 overflow-y-hidden">
             <ReactionBubbles partyId={partyId} />
           </div>
         </div>

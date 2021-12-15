@@ -8,16 +8,22 @@ interface Change {
   changes: ChangeItem[];
 }
 
-export const VERSION = '0.4.0';
-
 export const CHANGES: Change[] = [
+  {
+    name: '0.5.0',
+    changes: [
+      { description: 'Dependency updates', type: 'note' },
+      { description: 'Fix party reactions limit', type: 'fix' },
+      { description: 'Add custom emoji picker', type: 'feature' },
+    ],
+  },
   {
     name: '0.4.0',
     changes: [
       { description: 'Party reactions!', type: 'feature' },
       { description: 'Show the party name on party start page.', type: 'feature' },
-      { description: 'elect new moderator: users should be sorted by name.', type: 'fix' },
-      { description: 'party archive: sort parties by date.', type: 'fix' },
+      { description: 'Elect new moderator: users should be sorted by name.', type: 'fix' },
+      { description: 'Party archive: sort parties by date.', type: 'fix' },
     ],
   },
   {
@@ -60,3 +66,5 @@ export const CHANGES: Change[] = [
     ],
   },
 ];
+
+export const VERSION = CHANGES[0].name;

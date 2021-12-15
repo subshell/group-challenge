@@ -8,12 +8,16 @@ import PostPartySubmission from './PostPartySubmission';
 function OwnSubmissions() {
   const [session] = useSession();
   const { id } = useParams<{ id: string }>();
-  const { data: party, isError, isLoading, refetch } = useParty(id);
-  const { data: partyStatus } = usePartyStatus(id);
+  const { data: party, isError, isLoading, refetch } = useParty(id as string);
+  const { data: partyStatus } = usePartyStatus(id as string);
   if (isError) return <span>Error</span>;
   if (!party || isLoading) return <span>Loading</span>;
 
   const ownSubmissions = party!.submissions.filter((submission) => submission.userId === session?.userId);
+
+  if (!id) {
+    return <div>No party id provided</div>;
+  }
 
   return (
     <div className="space-y-20">

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { FaArrowRight, FaCameraRetro, FaEdit, FaTv } from 'react-icons/fa';
 import { useMutation } from 'react-query';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router';
 import { reopenParty, startParty, useParty, usePartyStatus } from '../api/api';
 import { isPartyLive } from '../api/api-models';
 import { useSession } from '../user/session';
@@ -12,7 +12,7 @@ function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPa
   const partyStatus = usePartyStatus(partyId);
   const { mutateAsync: startMutateAsync } = useMutation(startParty);
   const { mutateAsync: reopenPartyMutateAsync } = useMutation(reopenParty);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const isLive = partyStatus.isSuccess && isPartyLive(partyStatus.data);
   const isHost = party?.userId === session?.userId;
@@ -42,25 +42,25 @@ function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPa
   };
 
   const onJoinPartyButton = async () => {
-    history.push('/party/view/' + partyId);
+    navigate('/party/view/' + partyId);
   };
 
   const onEditButton = () => {
     if (!isHost) {
       return;
     }
-    history.push('/party/edit/' + partyId);
+    navigate('/party/edit/' + partyId);
   };
 
   const onSubmissionsButton = () => {
     if (party?.done) {
       return;
     }
-    history.push('/party/my-submissions/' + partyId);
+    navigate('/party/my-submissions/' + partyId);
   };
 
   const onLeaderboardButton = () => {
-    history.push('/party/view/' + partyId);
+    navigate('/party/view/' + partyId);
   };
 
   useEffect(() => {

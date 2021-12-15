@@ -1,5 +1,5 @@
 import Navigation from './navigation/Navigation';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
 import ViewParty from './party/view/ViewParty';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -29,54 +29,28 @@ function WithUser() {
   }, [parties.error, parties.isLoading, setSession]);
 
   return (
-    <Switch>
-      <Route path="/" exact>
-        <Home />
+    <Routes>
+      <Route path="/archive" element={<Archive />} />
+      <Route path="/changelog" element={<Changelog />} />
+      <Route path="/party">
+        <Route path="create" element={<CreateParty />} />
+        <Route path="view/:id" element={<ViewParty />} />
+        <Route path="edit/:id" element={<EditParty />} />
+        <Route path="my-submissions/:id" element={<OwnSubmissions />} />
       </Route>
-      <Route path="/archive" exact>
-        <Archive />
-      </Route>
-      <Route path="/changelog" exact>
-        <Changelog />
-      </Route>
-      <Route path="/party/create">
-        <CreateParty />
-      </Route>
-      <Route path="/party/view/:id">
-        <ViewParty />
-      </Route>
-      <Route path="/party/edit/:id">
-        <EditParty />
-      </Route>
-      <Route path="/party/my-submissions/:id">
-        <OwnSubmissions />
-      </Route>
-      <Route path="/profile">
-        <EditProfile />
-      </Route>
-      <Route>
-        <Redirect to="/" />
-      </Route>
-    </Switch>
+      <Route path="/profile" element={<EditProfile />} />
+      <Route path="/*" element={<Home />} />
+    </Routes>
   );
 }
 
 function WithoutUser() {
   return (
-    <Switch>
-      <Route path="/" exact>
-        <Home />
-      </Route>
-      <Route path="/signin">
-        <SignIn />
-      </Route>
-      <Route path="/signup">
-        <SignUp />
-      </Route>
-      <Route path="/">
-        <Redirect to="/" />
-      </Route>
-    </Switch>
+    <Routes>
+      <Route path="/signin" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/*" element={<Home />} />
+    </Routes>
   );
 }
 

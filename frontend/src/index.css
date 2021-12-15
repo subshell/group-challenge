@@ -1,5 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @import 'react-toastify/dist/ReactToastify.css';
 @import 'react-datepicker/dist/react-datepicker.css';
+
+/*
+ * Global styles for thrid party libraries
+ */
+.react-input-emoji--container {
+  margin: 0 !important;
+  width: 300px !important;
+}

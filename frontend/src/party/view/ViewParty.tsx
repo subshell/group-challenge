@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import {
   joinParty,
   nextPartySubmissions,
@@ -20,8 +20,6 @@ import ViewPartyStartPage from './ViewPartyStartPage';
 import ViewPartyReveal from './ViewPartyReveal';
 import EmojiBar from '../../components/EmojiBar';
 import ReactionPicker from '../../components/ReactionPicker';
-
-const REACTIONS = ['😍', '😐', '🤢', '😎', '😂', '😡', '🐶', '🐱'];
 
 const ViewPartyContent = ({
   partyStatus,
@@ -63,7 +61,7 @@ const ViewPartyContent = ({
 
   const reactionPicker = (
     <div className="block md:fixed mt-8 z-10 bottom-4 left-4">
-      <ReactionPicker reactions={REACTIONS} onReaction={onReaction} />
+      <ReactionPicker onReaction={onReaction} />
     </div>
   );
 
@@ -125,12 +123,12 @@ const ViewPartyContent = ({
 };
 
 function ViewParty() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [session] = useSession();
   const { id } = useParams<{ id: string }>();
 
-  const party = useParty(id);
-  const partyStatus = usePartyStatus(id);
+  const party = useParty(id as string);
+  const partyStatus = usePartyStatus(id as string);
 
   const { mutate: mutateJoinParty } = useMutation(joinParty);
   const { mutateAsync: mutateNextSubmission } = useMutation(nextPartySubmissions);
@@ -158,17 +156,17 @@ function ViewParty() {
     async (rating: number) => {
       if (!rating) return;
       console.trace('onRating', rating);
-      await mutateVote({ partyId: id, rating, sessionToken: session!.token });
+      await mutateVote({ partyId: id as string, rating, sessionToken: session!.token });
     },
     [session, id, mutateVote]
   );
 
   const onNextButton = async () => {
-    await mutateNextSubmission({ partyId: id, sessionToken: session!.token });
+    await mutateNextSubmission({ partyId: id as string, sessionToken: session!.token });
   };
 
   const onPreviousButton = async () => {
-    await mutatePreviousSubmission({ partyId: id, sessionToken: session!.token });
+    await mutatePreviousSubmission({ partyId: id as string, sessionToken: session!.token });
   };
 
   if (party.isError || partyStatus.isError) return <span>error</span>;
@@ -187,7 +185,7 @@ function ViewParty() {
         isHost={isHost}
         onRating={onSubmissionRating}
         onNextButton={onNextButton}
-        onRedirect={() => history.push('/')}
+        onRedirect={() => navigate('/')}
       />
       {showControlButtons && (
         <div>
