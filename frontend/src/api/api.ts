@@ -132,12 +132,9 @@ export const usePartyStatus = (id: string) =>
 export const useUsers = () => useApiHook<UserResponse[]>({ queryKey: ['users'] });
 export const useUser = (id: string) => useApiHook<UserResponse>({ queryKey: ['users', id] });
 
-export async function signIn(username: string, password: string): Promise<UserSession | undefined> {
-  const rawHeader = `${username}:${password}`;
+export async function signIn(emailOrUsername: string, password: string): Promise<UserSession | undefined> {
   const response = await fetch(`${API_URLS.AUTH}/signin`, {
-    headers: {
-      Authorization: `Bearer ${window.btoa(rawHeader)}`,
-    },
+    body: JSON.stringify({ emailOrUsername, password: window.btoa(password) }),
     method: 'POST',
   });
 

@@ -10,6 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type signInBody struct {
+	EmailOrUsername string `json:"emailOrUsername"`
+	Password        string `json:"password"`
+}
+
 type userSession struct {
 	Username string `json:"username"`
 	UserID   string `json:"userId"`
@@ -55,8 +60,10 @@ func registerHandler(c *gin.Context) {
 }
 
 func signinHandler(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	user, err := auth.GetUserFromToken(con, token)
+	body := signInBody{}
+	c.BindJSON(&body)
+
+	user, err := auth.GetUserFromSignInBody(con, body.EmailOrUsername, body.Password)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{

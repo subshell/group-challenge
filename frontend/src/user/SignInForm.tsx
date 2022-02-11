@@ -3,13 +3,18 @@ import { toast } from 'react-toastify';
 import { signIn } from '../api/api';
 import { useSession } from './session';
 
+interface FormData {
+  emailOrUsername: string;
+  password: string;
+}
+
 function SignInForm() {
   const [, setSession] = useSession();
 
-  const { register, handleSubmit, formState } = useForm<{ username: string; password: string }>();
-  const onSubmit = async ({ username, password }: { username: string; password: string }) => {
+  const { register, handleSubmit, formState } = useForm<FormData>();
+  const onSubmit = async ({ emailOrUsername, password }: FormData) => {
     try {
-      const session = await signIn(username, password);
+      const session = await signIn(emailOrUsername, password);
       if (!session) {
         toast('invalid login', { type: 'error' });
         return;
@@ -25,15 +30,15 @@ function SignInForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
-          Username
+        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="emailOrUsername">
+          Email or Username
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
           type="text"
-          {...register('username', { required: true })}
+          {...register('emailOrUsername', { required: true })}
         />
-        <p>{formState.errors.username && <span>This field is required</span>}</p>
+        <p>{formState.errors.emailOrUsername && <span>This field is required</span>}</p>
       </div>
       <div className="mb-6">
         <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">

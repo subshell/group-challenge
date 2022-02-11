@@ -67,7 +67,7 @@ function SignUpForm() {
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
           type="email"
-          {...register('email')}
+          {...register('email', { required: true })}
         />
         <p>{formState.errors.email && <span>Error</span>}</p>
       </div>

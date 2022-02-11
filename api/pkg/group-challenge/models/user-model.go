@@ -55,6 +55,12 @@ func (user *User) SelectByUsername(con *pg.DB) (err error) {
 	return
 }
 
+// SelectByUsername selects the user by its email
+func (user *User) SelectByUEmail(con *pg.DB) (err error) {
+	err = con.Model(user).Where("email = ?0", user.Email).Select()
+	return
+}
+
 // Update updates the user
 func (user *User) Update(con *pg.DB) error {
 	_, err := con.Model(user).Update()
