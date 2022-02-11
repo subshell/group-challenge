@@ -71,16 +71,10 @@ helm install -f gc-values.yaml group-challenge <path-to-repo>/group-challenge/he
 
 ## Run production build locally using docker-compose
 
-1. Build the docker image locally:
-
-```sh
-docker build -t=local.test/group-challenge:latest .
-```
-
-2. `cd` into the `local` directory and run
+1. `cd` into the `local` directory and run
 
 ```sh
 docker-compose up
 ```
 
-3. Open the browser at `http://localhost:8080`.
+2. Open the browser at `http://localhost:8080`.
