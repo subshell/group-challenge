@@ -49,25 +49,14 @@ challenges:
     defaultTimePerSubmissionSeconds: 45
 ```
 
-## Deploy to k8s with Helm
-
-### Postgres DB Chart
-
-Minimal `postgres-values.yaml` (see also: https://github.com/bitnami/charts/tree/master/bitnami/postgresql):
-
-```sh
-postgresqlDatabase: "group_challenge"
-postgresqlPassword: postgres
-postgresqlUsername: postgres
-```
-
-You definitely want to change the password using `global.postgresql.postgresqlPassword`. You have to install the `pgcrypto` extension manually.
-
-### GroupChallenge Chart
+### Kubernetes support
 
 ```sh
 helm install -f gc-values.yaml group-challenge <path-to-repo>/group-challenge/helm/group-challenge
 ```
+
+This chart uses the [Bitnami Postgres Helm Chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) as a dependency. Configure it with `postgresql` in your `values.yaml` file.
+You definitely want to change the password using `global.postgresql.postgresqlPassword` or a secret. You have to install the `pgcrypto` extension manually.
 
 ## Run production build locally using docker-compose
 

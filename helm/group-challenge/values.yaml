@@ -52,13 +52,12 @@ ingress:
   #      - chart-example.local
 
 resources:
-  {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1024Mi
 
 nodeSelector: {}
 
@@ -78,6 +77,14 @@ groupChallenge:
       user: postgres
       password: postgres
       database: group_challenge
-      host: "gc-db-postgresql:5432"
+      host: "gc-postgres:5432"
       poolSize: 50
       logQueries: false
+
+postgresql:
+  enabled: true
+  fullnameOverride: gc-postgres
+  auth:
+    database: "group_challenge"
+    enablePostgresUser: true
+    postgresPassword: postgres
