@@ -47,6 +47,12 @@ db:
 challenges:
   liveParty:
     defaultTimePerSubmissionSeconds: 45
+imgProxy:
+  enabled: true
+  url: "http://localhost:8081"
+  localFilePath: "/tmp/group-challenge-cache"
+  thumbnailQuality: 75
+  fullSizeQuality: 75
 ```
 
 ### Kubernetes support
@@ -67,3 +73,7 @@ docker-compose up
 ```
 
 2. Open the browser at `http://localhost:8080`.
+
+## Image processing
+
+To reduce the size of all uploaded images, we support [imgProxy](https://docs.imgproxy.net). See `imgProxy` for its configuration.

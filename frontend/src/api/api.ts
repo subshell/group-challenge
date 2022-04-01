@@ -93,7 +93,8 @@ const useUpdateQueryDataFromEvents = ({
   useWebSocket({ queryKey, onEvent, matchesQueryKeyFn });
 };
 
-export const getImageUrl = (imageId: string) => `${API_URLS.API}/images/${imageId}`;
+export const getImageUrl = (imageId: string) => `${API_URLS.API}/images/full/${imageId}`;
+export const getThumbnailUrl = (imageId: string) => `${API_URLS.API}/images/thumbnail/${imageId}`;
 
 export const useReactions = (partyId: string, onIncomingReaction: (reaction: string) => void) => {
   const queryKey = ['parties', partyId, 'live', 'reaction'];

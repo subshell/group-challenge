@@ -11,3 +11,11 @@ db:
 challenges:
   liveParty:
     defaultTimePerSubmissionSeconds: 45
+imgProxy:
+  enabled: true
+  url: "http://localhost:8081"
+  sharedLocalCacheDir: "/tmp/group-challenge-cache"
+  thumbnailQuality: 90
+  fullSizeQuality: 75
+  maxFullWidth: 1280
+  maxFullHeight: 1280

@@ -265,7 +265,7 @@ func addPartySubmissionHandler(c *gin.Context) {
 	}
 
 	// TODO check mime types
-	mimeType, err := GetFileContentType(&uploadedImage.Content)
+	mimeType, err := GetFileContentType(uploadedImage.Content)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
