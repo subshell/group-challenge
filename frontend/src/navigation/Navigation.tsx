@@ -1,4 +1,4 @@
-import { FaUserAlt, FaUserAstronaut, FaUserFriends, FaUserGraduate, FaWaveSquare } from 'react-icons/fa';
+import { FaUserGraduate } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 import { signOut } from '../api/api';
