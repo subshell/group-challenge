@@ -95,7 +95,7 @@ imgProxy:
     repository: darthsim/imgproxy
     pullPolicy: IfPresent
     tag: "v3.3.3"
-  env: {}
+  env: []
   resources: {}
 
 postgresql:
