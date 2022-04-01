@@ -40,7 +40,7 @@ spec:
             - name: IMGPROXY_LOCAL_FILESYSTEM_ROOT
               value: "/tmp/group-challenge-cache"
             - name: IMGPROXY_BIND
-              value: "8081"
+              value: ":8081"
             {{ if .Values.imgProxy.env -}}
             {{- toYaml .Values.imgProxy.env | nindent 12 }}
             {{- end }}
