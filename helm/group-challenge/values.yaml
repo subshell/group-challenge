@@ -80,6 +80,23 @@ groupChallenge:
       host: "gc-postgres:5432"
       poolSize: 50
       logQueries: false
+    imgProxy:
+      enabled: true
+      url: "http://localhost:8081"
+      sharedLocalCacheDir: "/tmp/group-challenge-cache"
+      thumbnailQuality: 90
+      fullSizeQuality: 75
+      maxFullWidth: 1280
+      maxFullHeight: 1280
+
+imgProxy:
+  enabled: true
+  image:
+    repository: darthsim/imgproxy
+    pullPolicy: IfPresent
+    tag: "v3.3.3"
+  env: {}
+  resources: {}
 
 postgresql:
   enabled: true

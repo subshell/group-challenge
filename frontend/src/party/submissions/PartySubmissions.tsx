@@ -1,7 +1,7 @@
 import { FaTrash } from 'react-icons/fa';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
-import { deleteSubmission, getImageUrl, useParty, usePartyStatus, useUser } from '../../api/api';
+import { deleteSubmission, getThumbnailUrl, useParty, usePartyStatus, useUser } from '../../api/api';
 import { isPartyLive, PartySubmissionResponse } from '../../api/api-models';
 import { useSession } from '../../user/session';
 
@@ -34,7 +34,7 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
   return (
     <div className="p-4">
       <div className="bg-gray-100 w-96 rounded-lg">
-        <img className="rounded w-full" src={getImageUrl(partySubmission.imageId)} alt={partySubmission.name} />
+        <img className="rounded w-full" src={getThumbnailUrl(partySubmission.imageId)} alt={partySubmission.name} />
         <div className="p-6">
           <span className="flex space-x-4">
             <span className="font-bold mb-4">{partySubmission.name || '-'}</span>

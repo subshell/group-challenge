@@ -18,14 +18,15 @@ import (
 )
 
 var (
-	con                      *pg.DB
-	sessionStore             *auth.PGSessionStore
-	formParser               *baraka.Parser
-	livePartyHub             *liveparty.LivePartyHub
-	imgCache                 *ttlcache.Cache
-	wsHub                    *ws.Hub
-	maxImageFileSize         = 4 << 20
-	imagesInMemomryCacheSize = 35
+	con                     *pg.DB
+	sessionStore            *auth.PGSessionStore
+	formParser              *baraka.Parser
+	livePartyHub            *liveparty.LivePartyHub
+	imgCache                *ttlcache.Cache
+	wsHub                   *ws.Hub
+	maxImageFileSize        = 4 << 20
+	imagesInMemoryCacheSize = 35
+	imgProxyConfig          config.ImgProxyConfig
 )
 
 func configureAPIRouter(router *gin.Engine, con *pg.DB) {
@@ -66,7 +67,8 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 		}
 		image := v1.Group("/images")
 		{
-			image.GET("/:imageId", serveImageHandler)
+			image.GET("/thumbnail/:imageId", serveThumbnailImageHandler)
+			image.GET("/full/:imageId", serveFullImageHandler)
 		}
 		user := v1.Group("/users")
 		{
@@ -91,22 +93,22 @@ func createWsHandler() gin.HandlerFunc {
 /*
 RunServer starts the server
 */
-func RunServer(serverConfig config.ServerConfig, challengesConfig config.ChallengesConfig, _con *pg.DB) {
+func RunServer(serverConfig config.ServerConfig, challengesConfig config.ChallengesConfig, _imgProxyConfig config.ImgProxyConfig, _con *pg.DB) {
 	con = _con
 	livePartyHub = liveparty.CreateLivePartyHub(challengesConfig.LiveParty, con)
+	imgProxyConfig = _imgProxyConfig
 
 	// in-memory image cache
 	imgCache = ttlcache.NewCache()
 	imgCache.SetTTL(time.Duration(8 * time.Hour))
 	imgCache.SetLoaderFunction(imageLoader)
-	imgCache.SetCacheSizeLimit(imagesInMemomryCacheSize)
+	imgCache.SetCacheSizeLimit(imagesInMemoryCacheSize)
 
 	// formdata
 	options := baraka.ParserOptions{
-		MaxFileSize:       maxImageFileSize + 1,
-		MaxFileCount:      0,
-		MaxParseCount:     20,
-		MaxAvailableSlice: 2,
+		MaxFileSize:   maxImageFileSize + 1,
+		MaxFileCount:  0,
+		MaxParseCount: 20,
 	}
 	formParser = baraka.NewParser(options)
 

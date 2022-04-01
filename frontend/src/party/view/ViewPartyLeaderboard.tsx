@@ -1,5 +1,5 @@
 import { FaStar } from 'react-icons/fa';
-import { getImageUrl } from '../../api/api';
+import { getImageUrl, getThumbnailUrl } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
 import PartyPosition from './rewards/PartyPosition';
 
@@ -17,7 +17,7 @@ function ViewPartyLeaderboard({ party }: { party: PartyResponse }) {
               <a href={getImageUrl(submission.imageId)} target="_blank" rel="noopener noreferrer">
                 <img
                   className="object-contain w-96 h-60 rounded"
-                  src={getImageUrl(submission.imageId)}
+                  src={getThumbnailUrl(submission.imageId)}
                   alt={submission.name}
                 />
               </a>

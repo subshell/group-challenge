@@ -5,6 +5,7 @@ type ApplicationConfig struct {
 	Server     ServerConfig
 	DB         DBConfig
 	Challenges ChallengesConfig
+	ImgProxy   ImgProxyConfig
 }
 
 // ServerConfig server config
@@ -30,4 +31,14 @@ type ChallengesConfig struct {
 
 type LivePartyConfig struct {
 	DefaultTimePerSubmissionSeconds int
+}
+
+type ImgProxyConfig struct {
+	Enabled             bool
+	URL                 string
+	SharedLocalCacheDir string
+	ThumbnailQuality    int
+	FullSizeQuality     int
+	MaxFullWidth        int
+	MaxFullHeight       int
 }

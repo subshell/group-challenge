@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.6.0',
+    changes: [{ description: 'new image processing proxy', type: 'feature' }],
+  },
+  {
     name: '0.5.1',
     changes: [{ description: 'Sign in with email', type: 'fix' }],
   },

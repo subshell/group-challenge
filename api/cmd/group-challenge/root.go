@@ -34,6 +34,13 @@ func init() {
 	viper.SetDefault("db.Host", "localhost:5432")
 	viper.SetDefault("db.PoolSize", 50)
 	viper.SetDefault("challenges.party.live.defaultTimePerSubmissionSeconds", 45)
+	viper.SetDefault("imgProxy.enabled", false)
+	viper.SetDefault("imgProxy.url", "http://localhost:8081")
+	viper.SetDefault("imgProxy.SharedLocalCacheDir", "/tmp/group-challenge-cache")
+	viper.SetDefault("imgProxy.thumbnailQuality", 75)
+	viper.SetDefault("imgProxy.fullSizeQuality", 75)
+	viper.SetDefault("imgProxy.maxFullWidth", 1280)
+	viper.SetDefault("imgProxy.maxFullHeight", 1280)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -54,5 +61,5 @@ func main() {
 	con := db.Connect(appConfig.DB)
 	defer con.Close()
 	db.InitDB(con)
-	api.RunServer(appConfig.Server, appConfig.Challenges, con)
+	api.RunServer(appConfig.Server, appConfig.Challenges, appConfig.ImgProxy, con)
 }
