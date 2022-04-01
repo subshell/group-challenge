@@ -45,7 +45,7 @@ spec:
             {{- toYaml .Values.imgProxy.env | nindent 12 }}
             {{- end }}
           ports:
-            - name: http
+            - name: http-imgproxy
               containerPort: 8081
               protocol: TCP
           livenessProbe:
