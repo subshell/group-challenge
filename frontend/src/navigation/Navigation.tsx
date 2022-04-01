@@ -1,4 +1,4 @@
-import { FaUserAstronaut } from 'react-icons/fa';
+import { FaUserAlt, FaUserAstronaut, FaUserFriends, FaUserGraduate, FaWaveSquare } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 import { signOut } from '../api/api';
@@ -17,7 +17,7 @@ function Navigation() {
   };
 
   return (
-    <header className="text-gray-200  bg-gray-800 body-font">
+    <header className="text-gray-200  bg-orange-800 body-font">
       <div className="container mx-auto flex flex-wrap p-5 mb-8 flex-col md:flex-row items-center justify-between">
         <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-2">
           <Link to="/">
@@ -36,7 +36,7 @@ function Navigation() {
           {session && (
             <span className="space-x-10">
               <Link to="/profile" className="hover:text-gray-300">
-                <FaUserAstronaut size={20} className="inline-block mr-2" />
+                <FaUserGraduate size={20} className="inline-block mr-2" />
                 {session.username}
               </Link>
 

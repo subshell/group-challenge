@@ -11,7 +11,8 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.10.1
-	github.com/xis/baraka/v2 v2.0.3
+	// TODO: v2.0.3 corrupts images
+	github.com/xis/baraka/v2 v2.0.2
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
 )
 

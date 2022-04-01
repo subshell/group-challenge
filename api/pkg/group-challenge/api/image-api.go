@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"group-challenge/pkg/group-challenge/models"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -61,7 +60,7 @@ func saveImageToFileSystem(image *models.Image) (string, error) {
 	savedImagePath := getLocalImageFilePath(image.ID)
 	if _, err := os.Stat(savedImagePath); errors.Is(err, os.ErrNotExist) {
 		os.MkdirAll(imgProxyConfig.SharedLocalCacheDir, 0777)
-		err = ioutil.WriteFile(savedImagePath, image.ImageData, fs.FileMode(0777))
+		err = os.WriteFile(savedImagePath, image.ImageData, fs.FileMode(0777))
 		if err != nil {
 			log.Println("unable to write image to file system:", err)
 			return "", err
@@ -80,6 +79,13 @@ func imgProxy(c *gin.Context, processingOptions string) {
 		return
 	}
 
+	// imgProxy only returns a simple image
+	mimeType, err := GetFileContentType(image.ImageData)
+	if err == nil && mimeType == "image/gif" {
+		serveFallbackImageHandler(c)
+		return
+	}
+
 	saveImageToFileSystem(image)
 
 	imgProxyUrl, err := url.Parse(imgProxyConfig.URL)
@@ -95,7 +101,6 @@ func imgProxy(c *gin.Context, processingOptions string) {
 		req.URL.Scheme = imgProxyUrl.Scheme
 		req.URL.Host = imgProxyUrl.Host
 		req.URL.Path = fmt.Sprintf("/%s/plain/local:///%s", processingOptions, image.ID)
-		log.Println("image url:", req.URL)
 	}
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
@@ -114,11 +119,11 @@ func getImageFromCache(c *gin.Context) (*models.Image, error) {
 	return _image.(*models.Image), nil
 }
 
-func GetFileContentType(content *[]byte) (string, error) {
+func GetFileContentType(content []byte) (string, error) {
 	// Only the first 512 bytes are used to sniff the content type.
 	buffer := make([]byte, 512)
 
-	_, err := bytes.NewReader(*content).Read(buffer)
+	_, err := bytes.NewReader(content).Read(buffer)
 	if err != nil {
 		return "", err
 	}
@@ -128,6 +133,7 @@ func GetFileContentType(content *[]byte) (string, error) {
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
+
 }
 
 func imageLoader(id string) (interface{}, time.Duration, error) {
