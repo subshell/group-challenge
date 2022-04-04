@@ -1,5 +1,5 @@
 # Go 
-FROM golang:1.17-alpine AS go-builder
+FROM golang:1.18-alpine AS go-builder
 RUN apk add --no-cache make upx
 
 WORKDIR /app 
