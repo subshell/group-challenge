@@ -47,20 +47,20 @@ spec:
             {{- toYaml .Values.imgProxy.env | nindent 12 }}
             {{- end }}
           ports:
-            - name: http-imgproxy
+            - name: http-ip
               containerPort: 8081
               protocol: TCP            
-            - name: http-imgproxy-prometheus
+            - name: http-ipp
               containerPort: 8082
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: http-imgproxy
+              port: http-ip
           readinessProbe:
             httpGet:
               path: /
-              port: http-imgproxy
+              port: http-ip
           resources:
             {{- toYaml .Values.imgProxy.resources | nindent 12 }}
         {{- end }}

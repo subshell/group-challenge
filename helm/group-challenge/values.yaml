@@ -67,7 +67,7 @@ affinity: {}
 
 groupChallenge:
   # k8s env variables
-  env: {}
+  env: []
   # config for the config.yaml file
   config:
     server:
@@ -100,7 +100,7 @@ imgProxy:
     repository: darthsim/imgproxy
     pullPolicy: IfNotPresent
     tag: "v3.3.3"
-  env: {}
+  env: []
   resources: {}
 
 postgresql:

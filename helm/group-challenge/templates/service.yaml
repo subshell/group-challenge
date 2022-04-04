@@ -13,9 +13,9 @@ spec:
       name: http
     {{ if .Values.imgProxy.enabled -}}
     - port: 8082
-      targetPort: http-imgproxy-prometheus
+      targetPort: http-ipp
       protocol: TCP
-      name: http-imgproxy-prometheus
+      name: http-ipp
     {{- end }}
   selector:
     {{- include "group-challenge.selectorLabels" . | nindent 4 }}

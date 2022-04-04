@@ -13,6 +13,6 @@ spec:
           port: http
           path: {{ .Values.serviceMonitor.path }}
         - interval: {{ .Values.serviceMonitor.interval }}
-          port: http-imgproxy-prometheus
+          port: http-ipp
           path: /
 {{- end }}
