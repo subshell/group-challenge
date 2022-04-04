@@ -41,21 +41,26 @@ spec:
               value: "/tmp/group-challenge-cache"
             - name: IMGPROXY_BIND
               value: ":8081"
+            - name: IMGPROXY_PROMETHEUS_BIND
+              value: ":8082"
             {{ if .Values.imgProxy.env -}}
             {{- toYaml .Values.imgProxy.env | nindent 12 }}
             {{- end }}
           ports:
             - name: http-imgproxy
               containerPort: 8081
+              protocol: TCP            
+            - name: http-imgproxy-prometheus
+              containerPort: 8082
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: http
+              port: http-imgproxy
           readinessProbe:
             httpGet:
               path: /
-              port: http
+              port: http-imgproxy
           resources:
             {{- toYaml .Values.imgProxy.resources | nindent 12 }}
         {{- end }}

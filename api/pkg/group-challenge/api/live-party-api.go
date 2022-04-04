@@ -2,10 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"group-challenge/pkg/group-challenge/liveparty"
 	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +39,7 @@ func broadcastPartyStatus(partyID uuid.UUID, partyStatus *liveparty.PartyStatus)
 func livePartyStatusHandler(c *gin.Context) {
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -56,7 +56,7 @@ func livePartyStatusHandler(c *gin.Context) {
 func livePartyNextHandler(c *gin.Context) {
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -83,7 +83,7 @@ func livePartyNextHandler(c *gin.Context) {
 func livePartyPreviousHandler(c *gin.Context) {
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -105,17 +105,17 @@ func livePartyStartHandler(c *gin.Context) {
 
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 	if err = party.Select(con); err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 	if party.UserID != session.User {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -130,7 +130,7 @@ func livePartyStartHandler(c *gin.Context) {
 
 	liveParty, err := livePartyHub.CreateLiveParty(party)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -147,7 +147,7 @@ func livePartyVoteHandler(c *gin.Context) {
 
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -176,7 +176,7 @@ func livePartyVoteHandler(c *gin.Context) {
 func livePartyReactionHandler(c *gin.Context) {
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -189,7 +189,7 @@ func livePartyReactionHandler(c *gin.Context) {
 
 	body := reactionRequest{}
 	if err := c.BindJSON(&body); err != nil {
-		fmt.Println("invalid body", err)
+		log.Println("[ERROR]", "invalid body", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -213,7 +213,7 @@ func livePartyJoinHandler(c *gin.Context) {
 
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}

@@ -89,13 +89,18 @@ groupChallenge:
       maxFullWidth: 1280
       maxFullHeight: 1280
 
+serviceMonitor:
+  enabled: false
+  interval: 5s
+  path: /metrics
+
 imgProxy:
   enabled: true
   image:
     repository: darthsim/imgproxy
     pullPolicy: IfNotPresent
     tag: "v3.3.3"
-  env: []
+  env: {}
   resources: {}
 
 postgresql:

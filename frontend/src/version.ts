@@ -10,9 +10,13 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.6.1',
+    changes: [{ description: 'Cleanup navigation', type: 'note' }],
+  },
+  {
     name: '0.6.0',
     changes: [
-      { description: 'Image processing proxy', type: 'feature' },
+      { description: 'ImgProxy support for automatic server side image compression', type: 'feature' },
       { description: 'New navigation color', type: 'feature' },
     ],
   },

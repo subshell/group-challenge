@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"group-challenge/pkg/group-challenge/models"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -40,7 +41,7 @@ func serveFullImageHandler(c *gin.Context) {
 func serveFallbackImageHandler(c *gin.Context) {
 	image, err := getImageFromCache(c)
 	if err != nil {
-		log.Println("unable to get image from cache:", err)
+		log.Println("[ERROR] unable to get image from cache:", err)
 		return
 	}
 
@@ -48,7 +49,7 @@ func serveFallbackImageHandler(c *gin.Context) {
 	c.Header("Content-Length", strconv.Itoa(len(image.ImageData)))
 	c.Header("Cache-Control", "max-age=31536000")
 	if _, err := c.Writer.Write(image.ImageData); err != nil {
-		log.Println("unable to write image.")
+		log.Println("[ERROR] unable to write image.")
 	}
 }
 
@@ -62,10 +63,10 @@ func saveImageToFileSystem(image *models.Image) (string, error) {
 		os.MkdirAll(imgProxyConfig.SharedLocalCacheDir, 0777)
 		err = os.WriteFile(savedImagePath, image.ImageData, fs.FileMode(0777))
 		if err != nil {
-			log.Println("unable to write image to file system:", err)
+			log.Println("[ERROR] unable to write image to file system:", err)
 			return "", err
 		}
-		log.Println("saved image to file system:", savedImagePath)
+		log.Println("[INFO] saved image to file system:", savedImagePath)
 	}
 
 	return savedImagePath, nil
@@ -75,12 +76,12 @@ func imgProxy(c *gin.Context, processingOptions string) {
 	image, err := getImageFromCache(c)
 
 	if err != nil {
-		log.Println("unable to get image from cache:", err)
+		log.Println("[ERROR] unable to get image from cache:", err)
 		return
 	}
 
 	// imgProxy only returns a simple image
-	mimeType, err := GetFileContentType(image.ImageData)
+	mimeType, err := GetFileContentType(bytes.NewReader(image.ImageData))
 	if err == nil && mimeType == "image/gif" {
 		serveFallbackImageHandler(c)
 		return
@@ -90,7 +91,7 @@ func imgProxy(c *gin.Context, processingOptions string) {
 
 	imgProxyUrl, err := url.Parse(imgProxyConfig.URL)
 	if err != nil {
-		log.Println("unable to parse img proxy url:", err)
+		log.Println("[ERROR] unable to parse img proxy url:", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -119,11 +120,11 @@ func getImageFromCache(c *gin.Context) (*models.Image, error) {
 	return _image.(*models.Image), nil
 }
 
-func GetFileContentType(content []byte) (string, error) {
+func GetFileContentType(reader io.Reader) (string, error) {
 	// Only the first 512 bytes are used to sniff the content type.
 	buffer := make([]byte, 512)
 
-	_, err := bytes.NewReader(content).Read(buffer)
+	_, err := reader.Read(buffer)
 	if err != nil {
 		return "", err
 	}
@@ -133,7 +134,6 @@ func GetFileContentType(content []byte) (string, error) {
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
-
 }
 
 func imageLoader(id string) (interface{}, time.Duration, error) {

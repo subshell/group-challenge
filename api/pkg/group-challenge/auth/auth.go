@@ -24,7 +24,7 @@ func CreateUser(username, password, email string) *models.User {
 
 func GetUserFromSignInBody(con *pg.DB, emailOrUsername string, password string) (*models.User, error) {
 	if len(emailOrUsername) == 0 || len(password) == 0 {
-		log.Println("Invalid sign in")
+		log.Println("[WARNING] Invalid sign in")
 		return nil, errors.New("invalid sign in")
 	}
 
@@ -41,12 +41,12 @@ func GetUserFromSignInBody(con *pg.DB, emailOrUsername string, password string) 
 	}
 
 	if err != nil {
-		log.Println("User not found")
+		log.Println("[INFO] User not found")
 		return nil, errors.New("user not found")
 	}
 
 	if !checkUserPassword(con, user, password) {
-		log.Println("invalid signin attempt")
+		log.Println("[INFO] invalid signin attempt")
 		return nil, errors.New("invalid credentials")
 	}
 

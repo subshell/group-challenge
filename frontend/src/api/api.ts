@@ -360,7 +360,7 @@ export async function addSubmission({
 }): Promise<Response> {
   const formData = new FormData();
   formData.append('image', submission.files[0]);
-  const meta: any = {
+  const meta: Partial<PartySubmissionFormData> = {
     ...submission,
   };
   delete meta.files;
