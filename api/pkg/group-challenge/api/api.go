@@ -7,6 +7,7 @@ import (
 	"group-challenge/pkg/group-challenge/liveparty"
 	"group-challenge/pkg/group-challenge/ws"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
@@ -14,18 +15,18 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
-	"github.com/xis/baraka/v2"
+
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 var (
 	con                     *pg.DB
 	sessionStore            *auth.PGSessionStore
-	formParser              *baraka.Parser
 	livePartyHub            *liveparty.LivePartyHub
 	imgCache                *ttlcache.Cache
 	wsHub                   *ws.Hub
-	maxImageFileSize        = 4 << 20
-	imagesInMemoryCacheSize = 35
+	maxImageFileSize        int64 = 4 << 20
+	imagesInMemoryCacheSize int   = 35
 	imgProxyConfig          config.ImgProxyConfig
 )
 
@@ -104,14 +105,6 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 	imgCache.SetLoaderFunction(imageLoader)
 	imgCache.SetCacheSizeLimit(imagesInMemoryCacheSize)
 
-	// formdata
-	options := baraka.ParserOptions{
-		MaxFileSize:   maxImageFileSize + 1,
-		MaxFileCount:  0,
-		MaxParseCount: 20,
-	}
-	formParser = baraka.NewParser(options)
-
 	// router setup
 	router := gin.Default()
 	config := cors.DefaultConfig()
@@ -123,6 +116,17 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 	sessionStore = auth.CreatePGSessionStore(con)
 	router.Use(sessionStore.InjectSessionMiddleware())
 	router.Use(sessionStore.RequireSessionMiddleware([]string{"/_api/v1/parties"}))
+
+	// metrics
+	prometheusMiddleware := ginprometheus.NewPrometheus("gin")
+	prometheusMiddleware.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
+		url := c.Request.URL.Path
+		for _, p := range c.Params {
+			url = strings.Replace(url, p.Value, p.Key, 1)
+		}
+		return url
+	}
+	prometheusMiddleware.Use(router)
 
 	// static files
 	router.Use(static.Serve("/", static.LocalFile(serverConfig.StaticFilesDir, true)))

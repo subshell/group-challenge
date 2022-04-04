@@ -16,20 +16,20 @@ function Archive() {
     return (
       <div className="flex items-center bg-blue-500 text-white text-sm font-bold px-4 py-3" role="alert">
         <FaInfo className="mr-2" />
-        <p>No archieved parties available... 😢</p>
+        <p>It's pretty empty here... 😢</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 className="text-2xl pl-4">📚 Archive</h1>
+    <>
+      <h1 className="text-2xl">Expired Challenges</h1>
       <div className="flex flex-wrap">
         {closedParties.map((party) => (
           <PartiesOverviewItem key={party.id} partyId={party.id} onPartyChange={refetch} />
         ))}
       </div>
-    </div>
+    </>
   );
 }
 

@@ -1,18 +1,21 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"group-challenge/pkg/group-challenge/liveparty"
 	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
+	"io"
+	"log"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
 	"github.com/gofrs/uuid"
-	"github.com/xis/baraka/v2"
 )
 
 type assignModeratorRequestBody struct {
@@ -27,10 +30,9 @@ type partyRequestBody struct {
 	EndDate     time.Time `json:"endDate"`
 }
 
-type partySubmissionRequestBody struct {
+type partySubmissionMetaBody struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	ImageURL    string `json:"imageUrl"`
 }
 
 func triggerPartyWebSocketEvent(operation string, party *models.Party) {
@@ -54,7 +56,7 @@ func partiesHandler(c *gin.Context) {
 	err := models.GetAllParties(&parties, con)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(500)
 		return
 	}
@@ -66,14 +68,14 @@ func addPartyHandler(c *gin.Context) {
 	party, err := requestBodyToParty(c, con, true)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	err = party.Insert(con)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(500)
 		return
 	}
@@ -112,7 +114,7 @@ func reopenPartyHandler(c *gin.Context) {
 
 	err = party.Update(con)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(500)
 		return
 	}
@@ -153,7 +155,7 @@ func assignModeratorHandler(c *gin.Context) {
 
 	err = party.Update(con)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(500)
 		return
 	}
@@ -185,7 +187,7 @@ func deletePartyHandler(c *gin.Context) {
 	livePartyHub.RemoveLiveParty(partyID)
 	err = party.Delete(con)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(500)
 		return
 	}
@@ -217,7 +219,7 @@ func deletePartySubmissionHandler(c *gin.Context) {
 		if submissionID == submissionInParty.ID && submissionInParty.UserID == session.User {
 			err = party.DeleteSubmission(submissionInParty, con)
 			if err != nil {
-				fmt.Println(err)
+				log.Println("[ERROR]", err)
 				c.Status(500)
 				return
 			}
@@ -238,7 +240,7 @@ func addPartySubmissionHandler(c *gin.Context) {
 
 	party, err := parseParty(c)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -250,38 +252,46 @@ func addPartySubmissionHandler(c *gin.Context) {
 		return
 	}
 
-	var meta = &partySubmissionRequestBody{}
-	uploadedImage, err := readFormData(c, "image", meta)
+	imageHeader, imageFile, meta, err := readSubmissionFormData(c)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	if uploadedImage.Size > maxImageFileSize {
+	if imageHeader.Size > maxImageFileSize {
 		c.Status(http.StatusRequestEntityTooLarge)
 		return
 	}
 
+	// read image file to buffer
+	defer imageFile.Close()
+	imageBuffer := bytes.NewBuffer(nil)
+	if _, err := io.Copy(imageBuffer, imageFile); err != nil {
+		log.Println("[ERROR]", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
 	// TODO check mime types
-	mimeType, err := GetFileContentType(uploadedImage.Content)
+	mimeType, err := GetFileContentType(bytes.NewReader(imageBuffer.Bytes()))
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	image := &models.Image{
-		ImageData:     uploadedImage.Content,
-		Extension:     uploadedImage.Extension,
-		FileSizeBytes: int64(uploadedImage.Size),
+		ImageData:     imageBuffer.Bytes(),
+		Extension:     filepath.Ext(imageHeader.Filename),
+		FileSizeBytes: imageHeader.Size,
 		UserID:        session.User,
 		MimeType:      mimeType,
 		// ImageURL: , TODO: support external image urls
 	}
 	if err = image.Insert(con); err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -294,7 +304,7 @@ func addPartySubmissionHandler(c *gin.Context) {
 		ImageID:        image.ID,
 	}
 	if err = party.AddSubmission(partySubmission, con); err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -333,7 +343,7 @@ func editPartyByIDHandler(c *gin.Context) {
 
 	err = party.Update(con)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -389,26 +399,25 @@ func requestBodyToParty(c *gin.Context, con *pg.DB, isNew bool) (*models.Party, 
 	return party, nil
 }
 
-func readFormData(c *gin.Context, key string, meta interface{}) (*baraka.Part, error) {
-	// parse formdata
-	request, err := formParser.Parse(c.Request)
-	if err != nil {
-		return nil, err
+func readSubmissionFormData(c *gin.Context) (*multipart.FileHeader, multipart.File, *partySubmissionMetaBody, error) {
+	var err error
+	var fileHeader *multipart.FileHeader
+	var file multipart.File
+	var meta = &partySubmissionMetaBody{}
+
+	if err = c.Request.ParseForm(); err != nil {
+		return nil, nil, nil, err
 	}
 
-	metaForm, err := request.GetForm("meta")
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(metaForm[0].Content, meta); err != nil {
-		return nil, err
+	// image
+	if file, fileHeader, err = c.Request.FormFile("image"); err != nil {
+		return nil, nil, nil, err
 	}
 
-	images, err := request.GetForm(key)
-	if err != nil || len(images) != 1 {
-		return nil, err
+	// meta
+	if err := json.Unmarshal([]byte(c.Request.FormValue("meta")), meta); err != nil {
+		return nil, nil, nil, err
 	}
-	image := images[0]
 
-	return image, nil
+	return fileHeader, file, meta, nil
 }

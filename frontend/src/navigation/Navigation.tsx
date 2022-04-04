@@ -21,31 +21,38 @@ function Navigation() {
       <div className="container mx-auto flex flex-wrap p-5 mb-8 flex-col md:flex-row items-center justify-between">
         <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-2">
           <Link to="/">
-            <span className="text-xl hover:text-gray-300">Group Challenge</span>
+            <span className="text-xl hover:text-gray-300 hover:underline">Group Challenge</span>
           </Link>
           <Link to="/changelog" title="Changelog">
-            <span className="text-sm font-bold pr-4">{VERSION}</span>
+            <span className="text-sm font-bold pr-4 hover:text-gray-300 hover:underline">{VERSION}</span>
           </Link>
           {session && (
-            <Link className="hover:text-gray-300" to="/party/create">
-              Create Party
-            </Link>
+            <span className="space-x-4">
+              <Link className="hover:text-gray-300 hover:underline" to="/party/create">
+                New
+              </Link>
+              <Link className="hover:text-gray-300 hover:underline" to="/all">
+                All Challenges
+              </Link>
+            </span>
           )}
         </div>
         <nav className="flex flex-wrap text-base">
           {session && (
             <span className="space-x-10">
-              <Link to="/profile" className="hover:text-gray-300">
+              <Link to="/profile" className="hover:text-gray-300 hover:underline">
                 <FaUserGraduate size={20} className="inline-block mr-2" />
                 {session.username}
               </Link>
 
-              <button onClick={signOutAndRemoveSession}>Sign out</button>
+              <button className="hover:text-gray-300  hover:underline" onClick={signOutAndRemoveSession}>
+                Sign out
+              </button>
             </span>
           )}
           {!session && (
             <Link
-              className="flex rounded-full hover:text-gray-300 bg-indigo-500 hover:bg-indigo-400 uppercase px-3 py-1 text-xs font-bold mr-3"
+              className="flex rounded-full hover:text-gray-300 hover:underline bg-indigo-500 hover:bg-indigo-400 uppercase px-3 py-1 text-xs font-bold mr-3"
               to="/signup"
             >
               Sign Up

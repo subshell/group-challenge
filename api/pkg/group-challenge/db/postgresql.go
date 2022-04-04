@@ -2,10 +2,9 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/models"
-	"os"
+	"log"
 
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
@@ -13,7 +12,7 @@ import (
 
 // Connect to PostgreSQL DB
 func Connect(dbConfig config.DBConfig) (con *pg.DB) {
-	fmt.Fprintf(os.Stdout, "connecting to postgreSQL DB %s/%s\n", dbConfig.Host, dbConfig.Database)
+	log.Printf("[INFO] connecting to postgreSQL DB %s/%s\n", dbConfig.Host, dbConfig.Database)
 
 	con = pg.Connect(&pg.Options{
 		User:       dbConfig.User,
@@ -36,7 +35,7 @@ func Connect(dbConfig config.DBConfig) (con *pg.DB) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(version)
+	log.Println("[INFO]", version)
 
 	if dbConfig.LogQueries {
 		con.AddQueryHook(dbLogger{})

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"fmt"
 	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/models"
+	"log"
 	"net/http"
 	"regexp"
 
@@ -103,7 +103,7 @@ func userByIdHandler(c *gin.Context) {
 	user.ID = uuid
 	err = user.Select(con)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[ERROR]", err)
 		c.Status(500)
 		return
 	}

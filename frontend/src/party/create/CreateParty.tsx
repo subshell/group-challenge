@@ -17,8 +17,8 @@ function CreateParty() {
 
   return (
     <div>
-      <h1 className="text-2xl mb-8">Create Party</h1>
-      <PartyForm onSubmit={onSubmit} submitBtnText="Create Party" />
+      <h1 className="text-2xl mb-8">Create Challenge</h1>
+      <PartyForm onSubmit={onSubmit} submitBtnText="Create Challenge" />
     </div>
   );
 }

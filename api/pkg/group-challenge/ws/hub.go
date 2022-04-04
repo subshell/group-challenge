@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"log"
 	"time"
 )
@@ -42,7 +41,7 @@ func NewHub() *Hub {
 func (hub *Hub) LogClients(tick time.Duration) {
 	func() {
 		for range time.Tick(tick) {
-			log.Printf("connected ws clients: %d", len(hub.clients))
+			log.Printf("[INFO] connected ws clients: %d", len(hub.clients))
 		}
 	}()
 }
@@ -59,7 +58,6 @@ func (hub *Hub) Run() {
 				close(client.send)
 			}
 		case message := <-hub.Broadcast:
-			fmt.Println(string(message))
 			for client := range hub.clients {
 				select {
 				case client.send <- message:

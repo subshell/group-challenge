@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-pg/pg/v10"
@@ -58,7 +58,7 @@ func (party *Party) Insert(con *pg.DB) (err error) {
 
 func (party *Party) Delete(con *pg.DB) (err error) {
 	_, err = con.Model(party).Where("id = ?0", party.ID).Delete()
-	fmt.Println(party.ID)
+	log.Println("[INFO]", party.ID)
 	return
 }
 

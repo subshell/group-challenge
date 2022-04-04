@@ -64,14 +64,6 @@ helm install -f gc-values.yaml group-challenge <path-to-repo>/group-challenge/he
 This chart uses the [Bitnami Postgres Helm Chart](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) as a dependency. Configure it with `postgresql` in your `values.yaml` file.
 You definitely want to change the password using `global.postgresql.postgresqlPassword` or a secret. You have to install the `pgcrypto` extension manually.
 
-## Run production build locally using docker-compose
-
-1. `cd` into the `local` directory and run
-
-```sh
-docker-compose up
-```
-
 2. Open the browser at `http://localhost:8080`.
 
 ## Image processing

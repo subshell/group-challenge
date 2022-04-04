@@ -44,9 +44,9 @@ func init() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Print("[WARNING] Config file not found; using defaults! ", err)
+			log.Println("[WARNING] Config file not found; using defaults! ", err)
 		} else {
-			log.Panic(err, "Config file was found but another error was produced")
+			log.Panicln(err, "[PANIC] Config file was found but another error was produced")
 			os.Exit(1)
 		}
 	}

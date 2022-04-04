@@ -30,7 +30,7 @@ function WithUser() {
 
   return (
     <Routes>
-      <Route path="/archive" element={<Archive />} />
+      <Route path="/all" element={<Archive />} />
       <Route path="/changelog" element={<Changelog />} />
       <Route path="/party">
         <Route path="create" element={<CreateParty />} />

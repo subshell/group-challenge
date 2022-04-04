@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.9"
 
 services:
   postgres:
@@ -12,8 +12,13 @@ services:
   imgProxy:
     image: "darthsim/imgproxy:v3.3.3"
     ports: 
-      - 8081:8080
+      - 8081:8081
+      - 8082:8082
     environment:
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /tmp/group-challenge-cache
+      IMGPROXY_BIND: ":8081"
+      IMGPROXY_PROMETHEUS_BIND: ":8082"
     volumes:
-      - /tmp/group-challenge-cache:/tmp/group-challenge-cache
+      - type: bind
+        source: /tmp/group-challenge-cache
+        target: /tmp/group-challenge-cache
