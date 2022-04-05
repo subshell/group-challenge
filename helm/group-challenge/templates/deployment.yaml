@@ -43,6 +43,8 @@ spec:
               value: ":8081"
             - name: IMGPROXY_PROMETHEUS_BIND
               value: ":8082"
+            - name: IMGPROXY_MAX_SRC_RESOLUTION
+              value: "25"
             {{ if .Values.imgProxy.env -}}
             {{- toYaml .Values.imgProxy.env | nindent 12 }}
             {{- end }}

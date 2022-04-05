@@ -87,7 +87,7 @@ groupChallenge:
       thumbnailQuality: 90
       fullSizeQuality: 75
       maxFullWidth: 1280
-      maxFullHeight: 1280
+      maxFullHeight: 0
 
 serviceMonitor:
   enabled: false
