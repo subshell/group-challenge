@@ -1,5 +1,4 @@
-import { FunctionComponent, useState } from 'react';
-import { useInterval } from 'react-use';
+import { FunctionComponent, useEffect, useState } from 'react';
 import { useReactions } from '../../api/api';
 
 interface TimedReaction {
@@ -27,10 +26,14 @@ const ReactionBubbles: FunctionComponent<{ partyId: string }> = ({ partyId }) =>
     );
   });
 
-  useInterval(() => {
-    const now = Date.now();
-    setReactions(reactions.filter((reaction) => reaction.dieDate > now));
-  }, 500);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = Date.now();
+      setReactions(reactions.filter((reaction) => reaction.dieDate > now));
+    }, 500);
+
+    return () => clearInterval(intervalId);
+  }, [reactions]);
 
   return (
     <div className="space-y-2 flex flex-col">

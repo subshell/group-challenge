@@ -27,7 +27,7 @@ func Connect(dbConfig config.DBConfig) (con *pg.DB) {
 
 	// check connection
 	if err := con.Ping(ctx); err != nil {
-		panic("cannot connect to postgres")
+		log.Panicln("cannot connect to postgres {}", err)
 	}
 
 	var version string

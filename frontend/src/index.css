@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @import 'react-toastify/dist/ReactToastify.css';
-@import 'react-datepicker/dist/react-datepicker.css';
 
 /*
  * Global styles for thrid party libraries

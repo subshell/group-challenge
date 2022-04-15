@@ -10,6 +10,13 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.6.2',
+    changes: [
+      { description: 'Dependency updates', type: 'note' },
+      { description: 'Access higher resolution image of own submission via link', type: 'feature' },
+    ],
+  },
+  {
     name: '0.6.1',
     changes: [{ description: 'Cleanup navigation', type: 'note' }],
   },

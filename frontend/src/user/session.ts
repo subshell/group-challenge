@@ -1,4 +1,4 @@
 import { UserSession } from '../api/api-models';
-import { createLocalStorageStateHook } from 'use-local-storage-state';
+import useLocalStorageState from 'use-local-storage-state';
 
-export const useSession = createLocalStorageStateHook<UserSession>('session');
+export const useSession = () => useLocalStorageState<UserSession>('session');
