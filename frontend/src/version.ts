@@ -10,7 +10,7 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
-    name: '0.6.2',
+    name: '0.7.0',
     changes: [
       { description: 'Dependency updates', type: 'note' },
       { description: 'Access higher resolution image of own submission via link', type: 'feature' },
