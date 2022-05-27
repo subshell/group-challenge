@@ -48,23 +48,22 @@ function useApiHook<T>({
 }) {
   const [session] = useSession();
 
-  return useQuery<T>(
-    queryKey,
-    async () => {
-      const res = await fetch(url, {
-        headers: {
-          'X-AuthToken': session?.token || '',
-        },
-      });
+  const fetchData = async (): Promise<T> => {
+    const res = await fetch(url, {
+      headers: {
+        'X-AuthToken': session?.token || '',
+      },
+    });
 
-      if (res.status >= 400 && res.status < 600) {
-        throw new RequestError(res.status);
-      }
+    if (res.status >= 400 && res.status < 600) {
+      throw new RequestError(res.status);
+    }
 
-      return res.json();
-    },
-    useQueryOptions
-  );
+    return res.json();
+  };
+
+  // TODO: figure out generics for fetchData
+  return useQuery<T>(queryKey, fetchData as any, useQueryOptions);
 }
 
 const useUpdateQueryDataFromEvents = ({
