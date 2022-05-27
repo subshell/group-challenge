@@ -1,7 +1,13 @@
-import { createLocalStorageStateHook } from 'use-local-storage-state';
+import useLocalStorageState from 'use-local-storage-state';
 
 export interface AppState {
   reactionPickerOpen: boolean;
 }
 
-export const useAppState = createLocalStorageStateHook<AppState>('appState', { reactionPickerOpen: true });
+export const useAppState = () =>
+  useLocalStorageState<AppState>('appState', {
+    ssr: false,
+    defaultValue: {
+      reactionPickerOpen: true,
+    },
+  });

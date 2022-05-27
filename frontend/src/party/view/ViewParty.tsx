@@ -170,8 +170,8 @@ function ViewParty() {
   };
 
   if (party.isError || partyStatus.isError) return <span>error</span>;
-  if (party.isLoading || party.isIdle) return <span>Loading</span>;
-  if (partyStatus.isLoading || partyStatus.isIdle) return <span>Loading party status</span>;
+  if (party.isLoading) return <span>Loading</span>;
+  if (partyStatus.isLoading) return <span>Loading party status</span>;
 
   const isHost = session!.userId === partyUserId;
   const showControlButtons =

@@ -1,4 +1,4 @@
-import ReactDatePicker from 'react-datepicker';
+import ReactDatePicker from 'react-date-picker';
 import { Controller, useForm } from 'react-hook-form';
 import { PartyResponse } from '../api/api-models';
 
@@ -73,8 +73,8 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
               control={control}
               render={({ field }) => (
                 <ReactDatePicker
+                  value={new Date(field.value)}
                   className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-                  selected={new Date(field.value)}
                   onChange={field.onChange}
                 />
               )}
@@ -90,7 +90,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
               render={({ field }) => (
                 <ReactDatePicker
                   className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-                  selected={new Date(field.value)}
+                  value={new Date(field.value)}
                   onChange={field.onChange}
                 />
               )}
