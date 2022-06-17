@@ -62,8 +62,7 @@ function useApiHook<T>({
     return res.json();
   };
 
-  // TODO: figure out generics for fetchData
-  return useQuery<T>(queryKey, fetchData as any, useQueryOptions);
+  return useQuery<T>(queryKey, fetchData, useQueryOptions);
 }
 
 const useUpdateQueryDataFromEvents = ({
