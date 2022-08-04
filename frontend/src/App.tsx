@@ -2,7 +2,7 @@ import Navigation from './navigation/Navigation';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import EditParty from './party/edit/EditParty';
 import ViewParty from './party/view/ViewParty';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSession } from './user/session';
 import { SignIn, SignUp } from './user/SignInAndSignUp';
 import Home from './home/Home';

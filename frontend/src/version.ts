@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.7.2',
+    changes: [{ description: 'Even more dependency updates. (+ go v1.19)', type: 'note' }],
+  },
+  {
     name: '0.7.1',
     changes: [{ description: 'Dependency update to fix server TypeScript type workaround', type: 'note' }],
   },

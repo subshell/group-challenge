@@ -1,5 +1,5 @@
 import { FaTrash } from 'react-icons/fa';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { deleteSubmission, getImageUrl, getThumbnailUrl, useParty, usePartyStatus, useUser } from '../../api/api';
 import { isPartyLive, PartySubmissionResponse } from '../../api/api-models';

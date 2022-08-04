@@ -6,7 +6,6 @@ export interface AppState {
 
 export const useAppState = () =>
   useLocalStorageState<AppState>('appState', {
-    ssr: false,
     defaultValue: {
       reactionPickerOpen: true,
     },

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUpload } from 'react-icons/fa';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { addSubmission } from '../../api/api';

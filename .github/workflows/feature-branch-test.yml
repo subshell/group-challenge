@@ -1,0 +1,17 @@
+name: Docker
+
+on:
+  push:
+   branches-ignore:
+     - "main"
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile

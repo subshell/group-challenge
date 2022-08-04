@@ -1,5 +1,5 @@
 # Go 
-FROM golang:1.18-alpine AS go-builder
+FROM golang:1.19-alpine AS go-builder
 RUN apk add --no-cache make upx
 
 WORKDIR /app 
@@ -9,7 +9,7 @@ RUN make go-build-for-docker
 #########
 
 # React Frontend
-FROM node:17-alpine AS react-builder
+FROM node:18-alpine AS react-builder
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH

@@ -5,16 +5,18 @@ import (
 	"group-challenge/pkg/group-challenge/auth"
 	"group-challenge/pkg/group-challenge/config"
 	"group-challenge/pkg/group-challenge/liveparty"
+	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
 	"path"
 	"strings"
 	"time"
 
-	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
+	"github.com/gofrs/uuid"
+	"github.com/jellydator/ttlcache/v3"
 
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
@@ -23,10 +25,10 @@ var (
 	con                     *pg.DB
 	sessionStore            *auth.PGSessionStore
 	livePartyHub            *liveparty.LivePartyHub
-	imgCache                *ttlcache.Cache
+	imgCache                *ttlcache.Cache[string, models.Image]
 	wsHub                   *ws.Hub
-	maxImageFileSize        int64 = 4 << 20
-	imagesInMemoryCacheSize int   = 35
+	maxImageFileSize        int64  = 4 << 20
+	imagesInMemoryCacheSize uint64 = 35
 	imgProxyConfig          config.ImgProxyConfig
 )
 
@@ -100,10 +102,22 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 	imgProxyConfig = _imgProxyConfig
 
 	// in-memory image cache
-	imgCache = ttlcache.NewCache()
-	imgCache.SetTTL(time.Duration(8 * time.Hour))
-	imgCache.SetLoaderFunction(imageLoader)
-	imgCache.SetCacheSizeLimit(imagesInMemoryCacheSize)
+	loader := ttlcache.LoaderFunc[string, models.Image](
+		func(c *ttlcache.Cache[string, models.Image], key string) *ttlcache.Item[string, models.Image] {
+			idAsUUID, _ := uuid.FromString(key)
+			image := models.Image{
+				ID: idAsUUID,
+			}
+			image.Select(con)
+			return c.Set(key, image, 8*time.Hour)
+		},
+	)
+
+	imgCache = ttlcache.New[string, models.Image](
+		ttlcache.WithTTL[string, models.Image](8*time.Hour),
+		ttlcache.WithLoader[string, models.Image](loader),
+		ttlcache.WithCapacity[string, models.Image](imagesInMemoryCacheSize),
+	)
 
 	// router setup
 	router := gin.Default()

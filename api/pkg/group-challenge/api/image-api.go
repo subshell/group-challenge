@@ -14,7 +14,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
@@ -112,12 +111,15 @@ func getImageFromCache(c *gin.Context) (*models.Image, error) {
 		c.Status(http.StatusBadRequest)
 		return nil, err
 	}
-	_image, err := imgCache.Get(imageUUID.String())
-	if err != nil {
+	imageItem := imgCache.Get(imageUUID.String())
+	_image := imageItem.Value()
+
+	if _image.ID == uuid.Nil {
 		c.Status(http.StatusInternalServerError)
 		return nil, err
 	}
-	return _image.(*models.Image), nil
+
+	return &_image, nil
 }
 
 func GetFileContentType(reader io.Reader) (string, error) {
@@ -134,14 +136,4 @@ func GetFileContentType(reader io.Reader) (string, error) {
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
-}
-
-func imageLoader(id string) (interface{}, time.Duration, error) {
-	ttl := time.Hour * 8
-	idAsUUID, _ := uuid.FromString(id)
-	image := models.Image{
-		ID: idAsUUID,
-	}
-	err := image.Select(con)
-	return &image, ttl, err
 }
