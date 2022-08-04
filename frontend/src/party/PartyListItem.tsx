@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { FaArrowRight, FaCameraRetro, FaEdit, FaTv } from 'react-icons/fa';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { reopenParty, startParty, useParty, usePartyStatus } from '../api/api';
 import { isPartyLive } from '../api/api-models';

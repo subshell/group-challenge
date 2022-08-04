@@ -13,7 +13,7 @@ import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyLeaderboard from './ViewPartyLeaderboard';
 import { PartyResponse, PartyStatusResponse } from '../../api/api-models';
 import Button from '../../components/Button';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useSession } from '../../user/session';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import ViewPartyStartPage from './ViewPartyStartPage';

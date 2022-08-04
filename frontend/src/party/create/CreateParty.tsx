@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { createParty } from '../../api/api';
 import { useSession } from '../../user/session';
 import { useNavigate } from 'react-router';

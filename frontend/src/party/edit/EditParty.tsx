@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { deleteParty, editParty, assignModerator, useParty } from '../../api/api';
