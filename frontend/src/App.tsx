@@ -13,7 +13,6 @@ import { RequestError, useParties } from './api/api';
 import { useEffect, useState } from 'react';
 import OwnSubmissions from './party/submissions/OwnSubmissions';
 import { createWebSocket, WebSocketContext } from './api/api-websockets';
-import Archive from './party/archive/Archive';
 import Changelog from './Changelog';
 
 function WithUser() {
@@ -30,7 +29,6 @@ function WithUser() {
 
   return (
     <Routes>
-      <Route path="/all" element={<Archive />} />
       <Route path="/changelog" element={<Changelog />} />
       <Route path="/party">
         <Route path="create" element={<CreateParty />} />
@@ -68,17 +66,15 @@ function App() {
   const [webSocket] = useState(createWebSocket);
 
   return (
-    <div className="App mb-16">
-      <Router>
-        <QueryClientProvider client={queryClient}>
-          <WebSocketContext.Provider value={{ webSocket }}>
-            <Navigation />
-            <ToastContainer position="bottom-right" />
-            <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
-          </WebSocketContext.Provider>
-        </QueryClientProvider>
-      </Router>
-    </div>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <WebSocketContext.Provider value={{ webSocket }}>
+          <Navigation />
+          <ToastContainer position="bottom-right" />
+          <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+        </WebSocketContext.Provider>
+      </QueryClientProvider>
+    </Router>
   );
 }
 

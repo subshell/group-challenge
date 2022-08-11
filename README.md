@@ -13,6 +13,7 @@ This project includes pre-configured configuration files to launch the api, fron
 1. **Postgres:** start a postgres db at port `5432`.
 
 ```sh
+  mkdir /tmp/group-challenge-cache
   docker-compose up
 ```
 

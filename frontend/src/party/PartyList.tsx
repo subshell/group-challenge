@@ -1,39 +1,36 @@
-import { FaInfo } from 'react-icons/fa';
+import { useState } from 'react';
 import { useParties } from '../api/api';
-import PartiesOverviewItem from './PartyListItem';
+import { PartyTable } from './table/PartyTable';
+import { PartyTimelines } from './timeline/PartyTimelines';
 
 function PartyList() {
-  const { data: parties, isError, isLoading, refetch } = useParties();
+  const [displayType, setDisplayType] = useState('table');
+  const { data: parties, isError, isLoading } = useParties();
 
   if (isError) return <p>ERROR!</p>;
   if (isLoading) return <p>loading parties...</p>;
-  if (!parties?.length) {
-    return (
-      <div className="flex items-center bg-blue-500 text-white text-sm font-bold px-4 py-3" role="alert">
-        <FaInfo className="mr-2" />
-        <p>No Parties available... 😢</p>
-      </div>
-    );
-  }
 
-  const reversedParties = [...parties].reverse();
-  const openAndLiveParties = reversedParties.filter((party) => !party.done);
-
-  if (openAndLiveParties.length === 0) {
-    return (
-      <div className="flex items-center bg-blue-500 text-white text-sm font-bold px-4 py-3" role="alert">
-        <FaInfo className="mr-2" />
-        <p>No open challenges available... 😢</p>
-      </div>
-    );
-  }
+  const reversedParties = [...parties].sort((a, b) => new Date(b.endDate).getDate() - new Date(a.endDate).getDate());
 
   return (
-    <div className="container mx-auto">
-      <div className="my-8 flex flex-wrap">
-        {openAndLiveParties.map((party) => (
-          <PartiesOverviewItem key={party.id} partyId={party.id} onPartyChange={refetch} />
+    <div>
+      <div className="flex flex-row ">
+        {['table', 'timeline'].map((type, i) => (
+          <button
+            key={type}
+            className={`font-bold py-2 px-4 border-2 border-slate-500 w-full ${
+              type === displayType ? 'border-b-0' : 'hover:bg-slate-500 hover:text-white'
+            }
+            ${i !== 0 && 'border-l-0'}`}
+            onClick={() => setDisplayType(type)}
+          >
+            {type.toUpperCase()}
+          </button>
         ))}
+      </div>
+      <div className="border-2 border-t-0 border-slate-500 pt-8 rounded-b-md">
+        {displayType === 'table' && <PartyTable parties={reversedParties} />}
+        {displayType === 'timeline' && <PartyTimelines />}
       </div>
     </div>
   );

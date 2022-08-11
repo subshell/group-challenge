@@ -11,3 +11,7 @@
   margin: 0 !important;
   width: 300px !important;
 }
+
+body {
+  background-color: aliceblue;
+}

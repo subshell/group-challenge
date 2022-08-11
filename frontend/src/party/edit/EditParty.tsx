@@ -81,16 +81,18 @@ function EditParty() {
           </button>
         </div>
       </div>
-      <div className="mb-8 border p-4">
+      <div className="mb-8 border p-4 bg-white">
         <h3 className="text-xl mb-8">Party Settings</h3>
         <PartyForm onSubmit={onSubmit} initialData={initialPartyFormData} />
       </div>
-      <div className="mb-8 border p-4">
+      <div className="mb-8 border p-4 bg-white">
         <h3 className="text-xl mb-8">Advanced Settings</h3>
         <ElectNewModeratorForm onSubmit={onChangeModerator} />
       </div>
-      <h3 className="text-xl mb-8 border p-4">Submissions</h3>
-      <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
+      <div className="mb-8 border p-4 bg-white">
+        <h3 className="text-xl mb-8">Submissions</h3>
+        <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
+      </div>
     </div>
   );
 }
