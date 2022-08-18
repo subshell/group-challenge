@@ -30,7 +30,7 @@ function Navigation() {
           {session && (
             <>
               <Link
-                className="hover:text-white hover:bg-cyan-500 hover:outline-cyan-500  focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
+                className="hover:text-white hover:bg-blue-500 hover:outline-cyan-500  focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
                 to="/party/create"
               >
                 Create a Challenge

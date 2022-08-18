@@ -1,7 +1,7 @@
 import { useParties } from '../api/api';
 import { Footer } from '../Footer';
 import HighlightedParty from '../party/HighlightedParty';
-import PartyList from '../party/PartyList';
+import { PartyTimelines } from '../party/timeline/PartyTimelines';
 import { useSession } from '../user/session';
 import { SignIn } from '../user/SignInAndSignUp';
 
@@ -22,9 +22,14 @@ export function Home() {
 
   return (
     <div className="flex flex-col justify-between h-screen">
-      <div className="flex flex-col space-y-12">
-        {highlightedParty && <HighlightedParty party={highlightedParty} />}
-        <PartyList />
+      <div className="flex flex-col space-y-28">
+        {highlightedParty && (
+          <div>
+            <h2 className="font-extrabold text-2xl text-cyan-600 mb-4">Next up:</h2>
+            <HighlightedParty party={highlightedParty} />
+          </div>
+        )}
+        <PartyTimelines parties={parties} />
       </div>
       <Footer />
     </div>

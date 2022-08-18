@@ -1,15 +1,13 @@
-import { useEffect } from 'react';
 import { FaArrowRight, FaCameraRetro, FaEdit, FaTv } from 'react-icons/fa';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { reopenParty, startParty, useParty, usePartyStatus } from '../api/api';
-import { isPartyLive } from '../api/api-models';
+import { getThumbnailUrl, reopenParty, startParty, usePartyStatus } from '../api/api';
+import { isPartyLive, PartyResponse } from '../api/api-models';
 import { useSession } from '../user/session';
 
-function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPartyChange?: () => any }) {
+function PartiesOverviewItem({ party, onPartyChange }: { party: PartyResponse; onPartyChange?: () => any }) {
   const [session] = useSession();
-  const { data: party, isError, isLoading, refetch: refetchParty } = useParty(partyId);
-  const partyStatus = usePartyStatus(partyId);
+  const partyStatus = usePartyStatus(party.id);
   const { mutateAsync: startMutateAsync } = useMutation(startParty);
   const { mutateAsync: reopenPartyMutateAsync } = useMutation(reopenParty);
   const navigate = useNavigate();
@@ -27,8 +25,7 @@ function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPa
       return;
     }
 
-    await reopenPartyMutateAsync({ partyId, sessionToken: session!.token });
-    await refetchParty();
+    await reopenPartyMutateAsync({ partyId: party.id, sessionToken: session!.token });
     onPartyChange?.();
   };
 
@@ -37,76 +34,74 @@ function PartiesOverviewItem({ partyId, onPartyChange }: { partyId: string; onPa
       return;
     }
 
-    await startMutateAsync({ partyId: partyId, sessionToken: session!.token });
+    await startMutateAsync({ partyId: party.id, sessionToken: session!.token });
     onJoinPartyButton();
   };
 
   const onJoinPartyButton = async () => {
-    navigate('/party/view/' + partyId);
+    navigate('/party/view/' + party.id);
   };
 
   const onEditButton = () => {
     if (!isHost) {
       return;
     }
-    navigate('/party/edit/' + partyId);
+    navigate('/party/edit/' + party.id);
   };
 
   const onSubmissionsButton = () => {
     if (party?.done) {
       return;
     }
-    navigate('/party/my-submissions/' + partyId);
+    navigate('/party/my-submissions/' + party.id);
   };
 
   const onLeaderboardButton = () => {
-    navigate('/party/view/' + partyId);
+    navigate('/party/view/' + party.id);
   };
-
-  useEffect(() => {
-    refetchParty();
-  }, [refetchParty, isLive]);
-
-  if (isError) return <span>ERROR</span>;
-  if (isLoading || !party) return <span>LOADING</span>;
 
   party.submissions = party?.submissions ?? [];
 
   return (
-    <div className="p-4 xl:w-1/3 md:w-1/2 w-full relative">
+    <div className="p-4 w-full relative">
       {isLive && (
         <span className="bg-blue-500 text-white px-3 py-1 tracking-widest text-xs absolute flex items-center space-x-2 right-4 top-4 rounded-bl rounded-tr uppercase">
           <FaTv title="is live" /> <span>live</span>
         </span>
       )}
       <div
-        className={`h-full p-6 rounded-lg border-2 shadow-md hover:shadow-lg transition-all flex flex-col justify-between overflow-hidden space-y-4
+        className={`h-full rounded-lg border-2 shadow-md hover:shadow-lg transition-all flex flex-col justify-between overflow-hidden space-y-4
         ${isLive && 'border-blue-500 bg-blue-100'}
         ${party.done && 'bg-gray-200'}`}
       >
-        <div className="space-y-4">
-          <div className="flex justify-between">
-            <h2 className="text-sm tracking-widest title-font font-medium">
-              {new Date(party.startDate).toLocaleDateString()} - {new Date(party.endDate).toLocaleDateString()}
-            </h2>
-            {isHost && !isLive && (
-              <button
-                className="flex rounded-full text-white bg-blue-500 hover:bg-blue-400 px-3 py-1 text-xs font-bold"
-                onClick={() => (party.done ? onReopenPartyButton() : onStartPartyButton())}
-              >
-                {party.done ? 'Reopen' : 'Go Live'}
-              </button>
-            )}
+        {party.done && party.submissions.length !== 0 && (
+          <img src={getThumbnailUrl(party.submissions[0]?.imageId)} alt={party.name} className="fit" />
+        )}
+        <div className="p-6">
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <h2 className="text-sm tracking-widest title-font font-medium">
+                {new Date(party.startDate).toLocaleDateString()} - {new Date(party.endDate).toLocaleDateString()}
+              </h2>
+              {isHost && !isLive && (
+                <button
+                  className="flex rounded-full text-white bg-blue-500 hover:bg-blue-400 px-3 py-1 text-xs font-bold"
+                  onClick={() => (party.done ? onReopenPartyButton() : onStartPartyButton())}
+                >
+                  {party.done ? 'Reopen' : 'Go Live'}
+                </button>
+              )}
+            </div>
+
+            <h1 className="text-xl text-gray-900 pb-2">
+              <span>{party.name}</span>
+            </h1>
+
+            <span className="text-xs text-gray-600">{party.description}</span>
           </div>
-
-          <h1 className="text-xl text-gray-900 pb-2">
-            <span>{party.name}</span>
-          </h1>
-
-          <span className="text-xs text-gray-600">{party.description}</span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 p-6">
           <div className="space-y-2">
             {!party.done && (
               <button

@@ -25,7 +25,7 @@ export const PartyHostMenu: FunctionComponent<{ party: PartyResponse }> = ({ par
     <div>
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className="inline-flex items-center justify-center space-x-2 rounded-full border-2 border-white px-4 py-2 hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+          <Menu.Button className="inline-flex items-center justify-center space-x-2 rounded-full border-2 border-white px-4 py-2 hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
             <FaEllipsisV />
           </Menu.Button>
         </div>
@@ -45,7 +45,7 @@ export const PartyHostMenu: FunctionComponent<{ party: PartyResponse }> = ({ par
                   <a
                     href={'party/edit/' + party.id}
                     className={`${
-                      active ? 'bg-slate-900 text-white' : 'text-gray-900'
+                      active ? 'bg-blue-500 text-white' : 'text-gray-900'
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                   >
                     Edit
@@ -57,7 +57,7 @@ export const PartyHostMenu: FunctionComponent<{ party: PartyResponse }> = ({ par
                   <button
                     onClick={onStartPartyButton}
                     className={`${
-                      active ? 'bg-slate-900 text-white' : 'text-gray-900'
+                      active ? 'bg-blue-500 text-white' : 'text-gray-900'
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                   >
                     Start

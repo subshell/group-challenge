@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react';
-import { useParties, getThumbnailUrl } from '../../api/api';
+import { useParties } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
+import PartiesOverviewItem from '../PartyOverviewItem';
 
 const months = [
   'January',
@@ -42,25 +43,16 @@ export const PartyTimeline: FunctionComponent<{ year: number }> = ({ year }) => 
 
   return (
     <div className="space-y-6">
-      <h1 className="font-extrabold text-4xl text-white bg-cyan-500 px-4 py-2">{year}</h1>
+      <h1 className="font-extrabold text-4xl text-white bg-cyan-600 px-4 py-2 rounded-md">{year}</h1>
       {[...months].reverse().map((month) => (
         <div key={month} className="space-y-4 m-2">
           {timeline.has(month) && (
             <>
-              <h2 className="font-extrabold text-2xl text-slate-500">{month}</h2>
-              <div className="flex space-x-2">
+              <h2 className="font-extrabold text-2xl text-cyan-600">{month}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gab-4">
                 {timeline.get(month)!.map((party) => (
-                  <div key={party.id} title={party.name} className="border border-slate-500 relative">
-                    <a href={'/party/view/' + party.id} className="inline-block w-80 h-40">
-                      {party.done && (
-                        <img src={getThumbnailUrl(party.submissions[0]?.imageId)} alt={party.name} className="fit" />
-                      )}
-                      <div className="absolute bottom-4 left-0">
-                        <span className="font-bold px-2 py-1 text-xs tracking-tight bg-white text-slate-500 dark:bg-slate-500 dark:text-white text-ellipsis inline-block">
-                          {party.name}
-                        </span>
-                      </div>
-                    </a>
+                  <div key={party.id} className="">
+                    <PartiesOverviewItem party={party} />
                   </div>
                 ))}
               </div>
