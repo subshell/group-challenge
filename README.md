@@ -72,3 +72,9 @@ You definitely want to change the password using `global.postgresql.postgresqlPa
 ## Image processing
 
 To reduce the size of all uploaded images, we support [imgProxy](https://docs.imgproxy.net). See `imgProxy` for its configuration.
+
+
+* * *
+
+Take a look at this project from the [subshell](https://subshell.com) team. We make [Sophora](https://subshell.com/sophora/): a content management software for content creation, curation, and distribution. [Join our team!](https://subshell.com/jobs/) | [Imprint](https://subshell.com/about/imprint/)
+
