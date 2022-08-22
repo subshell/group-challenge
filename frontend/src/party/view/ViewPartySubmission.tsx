@@ -41,7 +41,7 @@ function ViewPartySubmission({
   }, [rating, onRating]);
 
   return (
-    <section className="text-gray-600 body-font space-y-2">
+    <section className="body-font space-y-2">
       <div className="container mx-auto flex px-5 flex-col space-y-2 lg:w-4/6 md:w-full w-5/6">
         <Timer
           forSeconds={partyStatus.submissionTimeMs / 1_000}
@@ -65,23 +65,23 @@ function ViewPartySubmission({
         </div>
         <div className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
-            <h3 className="text-2xl font-medium text-gray-900">
-              <span className="text-gray-800 text-xl">{partyStatus.current!.position + 1}</span>
-              <span className="text-gray-400 ml-2 mr-2 text-xl">of</span>
-              <span className="text-gray-800 text-xl">{numSubmissions}</span>
+            <h3 className="text-2xl font-medium">
+              <span className="text-xl">{partyStatus.current!.position + 1}</span>
+              <span className="text-slate-500 ml-2 mr-2 text-xl">of</span>
+              <span className="text-xl">{numSubmissions}</span>
             </h3>
             <p>
-              <span className="text-gray-800 text-xl mr-4">{partySubmission.name}</span>
-              <span className="text-gray-600">{partySubmission.description}</span>
+              <span className="text-xl mr-4">{partySubmission.name}</span>
+              <span className="text-slate-500">{partySubmission.description}</span>
             </p>
           </div>
           <div className="flex justify-center flex-col items-start">
             <StarRating stars={6} onRating={setRating} initialStars={rating} disabled={done} />
             <div className="mt-4">
-              <span className="text-gray-600 text-xl">{getSubmissionVotes(partyStatus, partySubmission).length}</span>
-              <span className="text-gray-400 ml-2 mr-2 text-xl">/</span>
-              <span className="text-gray-800 text-2xl">{partyStatus.participants}</span>
-              <span className="text-gray-600 ml-4 text-xl">votes</span>
+              <span className="text-slate-500 text-xl">{getSubmissionVotes(partyStatus, partySubmission).length}</span>
+              <span className="text-slate-500 ml-2 mr-2 text-xl">/</span>
+              <span className="text-2xl">{partyStatus.participants}</span>
+              <span className="text-slate-500 ml-4 text-xl">votes</span>
             </div>
           </div>
         </div>

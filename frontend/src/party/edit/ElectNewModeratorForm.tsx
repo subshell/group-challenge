@@ -25,14 +25,11 @@ const ElectNewModeratorForm: FunctionComponent<{ onSubmit: (data: ElectNewModera
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="new_moderator">
+        <label className="block text-sm font-bold mb-2" htmlFor="new_moderator">
           New Moderator
         </label>
 
-        <select
-          className="shadow border rounded w-full py-2 px-3 text-grey-darker"
-          {...register('new_moderator', { required: true })}
-        >
+        <select className="shadow border rounded w-full py-2 px-3" {...register('new_moderator', { required: true })}>
           {possibleModerators.map((user) => (
             <option key={user.id} value={user.id}>
               {user.username}

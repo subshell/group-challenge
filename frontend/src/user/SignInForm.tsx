@@ -30,22 +30,22 @@ function SignInForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="emailOrUsername">
+        <label className="block text-sm font-bold mb-2" htmlFor="emailOrUsername">
           Email or Username
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
           type="text"
           {...register('emailOrUsername', { required: true })}
         />
         <p>{formState.errors.emailOrUsername && <span>This field is required</span>}</p>
       </div>
       <div className="mb-6">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
+        <label className="block text-sm font-bold mb-2" htmlFor="password">
           Password
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black mb-3"
           type="password"
           {...register('password', { required: true })}
         />

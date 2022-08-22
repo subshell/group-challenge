@@ -11,7 +11,10 @@ interface Change {
 export const CHANGES: Change[] = [
   {
     name: '0.8.0',
-    changes: [{ description: 'Landing Page UI overhaul', type: 'feature' }],
+    changes: [
+      { description: 'Landing Page UI overhaul', type: 'feature' },
+      { description: 'Theme support: introduing dark mode!', type: 'feature' },
+    ],
   },
   {
     name: '0.7.2',

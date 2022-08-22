@@ -21,11 +21,11 @@ export function Home() {
     .sort((a, b) => new Date(b.endDate).getDate() - new Date(a.endDate).getDate())[0];
 
   return (
-    <div className="flex flex-col justify-between h-screen">
+    <div className="flex flex-col justify-between">
       <div className="flex flex-col space-y-28">
         {highlightedParty && (
           <div>
-            <h2 className="font-extrabold text-2xl text-cyan-600 mb-4">Next up:</h2>
+            <h2 className="font-bold text-2xl mb-4 dark:text-slate-300">Next up:</h2>
             <HighlightedParty party={highlightedParty} />
           </div>
         )}

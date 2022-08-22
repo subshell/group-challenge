@@ -43,12 +43,12 @@ export const PartyTimeline: FunctionComponent<{ year: number }> = ({ year }) => 
 
   return (
     <div className="space-y-6">
-      <h1 className="font-extrabold text-4xl text-white bg-cyan-600 px-4 py-2 rounded-md">{year}</h1>
+      <h1 className="font-bold text-4xl dark:text-slate-300">{year}</h1>
       {[...months].reverse().map((month) => (
         <div key={month} className="space-y-4 m-2">
           {timeline.has(month) && (
             <>
-              <h2 className="font-extrabold text-2xl text-cyan-600">{month}</h2>
+              <h2 className="font-bold text-2xl dark:text-slate-300">{month}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gab-4">
                 {timeline.get(month)!.map((party) => (
                   <div key={party.id} className="">

@@ -100,7 +100,7 @@ const ViewPartyContent = ({
       <div>
         <div className="flex flex-col items-center space-y-4 mt-20">
           <p className="text-5xl">Thanks for voting!</p>
-          <p className="text-3xl text-gray-700">Waiting for host...</p>
+          <p className="text-3xl font-thin">Waiting for host...</p>
           <div className="py-8">
             <EmojiBar count={partyStatus.participants} />
           </div>

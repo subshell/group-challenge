@@ -62,9 +62,9 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
         <div>
           <div className="flex items-center justify-center bg-grey-lighter">
             <label
-              className={`w-64 flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide border cursor-pointer hover:bg-blue-500 hover:text-white ${
+              className={`w-64 flex-col items-center px-4 py-6 bg-white rounded-lg shadow-lg tracking-wide border cursor-pointer hover:bg-blue-500 hover:text-white ${
                 hasPreview() ? 'hidden' : 'flex'
-              }`}
+              } dark:bg-slate-900 dark:hover:bg-blue-500`}
             >
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal uppercase">Select a file</span>
@@ -84,23 +84,23 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
         </div>
 
         <div>
-          <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="name">
-            Image Title <span className="text-gray-600">(optional)</span>
+          <label className="block text-sm font-bold mb-2" htmlFor="name">
+            Image Title <span className="text-gray-500">(optional)</span>
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
             type="text"
             {...form.register('name')}
           />
         </div>
 
         <div>
-          <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="description">
-            Image Description <span className="text-gray-600">(optional)</span>
+          <label className="block text-sm font-bold mb-2" htmlFor="description">
+            Image Description <span className="text-gray-500">(optional)</span>
           </label>
 
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
             {...form.register('description')}
           />
         </div>

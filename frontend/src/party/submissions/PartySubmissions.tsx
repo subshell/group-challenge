@@ -33,7 +33,7 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
 
   return (
     <div className="p-4">
-      <div className="bg-gray-100 w-96 rounded-lg">
+      <div className="bg-white w-96 rounded-lg border dark:bg-slate-900">
         <a
           href={getImageUrl(partySubmission.imageId)}
           target="_blank"
@@ -45,7 +45,7 @@ function PartySubmission({ partyId, partySubmission }: { partyId: string; partyS
         <div className="p-6">
           <span className="flex space-x-4">
             <span className="font-bold mb-4">{partySubmission.name || '-'}</span>
-            <span className="text-gray-700">by {user?.username}</span>
+            <span className="text-gray-500">by {user?.username}</span>
           </span>
           <p className="leading-relaxed text-base">{partySubmission.description}</p>
           {!deletionDisabled && (

@@ -2,6 +2,7 @@ import { FaUserGraduate } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 import { signOut } from '../api/api';
+import { ThemeButton } from '../components/ThemeButton';
 import { useSession } from '../user/session';
 import { VERSION } from '../version';
 
@@ -17,7 +18,7 @@ function Navigation() {
   };
 
   return (
-    <header className="text-gray-900 body-font">
+    <header className="body-font">
       <div className="container mx-auto flex flex-wrap p-5 mb-8 flex-col md:flex-row items-center justify-between border-b-2 border-gray-600">
         <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-2">
           <Link to="/">
@@ -30,7 +31,7 @@ function Navigation() {
           {session && (
             <>
               <Link
-                className="hover:text-white hover:bg-blue-500 hover:outline-cyan-500  focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
+                className="hover:text-white hover:bg-blue-500 hover:outline-cyan-500 focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
                 to="/party/create"
               >
                 Create a Challenge
@@ -38,7 +39,9 @@ function Navigation() {
             </>
           )}
         </div>
-        <nav className="flex flex-wrap text-base">
+        <nav className="flex flex-wrap items-center space-x-10">
+          <ThemeButton />
+
           {session && (
             <span className="space-x-10">
               <Link to="/profile" className="hover:text-gray-500 hover:underline">

@@ -17,7 +17,7 @@ const ReactionPicker: FunctionComponent<{ onReaction: (reaction: string) => void
   );
 
   return (
-    <div className="bg-white shadow-sm flex flex-col p-2 rounded border border-gray-700 space-y-4">
+    <div className="bg-white shadow-sm flex flex-col p-2 rounded border border-slate-500 space-y-4 dark:bg-slate-900">
       <div
         className="flex justify-between hover:opacity-100 opacity-50 cursor-pointer"
         title="Live Reactions"

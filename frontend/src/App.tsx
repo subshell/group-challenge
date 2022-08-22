@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import OwnSubmissions from './party/submissions/OwnSubmissions';
 import { createWebSocket, WebSocketContext } from './api/api-websockets';
 import Changelog from './Changelog';
+import { useThemeClass } from './theme';
 
 function WithUser() {
   const parties = useParties();
@@ -64,14 +65,19 @@ const queryClient = new QueryClient({
 function App() {
   const [session] = useSession();
   const [webSocket] = useState(createWebSocket);
+  const themeClass = useThemeClass();
 
   return (
     <Router>
       <QueryClientProvider client={queryClient}>
         <WebSocketContext.Provider value={{ webSocket }}>
-          <Navigation />
-          <ToastContainer position="bottom-right" />
-          <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+          <div className={themeClass}>
+            <div className="dark:bg-slate-800 dark:text-white min-h-screen">
+              <Navigation />
+              <ToastContainer position="bottom-right" className="text-black" />
+              <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+            </div>
+          </div>
         </WebSocketContext.Provider>
       </QueryClientProvider>
     </Router>

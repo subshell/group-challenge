@@ -1,5 +1,7 @@
 # Group Challenge
 
+[![Docker](https://github.com/subshell/group-challenge/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/subshell/group-challenge/actions/workflows/docker-publish.yml)
+
 An easy-to-use website to create submission-based challenges that will be evaluated together in real-time.
 Any user is allowed to create challenges with a fixed start and end date while others join and
 contribute. Currently supported challenges are:
@@ -58,10 +60,10 @@ imgProxy:
 
 ### Kubernetes support
 
-The helm chart is available under https://subshell.github.io/helm-charts/
+The helm chart is available under https://subshell.github.io/helm-charts-lab/
 
 ```sh
-helm repo add subshell-public https://subshell.github.io/helm-charts
+helm repo add subshell-public https://subshell.github.io/helm-charts-lab
 helm install -f gc-values.yaml group-challenge subshell-public/group-challenge
 ```
 
