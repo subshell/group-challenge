@@ -15,15 +15,15 @@ function ViewPartyStartPage({
   return (
     <div className="flex flex-col items-center justify-between align-middle space-y-10">
       <h2 className="text-4xl font-bold">- {partyName} -</h2>
-      <div className="flex space-x-8 items-center bg-white">
+      <div className="flex space-x-8 items-center">
         <p className="font-bold">Share link:</p>
-        <span className="flex items-center border border-blue-500 rounded p-2 pl-4 pr-4 font-bold">
+        <span className="flex items-center border border-blue-500 rounded p-2 pl-4 pr-4 font-bold bg-white dark:bg-slate-900">
           <FaLink className="mr-2" /> <span>{window.location.href}</span>
         </span>
       </div>
       {isHost && (
         <>
-          <div className="flex items-center border-2 border-blue-500 px-4 py-3" role="alert">
+          <div className="flex items-center border-2 border-blue-500 px-4 py-3 rounded" role="alert">
             <FaInfo className="mr-2" />
 
             <div className="ml-8 leading-8">

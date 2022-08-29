@@ -97,32 +97,17 @@ func (partySubmission *PartySubmission) AddVote(vote *Vote, con *pg.DB) (err err
 }
 
 // Select selects the party by its id
-func (party *Party) Select(con *pg.DB) (err error) {
+func (party *Party) Select(con *pg.DB) error {
 	// party
-	err = con.Model(party).Where("id = ?0", party.ID).Select()
+	err := con.Model(party).Where("id = ?0", party.ID).Select()
 	if err != nil {
 		return err
 	}
 
 	// submissions
-	submissions := []*PartySubmission{}
-	err = con.Model(&submissions).Column("psubm.*").Join("INNER JOIN parties_submissions psr on psr.submission_id = psubm.id").Where("psr.party_id = ?", party.ID).Select()
-	if err != nil {
-		return err
-	}
-	party.Submissions = submissions
+	party.loadPartySubmissions(con)
 
-	// votes for each submission
-	for _, submission := range submissions {
-		votes := []*Vote{}
-		err = con.Model(&votes).Where("svote.submission_id = ?", submission.ID).Select()
-		if err != nil {
-			return err
-		}
-		submission.Votes = votes
-	}
-
-	return
+	return nil
 }
 
 func (submission *PartySubmission) DeleteVotes(con *pg.DB) {
@@ -152,6 +137,32 @@ func GetAllParties(parties *[]*Party, con *pg.DB) error {
 
 	if err != nil {
 		return err
+	}
+
+	// submissions
+	for _, party := range *parties {
+		party.loadPartySubmissions(con)
+	}
+
+	return nil
+}
+
+func (party *Party) loadPartySubmissions(con *pg.DB) error {
+	submissions := []*PartySubmission{}
+	err := con.Model(&submissions).Column("psubm.*").Join("INNER JOIN parties_submissions psr on psr.submission_id = psubm.id").Where("psr.party_id = ?", party.ID).Select()
+	if err != nil {
+		return err
+	}
+	party.Submissions = submissions
+
+	// votes for each submission
+	for _, submission := range submissions {
+		votes := []*Vote{}
+		err = con.Model(&votes).Where("svote.submission_id = ?", submission.ID).Select()
+		if err != nil {
+			return err
+		}
+		submission.Votes = votes
 	}
 
 	return nil

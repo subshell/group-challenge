@@ -113,7 +113,7 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 		},
 	)
 
-	imgCache = ttlcache.New[string, models.Image](
+	imgCache = ttlcache.New(
 		ttlcache.WithTTL[string, models.Image](8*time.Hour),
 		ttlcache.WithLoader[string, models.Image](loader),
 		ttlcache.WithCapacity[string, models.Image](imagesInMemoryCacheSize),

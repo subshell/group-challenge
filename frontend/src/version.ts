@@ -10,8 +10,15 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.8.0',
+    changes: [
+      { description: 'Landing Page UI overhaul', type: 'feature' },
+      { description: 'Themes! Introduing dark mode!', type: 'feature' },
+    ],
+  },
+  {
     name: '0.7.2',
-    changes: [{ description: 'Even more dependency updates. (+ go v1.19)', type: 'note' }],
+    changes: [{ description: 'Even more dependency updates. (go v1.19)', type: 'note' }],
   },
   {
     name: '0.7.1',

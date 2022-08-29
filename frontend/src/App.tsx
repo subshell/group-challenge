@@ -13,8 +13,8 @@ import { RequestError, useParties } from './api/api';
 import { useEffect, useState } from 'react';
 import OwnSubmissions from './party/submissions/OwnSubmissions';
 import { createWebSocket, WebSocketContext } from './api/api-websockets';
-import Archive from './party/archive/Archive';
 import Changelog from './Changelog';
+import { useThemeClass } from './theme';
 
 function WithUser() {
   const parties = useParties();
@@ -30,7 +30,6 @@ function WithUser() {
 
   return (
     <Routes>
-      <Route path="/all" element={<Archive />} />
       <Route path="/changelog" element={<Changelog />} />
       <Route path="/party">
         <Route path="create" element={<CreateParty />} />
@@ -66,19 +65,22 @@ const queryClient = new QueryClient({
 function App() {
   const [session] = useSession();
   const [webSocket] = useState(createWebSocket);
+  const themeClass = useThemeClass();
 
   return (
-    <div className="App mb-16">
-      <Router>
-        <QueryClientProvider client={queryClient}>
-          <WebSocketContext.Provider value={{ webSocket }}>
-            <Navigation />
-            <ToastContainer position="bottom-right" />
-            <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
-          </WebSocketContext.Provider>
-        </QueryClientProvider>
-      </Router>
-    </div>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <WebSocketContext.Provider value={{ webSocket }}>
+          <div className={themeClass}>
+            <div className="dark:bg-slate-800 dark:text-white min-h-screen">
+              <Navigation />
+              <ToastContainer position="bottom-right" className="text-black" />
+              <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+            </div>
+          </div>
+        </WebSocketContext.Provider>
+      </QueryClientProvider>
+    </Router>
   );
 }
 

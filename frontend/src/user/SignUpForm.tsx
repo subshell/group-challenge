@@ -41,11 +41,11 @@ function SignUpForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
+        <label className="block text-sm font-bold mb-2" htmlFor="username">
           Username *
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
           type="text"
           {...register('username', { required: true, pattern: /^[a-zA-Z0-9]{2,}$/ })}
         />
@@ -61,33 +61,33 @@ function SignUpForm() {
         </p>
       </div>
       <div className="mb-4">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
+        <label className="block text-sm font-bold mb-2" htmlFor="username">
           Email
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
           type="email"
           {...register('email', { required: true })}
         />
         <p>{formState.errors.email && <span>Error</span>}</p>
       </div>
       <div className="mb-4">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
+        <label className="block text-sm font-bold mb-2" htmlFor="password">
           Password *
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black"
           type="password"
           {...register('password', { required: true, minLength: 2 })}
         />
         <p>{formState.errors.password && <span>This field is required and must be longer than 2 characters</span>}</p>
       </div>
       <div className="mb-4">
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="password">
+        <label className="block text-sm font-bold mb-2" htmlFor="password">
           Repeat Password *
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black"
           type="password"
           {...register('confirmpassword', { required: true, validate: (value) => watch('password') === value })}
         />

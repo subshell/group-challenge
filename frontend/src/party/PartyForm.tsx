@@ -28,34 +28,34 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="name">
+        <label className="block text-sm font-bold mb-2" htmlFor="name">
           Name
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
           type="text"
           {...register('name', { required: true })}
         />
       </div>
 
       <div>
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="description">
+        <label className="block text-sm font-bold mb-2" htmlFor="description">
           Description
         </label>
 
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
           {...register('description', { required: true })}
         />
       </div>
 
       <div>
-        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="category">
+        <label className="block text-sm font-bold mb-2" htmlFor="category">
           Category
         </label>
 
         <select
-          className="shadow border rounded w-full py-2 px-3 text-grey-darker"
+          className="shadow border rounded w-full py-2 px-3 text-black"
           {...register('category', { required: true })}
         >
           <option value="photo">Photo Challenge</option>
@@ -65,7 +65,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
       <div>
         <div className="flex space-x-8">
           <div>
-            <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="startDate">
+            <label className="block text-sm font-bold mb-2" htmlFor="startDate">
               Submission Start Date
             </label>
             <Controller
@@ -74,14 +74,14 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
               render={({ field }) => (
                 <ReactDatePicker
                   value={new Date(field.value)}
-                  className="shadow border rounded w-full py-2 px-3 text-grey-darker"
+                  className="shadow rounded w-full text-black dark:bg-white"
                   onChange={field.onChange}
                 />
               )}
             />
           </div>
           <div>
-            <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="endDate">
+            <label className="block text-sm font-bold mb-2" htmlFor="endDate">
               Submission End Date
             </label>
             <Controller
@@ -89,7 +89,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
               control={control}
               render={({ field }) => (
                 <ReactDatePicker
-                  className="shadow border rounded w-full py-2 px-3 text-grey-darker"
+                  className="shadow rounded w-full text-black dark:bg-white"
                   value={new Date(field.value)}
                   onChange={field.onChange}
                 />

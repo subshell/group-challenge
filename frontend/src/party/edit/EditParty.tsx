@@ -22,7 +22,7 @@ function EditParty() {
     const result = window.confirm(`Are you sure you want to delete ${party?.name}`);
     if (result) {
       toast.info(`Party ${party?.name} has been deleted`);
-      await deletePartyMutation.mutate({ partyId: id as string, sessionToken: session!.token });
+      deletePartyMutation.mutate({ partyId: id as string, sessionToken: session!.token });
       navigate('/');
     }
   };
@@ -72,7 +72,7 @@ function EditParty() {
   }
 
   return (
-    <div>
+    <div className="space-y-4 pb-4">
       <div className="flex w-full place-content-between">
         <h1 className="text-2xl mb-8">Edit Party</h1>
         <div>
@@ -81,16 +81,18 @@ function EditParty() {
           </button>
         </div>
       </div>
-      <div className="mb-8 border p-4">
+      <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
         <h3 className="text-xl mb-8">Party Settings</h3>
         <PartyForm onSubmit={onSubmit} initialData={initialPartyFormData} />
       </div>
-      <div className="mb-8 border p-4">
+      <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
         <h3 className="text-xl mb-8">Advanced Settings</h3>
         <ElectNewModeratorForm onSubmit={onChangeModerator} />
       </div>
-      <h3 className="text-xl mb-8 border p-4">Submissions</h3>
-      <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
+      <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
+        <h3 className="text-xl mb-8">Submissions</h3>
+        <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
+      </div>
     </div>
   );
 }
