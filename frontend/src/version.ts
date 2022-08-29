@@ -13,7 +13,7 @@ export const CHANGES: Change[] = [
     name: '0.8.0',
     changes: [
       { description: 'Landing Page UI overhaul', type: 'feature' },
-      { description: 'Theme support: introduing dark mode!', type: 'feature' },
+      { description: 'Themes! Introduing dark mode!', type: 'feature' },
     ],
   },
   {

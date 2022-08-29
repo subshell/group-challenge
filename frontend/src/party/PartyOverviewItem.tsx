@@ -5,6 +5,7 @@ import { getThumbnailUrl, usePartyStatus, useUser } from '../api/api';
 import { isPartyLive, PartyResponse } from '../api/api-models';
 import { useSession } from '../user/session';
 import { PartyHostMenu } from './PartyHostMenu';
+import { sortSubmissions } from './view/util';
 
 function PartiesOverviewItem({ party }: { party: PartyResponse }) {
   const [session] = useSession();
@@ -32,6 +33,8 @@ function PartiesOverviewItem({ party }: { party: PartyResponse }) {
 
   party.submissions = party?.submissions ?? [];
 
+  const bestSubmission = sortSubmissions(party.submissions)?.[0];
+
   return (
     <div className="p-4 w-full relative">
       {isLive && (
@@ -49,7 +52,7 @@ function PartiesOverviewItem({ party }: { party: PartyResponse }) {
         ${isLive ? 'border-blue-500' : party.done ? 'border-red-700 dark:border-red-500' : 'border-slate-500'}`}
       >
         {party.done && party.submissions.length !== 0 && (
-          <img src={getThumbnailUrl(party.submissions[0]?.imageId)} alt={party.name} className="fit" />
+          <img src={getThumbnailUrl(bestSubmission?.imageId)} alt={bestSubmission?.name} className="fit" />
         )}
         <div className="p-6">
           <div className="space-y-4">

@@ -23,7 +23,7 @@ export function SignUp() {
   return (
     <div className="px-8 pt-6 pb-8 flex flex-col">
       <div className="mb-8">
-        <Link className="flex place-items-center space-x-2 text-indigo-500 font-bold" to="/signin">
+        <Link className="flex place-items-center space-x-2 font-bold" to="/signin">
           <FaArrowLeft />
           <div>Back</div>
         </Link>

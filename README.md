@@ -8,6 +8,8 @@ contribute. Currently supported challenges are:
 
 - 📸 **Photo Challenge**
 
+![Start Screen](.github/start_screen.png)
+
 ## Local development
 
 This project includes pre-configured configuration files to launch the api, frontend, and postgres in VS Code. Alternatively you can start all services with the following commands:
