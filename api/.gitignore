@@ -20,4 +20,4 @@ vendor
 
 __debug_bin
 tmp
-/group-challenge
+bin/group-challenge

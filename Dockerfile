@@ -1,10 +1,12 @@
 # Go 
 FROM golang:1.19-alpine AS go-builder
-RUN apk add --no-cache make upx
+RUN apk add --no-cache upx
 
-WORKDIR /app 
+WORKDIR /app
 COPY api .
-RUN make go-build-for-docker
+RUN go mod download
+RUN go build -o bin/group-challenge --tags release -ldflags "-s -w"
+RUN upx bin/group-challenge
 
 #########
 
@@ -22,11 +24,11 @@ RUN npm run build
 #########
 
 # Executable
-FROM alpine
+FROM alpine:3.16
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
-COPY --from=go-builder /app/group-challenge .
+COPY --from=go-builder /app/bin/group-challenge .
 COPY --from=react-builder /app/build/ ./static
 
 ENV GIN_MODE=release
