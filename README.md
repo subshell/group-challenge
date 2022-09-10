@@ -64,7 +64,7 @@ Alternatively you can start all services with the following commands:
 3. **Frontend:** start the frontend at port `3000`.
 
 ```sh
-  cd frontend && npm start
+  cd frontend && npm run dev
 ```
 
 ## Container

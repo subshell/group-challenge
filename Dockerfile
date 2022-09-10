@@ -29,7 +29,7 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 COPY --from=go-builder /app/bin/group-challenge .
-COPY --from=react-builder /app/build/ ./static
+COPY --from=react-builder /app/dist/ ./static
 
 ENV GIN_MODE=release
 CMD [ "./group-challenge" ]

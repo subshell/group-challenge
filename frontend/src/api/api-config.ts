@@ -11,7 +11,7 @@ const API_AUTO_CONFIG = {
 };
 
 // determine api config dynamically
-const API = window.location.host === 'localhost:3000' ? API_DEV_CONFIG : API_AUTO_CONFIG;
+const API = window.location.host === 'localhost:5173' ? API_DEV_CONFIG : API_AUTO_CONFIG;
 
 const API_URL = `${API.SECURE ? 'https' : 'http'}://${API.HOST}${API.PATH}`;
 const AUTH_URL = `${API_URL}/auth`;
