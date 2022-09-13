@@ -47,7 +47,7 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
                 </div>
               </div>
               <h1 className="text-3xl tracking-tight md:text-2xl lg:text-3xl">
-                <span className="font-extrabold">{party.name}</span>
+                <span className="font-bold">{party.name}</span>
               </h1>
               <p className="mt-6 max-w-3xl text-xl">{party.description}</p>
             </div>

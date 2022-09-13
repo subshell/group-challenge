@@ -10,7 +10,7 @@ export const PartyTimelines: FunctionComponent<{ parties: PartyResponse[] }> = (
     <div className="flex flex-col space-y-10">
       {years.map((year) => (
         <div key={year}>
-          <PartyTimeline year={year} />
+          <PartyTimeline year={year} parties={parties} />
         </div>
       ))}
     </div>

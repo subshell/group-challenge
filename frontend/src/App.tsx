@@ -1,57 +1,48 @@
 import Navigation from './navigation/Navigation';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import EditParty from './party/edit/EditParty';
-import ViewParty from './party/view/ViewParty';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSession } from './user/session';
 import { SignIn, SignUp } from './user/SignInAndSignUp';
-import Home from './home/Home';
-import EditProfile from './user/EditProfile';
-import CreateParty from './party/create/CreateParty';
-import { toast, ToastContainer } from 'react-toastify';
-import { RequestError, useParties } from './api/api';
-import { useEffect, useState } from 'react';
-import OwnSubmissions from './party/submissions/OwnSubmissions';
+import { ToastContainer } from 'react-toastify';
+import { lazy, Suspense, useState } from 'react';
 import { createWebSocket, WebSocketContext } from './api/api-websockets';
-import Changelog from './Changelog';
 import { useThemeClass } from './theme';
+import { FC } from 'react';
 
-function WithUser() {
-  const parties = useParties();
-  const [, setSession] = useSession();
-
-  useEffect(() => {
-    if (!parties.isLoading && (parties.error as RequestError)?.status === 401) {
-      console.error(parties.error);
-      toast('Your session has expired', { type: 'error' });
-      setSession(undefined);
-    }
-  }, [parties.error, parties.isLoading, setSession]);
+const WithUser: FC = () => {
+  const Changelog = lazy(() => import('./Changelog'));
+  const CreateParty = lazy(() => import('./party/create/CreateParty'));
+  const ViewParty = lazy(() => import('./party/view/ViewParty'));
+  const EditParty = lazy(() => import('./party/edit/EditParty'));
+  const OwnSubmissions = lazy(() => import('./party/submissions/OwnSubmissions'));
+  const EditProfile = lazy(() => import('./user/EditProfile'));
+  const Home = lazy(() => import('./home/Home'));
 
   return (
-    <Routes>
-      <Route path="/changelog" element={<Changelog />} />
-      <Route path="/party">
-        <Route path="create" element={<CreateParty />} />
-        <Route path="view/:id" element={<ViewParty />} />
-        <Route path="edit/:id" element={<EditParty />} />
-        <Route path="my-submissions/:id" element={<OwnSubmissions />} />
-      </Route>
-      <Route path="/profile" element={<EditProfile />} />
-      <Route path="/*" element={<Home />} />
-    </Routes>
+    <Suspense fallback={<span></span>}>
+      <Routes>
+        <Route path="/changelog" element={<Changelog />} />
+        <Route path="/party">
+          <Route path="create" element={<CreateParty />} />
+          <Route path="view/:id" element={<ViewParty />} />
+          <Route path="edit/:id" element={<EditParty />} />
+          <Route path="my-submissions/:id" element={<OwnSubmissions />} />
+        </Route>
+        <Route path="/profile" element={<EditProfile />} />
+        <Route path="/*" element={<Home />} />
+      </Routes>
+    </Suspense>
   );
-}
+};
 
-function WithoutUser() {
+const WithoutUser: FC = () => {
   return (
     <Routes>
-      <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/*" element={<Home />} />
+      <Route path="/*" element={<SignIn />} />
     </Routes>
   );
-}
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {

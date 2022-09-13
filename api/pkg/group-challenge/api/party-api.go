@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,12 @@ type partyRequestBody struct {
 	Category    string    `json:"category"`
 	StartDate   time.Time `json:"startDate"`
 	EndDate     time.Time `json:"endDate"`
+}
+
+type paginationResponseBody struct {
+	PageSize int             `json:"pageSize"`
+	Page     int             `json:"page"`
+	Data     []*models.Party `json:"data"`
 }
 
 type partySubmissionMetaBody struct {
@@ -52,8 +59,21 @@ func broadcastParty(operation string, party *models.Party) {
 }
 
 func partiesHandler(c *gin.Context) {
+	pageSize := 5
+
+	pageString := c.Request.URL.Query().Get("page")
+	if pageString == "" {
+		pageString = "0"
+	}
+	page, err := strconv.Atoi(pageString)
+	if err != nil {
+		log.Println("[ERROR]", "page param is not an integer", pageString)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
 	parties := []*models.Party{}
-	err := models.GetAllParties(&parties, con)
+	err = models.GetAllParties(&parties, page, pageSize, con)
 
 	if err != nil {
 		log.Println("[ERROR]", err)
@@ -61,7 +81,12 @@ func partiesHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, parties)
+	response := paginationResponseBody{}
+	response.Data = parties
+	response.Page = page
+	response.PageSize = pageSize
+
+	c.JSON(200, response)
 }
 
 func addPartyHandler(c *gin.Context) {

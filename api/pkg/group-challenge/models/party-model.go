@@ -132,8 +132,8 @@ func (submission *PartySubmission) Update(con *pg.DB) error {
 }
 
 // GetAllParties returns all parties
-func GetAllParties(parties *[]*Party, con *pg.DB) error {
-	err := con.Model(parties).Limit(200).Select()
+func GetAllParties(parties *[]*Party, page int, limit int, con *pg.DB) error {
+	err := con.Model(parties).Offset(page * limit).Limit(limit).Order("end_date desc").Select()
 
 	if err != nil {
 		return err

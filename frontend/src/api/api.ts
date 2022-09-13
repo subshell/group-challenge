@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import {
   PartyResponse,
   PartyStatusResponse,
@@ -8,11 +8,13 @@ import {
   UserSession,
   GCWebSocketEvent,
   PartyReaction,
+  PaginationPartiesResponse,
 } from './api-models';
 import { PartyFormData } from '../party/PartyForm';
 import { useSession } from '../user/session';
 import { API_URLS } from './api-config';
 import { EventQueryKeyMatcher, useWebSocket } from './api-websockets';
+import { toast } from 'react-toastify';
 
 export class RequestError extends Error {
   constructor(public readonly status: number) {
@@ -46,7 +48,7 @@ function useApiHook<T>({
   url?: string;
   useQueryOptions?: UseQueryOptions<T, unknown, T>;
 }) {
-  const [session] = useSession();
+  const [session, setSession] = useSession();
 
   const fetchData = async (): Promise<T> => {
     const res = await fetch(url, {
@@ -56,6 +58,12 @@ function useApiHook<T>({
     });
 
     if (res.status >= 400 && res.status < 600) {
+      // user is no longer signed in with valid credentials
+      if (session && res.status === 401) {
+        toast('You session expired');
+        setSession(undefined);
+      }
+
       throw new RequestError(res.status);
     }
 
@@ -110,21 +118,39 @@ export const useReactions = (partyId: string, onIncomingReaction: (reaction: str
   useWebSocket({ queryKey, onEvent, matchesQueryKeyFn });
 };
 
-export const useParties = () =>
-  useLiveApiHook<PartyResponse[]>({
-    queryKey: ['parties'],
-    matchesQueryKeyFn: (queryKey, eventQueryKey) => {
-      if (eventQueryKey.length === 0 || eventQueryKey[0] !== 'parties') {
-        return false;
+export const useParties = () => {
+  const [session] = useSession();
+
+  const queryKey = ['parties'];
+  const url = `${API_URLS.API}/${queryKey.join('/')}`;
+
+  const fetchParties = async ({ pageParam = 0 }): Promise<PaginationPartiesResponse> => {
+    const res = await fetch(url + `?page=${pageParam}`, {
+      headers: {
+        'X-AuthToken': session?.token || '',
+      },
+    });
+
+    return res.json();
+  };
+
+  return useInfiniteQuery(queryKey, fetchParties, {
+    getNextPageParam: (lastPage) => {
+      if (lastPage.data.length !== lastPage.pageSize) {
+        return undefined;
+      }
+      return lastPage.page + 1;
+    },
+    getPreviousPageParam: (firstPage) => {
+      if (firstPage.page === 0) {
+        return undefined;
       }
 
-      if (eventQueryKey.length > 2 && eventQueryKey[2] === 'live') {
-        return false;
-      }
-
-      return true;
+      return Math.max(0, firstPage.page - 1);
     },
   });
+};
+
 export const useParty = (id: string) => useLiveApiHook<PartyResponse>({ queryKey: ['parties', id] });
 export const usePartyStatus = (id: string) =>
   useLiveApiHook<PartyStatusResponse>({ queryKey: ['parties', id, 'live', 'status'] });
