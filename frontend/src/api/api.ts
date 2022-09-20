@@ -134,7 +134,7 @@ export const useParties = () => {
     return res.json();
   };
 
-  return useInfiniteQuery(queryKey, fetchParties, {
+  const query = useInfiniteQuery(queryKey, fetchParties, {
     getNextPageParam: (lastPage) => {
       if (lastPage.data.length !== lastPage.pageSize) {
         return undefined;
@@ -149,6 +149,14 @@ export const useParties = () => {
       return Math.max(0, firstPage.page - 1);
     },
   });
+
+  useUpdateQueryDataFromEvents({
+    queryKey,
+    matchesQueryKeyFn: (queryKey, eventQueryKey) => eventQueryKey.length === 2 && eventQueryKey[0] === queryKey[0],
+    refetch: query.refetch,
+  });
+
+  return query;
 };
 
 export const useParty = (id: string) => useLiveApiHook<PartyResponse>({ queryKey: ['parties', id] });
