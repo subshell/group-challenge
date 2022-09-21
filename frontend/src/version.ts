@@ -10,6 +10,15 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.9.0',
+    changes: [
+      { description: 'Replace CreateReactApp with Vite', type: 'note' },
+      { description: 'Simplify build setup', type: 'note' },
+      { description: 'Landing page pagination', type: 'feature' },
+      { description: 'Lazy loading for routes', type: 'feature' },
+    ],
+  },
+  {
     name: '0.8.0',
     changes: [
       { description: 'Landing Page UI overhaul', type: 'feature' },
