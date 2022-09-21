@@ -2,8 +2,12 @@
 
 ## Run locally
 
-    make go-run
+    go run main.go
 
-## Build Package
+## Build package
 
-    make go-build
+    go build -o bin/group-challenge
+
+## Reduce package size
+
+    upx bin/group-challenge

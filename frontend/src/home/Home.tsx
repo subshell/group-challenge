@@ -1,22 +1,18 @@
 import { useParties } from '../api/api';
+import { PartyResponse } from '../api/api-models';
 import { Footer } from '../Footer';
 import HighlightedParty from '../party/HighlightedParty';
 import { PartyTimelines } from '../party/timeline/PartyTimelines';
-import { useSession } from '../user/session';
-import { SignIn } from '../user/SignInAndSignUp';
 
 export function Home() {
-  const [session] = useSession();
-  const { data: parties, isError, isLoading } = useParties();
-
-  if (!session) {
-    return <SignIn />;
-  }
+  const { data: parties, isError, isLoading, fetchNextPage, hasNextPage } = useParties();
 
   if (isError) return <p>ERROR!</p>;
   if (isLoading) return <div></div>;
 
-  const highlightedParty = parties
+  const visibleParties = parties.pages.reduce((a, b) => a.concat(b.data), [] as PartyResponse[]);
+
+  const highlightedParty = visibleParties
     .filter((party) => !party.done)
     .sort((a, b) => new Date(b.endDate).getDate() - new Date(a.endDate).getDate())[0];
 
@@ -29,7 +25,12 @@ export function Home() {
             <HighlightedParty party={highlightedParty} />
           </div>
         )}
-        <PartyTimelines parties={parties} />
+        <PartyTimelines parties={visibleParties} />
+        {hasNextPage && (
+          <button onClick={() => fetchNextPage()} className="hover:text-slate-500 px-4 py-2 rounded">
+            Load More
+          </button>
+        )}
       </div>
       <Footer />
     </div>

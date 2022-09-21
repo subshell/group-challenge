@@ -47,6 +47,7 @@ function SignInForm() {
         <input
           className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black mb-3"
           type="password"
+          autoComplete="currnet-password"
           {...register('password', { required: true })}
         />
         <p>{formState.errors.password && <span>This field is required</span>}</p>

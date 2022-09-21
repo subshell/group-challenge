@@ -1,11 +1,12 @@
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, lazy, Suspense, useCallback, useState } from 'react';
 import { FaRegWindowMaximize, FaRegWindowMinimize } from 'react-icons/fa';
 import { useAppState } from '../user/appState';
-import InputEmoji from 'react-input-emoji';
 
 const ReactionPicker: FunctionComponent<{ onReaction: (reaction: string) => void }> = ({ onReaction }) => {
   const [appState, setAppState] = useAppState();
   const [textInput, setTextInput] = useState('');
+  const EmojiPicker = lazy(() => import('react-input-emoji'));
+
   const onTextSubmit = useCallback(
     (text: string) => {
       if (textInput) {
@@ -18,6 +19,12 @@ const ReactionPicker: FunctionComponent<{ onReaction: (reaction: string) => void
 
   return (
     <div className="bg-white shadow-sm flex flex-col p-2 rounded border border-slate-500 space-y-4 dark:bg-slate-900">
+      <style>
+        {`.react-input-emoji--container {
+          margin: 0 !important;
+          width: 300px !important;
+        }`}
+      </style>
       <div
         className="flex justify-between hover:opacity-100 opacity-50 cursor-pointer"
         title="Live Reactions"
@@ -33,14 +40,16 @@ const ReactionPicker: FunctionComponent<{ onReaction: (reaction: string) => void
       </div>
 
       {appState?.reactionPickerOpen && (
-        <InputEmoji
-          value={textInput}
-          onChange={setTextInput}
-          maxlength={64}
-          onEnter={onTextSubmit}
-          borderRadius={4}
-          placeholder="Type a message"
-        />
+        <Suspense>
+          <EmojiPicker
+            value={textInput}
+            onChange={setTextInput}
+            maxlength={64}
+            onEnter={onTextSubmit}
+            borderRadius={4}
+            placeholder="Type a message"
+          />
+        </Suspense>
       )}
     </div>
   );

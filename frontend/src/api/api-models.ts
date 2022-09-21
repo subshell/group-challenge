@@ -1,5 +1,13 @@
 //response interfaces
 
+export interface PaginationResponse<T> {
+  pageSize: number;
+  page: number;
+  data: T[];
+}
+
+export type PaginationPartiesResponse = PaginationResponse<PartyResponse>;
+
 export interface PartyResponse {
   id: string;
   name: string;

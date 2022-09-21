@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { useParties } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
 import PartiesOverviewItem from '../PartyOverviewItem';
 
@@ -18,10 +17,8 @@ const months = [
   'December',
 ];
 
-export const PartyTimeline: FunctionComponent<{ year: number }> = ({ year }) => {
-  const { data: parties } = useParties();
-
-  if (!parties) {
+export const PartyTimeline: FunctionComponent<{ year: number; parties: PartyResponse[] }> = ({ year, parties }) => {
+  if (parties?.length === 0) {
     return null;
   }
 

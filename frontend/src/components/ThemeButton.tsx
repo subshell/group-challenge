@@ -35,10 +35,7 @@ export const ThemeButton: FunctionComponent = () => {
       <Menu as="div" className="relative items-center text-left">
         <div>
           <Menu.Button className="inline-flex items-center space-x-2 justify-center rounded-md hover:underline hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-opacity-75">
-            <span>
-              <span className="bg-blue-600 text-white rounded px-1 py-0.5 mr-2">new</span>
-              Theme
-            </span>
+            <span>Theme</span>
             <FaArrowDown aria-hidden="true" />
           </Menu.Button>
         </div>
