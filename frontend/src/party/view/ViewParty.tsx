@@ -20,6 +20,7 @@ import ViewPartyStartPage from './ViewPartyStartPage';
 import ViewPartyReveal from './ViewPartyReveal';
 import EmojiBar from '../../components/EmojiBar';
 import ReactionPicker from '../../components/ReactionPicker';
+import { usePreloadNextImage } from './util';
 
 const ViewPartyContent = ({
   partyStatus,
@@ -45,6 +46,7 @@ const ViewPartyContent = ({
     },
     [mutateReactionAsync, partyId, session]
   );
+  usePreloadNextImage(party, partyStatus);
 
   if (!partyStatus || !party) {
     return <div>Unknown party or party status</div>;
