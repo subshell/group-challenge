@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.10.0',
+    changes: [{ description: 'Preload images', type: 'feature' }],
+  },
+  {
     name: '0.9.1',
     changes: [{ description: 'Prevent Emoji Picker from loosing focus on state change', type: 'fix' }],
   },
