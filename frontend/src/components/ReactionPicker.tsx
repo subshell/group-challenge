@@ -2,10 +2,11 @@ import { FunctionComponent, lazy, Suspense, useCallback, useState } from 'react'
 import { FaRegWindowMaximize, FaRegWindowMinimize } from 'react-icons/fa';
 import { useAppState } from '../user/appState';
 
+const EmojiPicker = lazy(() => import('react-input-emoji'));
+
 const ReactionPicker: FunctionComponent<{ onReaction: (reaction: string) => void }> = ({ onReaction }) => {
   const [appState, setAppState] = useAppState();
   const [textInput, setTextInput] = useState('');
-  const EmojiPicker = lazy(() => import('react-input-emoji'));
 
   const onTextSubmit = useCallback(
     (text: string) => {

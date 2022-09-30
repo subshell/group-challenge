@@ -9,15 +9,15 @@ import { createWebSocket, WebSocketContext } from './api/api-websockets';
 import { useThemeClass } from './theme';
 import { FC } from 'react';
 
-const WithUser: FC = () => {
-  const Changelog = lazy(() => import('./Changelog'));
-  const CreateParty = lazy(() => import('./party/create/CreateParty'));
-  const ViewParty = lazy(() => import('./party/view/ViewParty'));
-  const EditParty = lazy(() => import('./party/edit/EditParty'));
-  const OwnSubmissions = lazy(() => import('./party/submissions/OwnSubmissions'));
-  const EditProfile = lazy(() => import('./user/EditProfile'));
-  const Home = lazy(() => import('./home/Home'));
+const Changelog = lazy(() => import('./Changelog'));
+const CreateParty = lazy(() => import('./party/create/CreateParty'));
+const ViewParty = lazy(() => import('./party/view/ViewParty'));
+const EditParty = lazy(() => import('./party/edit/EditParty'));
+const OwnSubmissions = lazy(() => import('./party/submissions/OwnSubmissions'));
+const EditProfile = lazy(() => import('./user/EditProfile'));
+const Home = lazy(() => import('./home/Home'));
 
+const WithUser: FC = () => {
   return (
     <Suspense fallback={<span></span>}>
       <Routes>
