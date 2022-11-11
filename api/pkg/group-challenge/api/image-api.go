@@ -22,7 +22,7 @@ import (
 // see: https://docs.imgproxy.net/generating_the_url
 func serveThumbnailImageHandler(c *gin.Context) {
 	if imgProxyConfig.Enabled {
-		imgProxy(c, fmt.Sprintf("width:%d/height:%d/quality:%d", 150, 150, imgProxyConfig.ThumbnailQuality))
+		imgProxy(c, fmt.Sprintf("width:%d/height:%d/quality:%d", imgProxyConfig.MaxThumbnailWidth, imgProxyConfig.MaxThumbnailHeight, imgProxyConfig.ThumbnailQuality))
 	} else {
 		serveFallbackImageHandler(c)
 	}

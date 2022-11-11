@@ -38,6 +38,8 @@ type ImgProxyConfig struct {
 	URL                 string
 	SharedLocalCacheDir string
 	ThumbnailQuality    int
+	MaxThumbnailWidth   int
+	MaxThumbnailHeight  int
 	FullSizeQuality     int
 	MaxFullWidth        int
 	MaxFullHeight       int

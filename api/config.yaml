@@ -16,6 +16,8 @@ imgProxy:
   url: "http://localhost:8081"
   sharedLocalCacheDir: "/tmp/group-challenge-cache"
   thumbnailQuality: 90
+  maxThumbnailWidth: 420
+  maxThumbnailHeight: 420
   fullSizeQuality: 75
   maxFullWidth: 1280
   maxFullHeight: 1280

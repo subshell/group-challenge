@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.11.0',
+    changes: [{ description: 'Configurable max thumbnail width and height', type: 'feature' }],
+  },
+  {
     name: '0.10.0',
     changes: [{ description: 'Preload images', type: 'feature' }],
   },
