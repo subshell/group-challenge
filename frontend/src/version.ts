@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.11.1',
+    changes: [{ description: 'Dependency upadtes. Vite 4.0', type: 'note' }],
+  },
+  {
     name: '0.11.0',
     changes: [{ description: 'Configurable max thumbnail width and height', type: 'feature' }],
   },
