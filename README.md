@@ -62,13 +62,13 @@ Alternatively you can start all services with the following commands:
 2. **API:** start the go api server at port `8080`.
 
 ```sh
-  cd api && go run ./cmd/group-challenge/root.go
+  cd api && go mod tidy && go run main.go
 ```
 
 3. **Frontend:** start the frontend at port `3000`.
 
 ```sh
-  cd frontend && npm run dev
+  cd frontend && npm i && npm run dev
 ```
 
 ## Container
