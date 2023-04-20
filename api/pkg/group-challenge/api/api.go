@@ -8,7 +8,6 @@ import (
 	"group-challenge/pkg/group-challenge/models"
 	"group-challenge/pkg/group-challenge/ws"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -17,8 +16,7 @@ import (
 	"github.com/go-pg/pg/v10"
 	"github.com/gofrs/uuid"
 	"github.com/jellydator/ttlcache/v3"
-
-	ginprometheus "github.com/zsais/go-gin-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -93,6 +91,14 @@ func createWsHandler() gin.HandlerFunc {
 	}
 }
 
+func prometheusHandler() gin.HandlerFunc {
+	h := promhttp.Handler()
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
 /*
 RunServer starts the server
 */
@@ -132,15 +138,7 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 	router.Use(sessionStore.RequireSessionMiddleware([]string{"/_api/v1/parties"}))
 
 	// metrics
-	prometheusMiddleware := ginprometheus.NewPrometheus("gin")
-	prometheusMiddleware.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
-		url := c.Request.URL.Path
-		for _, p := range c.Params {
-			url = strings.Replace(url, p.Value, p.Key, 1)
-		}
-		return url
-	}
-	prometheusMiddleware.Use(router)
+	router.GET("/metrics", prometheusHandler())
 
 	// static files
 	router.Use(static.Serve("/", static.LocalFile(serverConfig.StaticFilesDir, true)))

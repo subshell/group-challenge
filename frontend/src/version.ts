@@ -11,7 +11,9 @@ interface Change {
 export const CHANGES: Change[] = [
   {
     name: '0.11.1',
-    changes: [{ description: 'Dependency upadtes. Vite 4.0', type: 'note' }],
+    changes: [
+      { description: 'Even more dependency upadtes. go 1.20', type: 'note' },
+      { description: 'Dependency upadtes. Vite 4.0', type: 'note' }],
   },
   {
     name: '0.11.0',
