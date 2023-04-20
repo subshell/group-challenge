@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   postgres:
-    image: "postgres:14"
+    image: "postgres:15"
     restart: always
     ports:
       - 5432:5432
@@ -10,8 +10,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: group_challenge
   imgProxy:
-    image: "darthsim/imgproxy:v3.7.1"
-    ports: 
+    image: "darthsim/imgproxy:v3.16.0"
+    ports:
       - 8081:8081
       - 8082:8082
     environment:

@@ -2,6 +2,9 @@ import ReactDatePicker from 'react-date-picker';
 import { Controller, useForm } from 'react-hook-form';
 import { PartyResponse } from '../api/api-models';
 
+import 'react-date-picker/dist/DatePicker.css';
+import 'react-calendar/dist/Calendar.css';
+
 export interface PartyFormData {
   name: string;
   description: string;
