@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 
 export const Footer: FunctionComponent = () => {
   return (
-    <footer className="m-4 p-4 md:flex md:items-center md:justify-between md:p-6">
+    <footer className="m-4 p-4 md:flex md:items-center md:justify-between md:p-6 print:hidden">
       <span className="text-sm sm:text-center">
         <a href="/" className="hover:underline">
           Group Challenge

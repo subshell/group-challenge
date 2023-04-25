@@ -16,7 +16,7 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
 
   return (
     <div>
-      <div className="relative bg-gradient-to-r from-blue-100 to-blue-300 transition-all duration-500 bg-size-200 rounded-md dark:from-slate-700 dark:to-slate-600 dark:text-white">
+      <div className="relative transition-all duration-500 bg-size-200 rounded-md dark:bg-slate-700 dark:text-white">
         {isLive && (
           <span className="bg-blue-500 text-white font-bold px-3 py-3 tracking-widest flex uppercase justify-between rounded-t-md">
             <span className="flex items-center space-x-2">

@@ -9,6 +9,7 @@ function ViewPartyLeaderboard({ party }: { party: PartyResponse }) {
   const sortedSubmissions = sortSubmissions(party.submissions);
   return (
     <section className="body-font">
+      <h1 className="font-bold text-4xl dark:text-slate-300">{party.name}</h1>
       <div className="space-y-4">
         {sortedSubmissions.map((submission, i) => (
           <div className="flex items-center justify-items-center space-x-4 space-y-4" key={submission.id}>

@@ -18,7 +18,7 @@ function Navigation() {
   };
 
   return (
-    <header className="body-font">
+    <header className="body-font print:hidden">
       <div className="container mx-auto flex flex-wrap p-5 mb-8 flex-col md:flex-row items-center justify-between border-b-2 border-gray-600">
         <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-2">
           <Link to="/">
@@ -32,9 +32,9 @@ function Navigation() {
             <>
               <Link
                 className="hover:text-white hover:bg-blue-500 hover:outline-cyan-500 focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
-                to="/party/create"
+                to="/collage"
               >
-                Create a Challenge
+                Collage
               </Link>
             </>
           )}

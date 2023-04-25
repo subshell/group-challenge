@@ -16,6 +16,7 @@ const EditParty = lazy(() => import('./party/edit/EditParty'));
 const OwnSubmissions = lazy(() => import('./party/submissions/OwnSubmissions'));
 const EditProfile = lazy(() => import('./user/EditProfile'));
 const Home = lazy(() => import('./home/Home'));
+const Collage = lazy(() => import('./collage/Collage'));
 
 const WithUser: FC = () => {
   return (
@@ -28,6 +29,7 @@ const WithUser: FC = () => {
           <Route path="edit/:id" element={<EditParty />} />
           <Route path="my-submissions/:id" element={<OwnSubmissions />} />
         </Route>
+        <Route path="/collage" element={<Collage />} />
         <Route path="/profile" element={<EditProfile />} />
         <Route path="/*" element={<Home />} />
       </Routes>
@@ -48,7 +50,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -63,7 +65,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <WebSocketContext.Provider value={{ webSocket }}>
           <div className={themeClass}>
-            <div className="dark:bg-slate-800 dark:text-white min-h-screen">
+            <div className="print:bg-white bg-slate-100 dark:bg-slate-800 dark:text-white min-h-screen">
               <Navigation />
               <ToastContainer position="bottom-right" className="text-black" />
               <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>

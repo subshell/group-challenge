@@ -39,7 +39,7 @@ export const PartyHostMenu: FunctionComponent<{ party: PartyResponse }> = ({ par
     <div>
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className="inline-flex items-center justify-center space-x-2 rounded-full border-2 border-slate-500 px-4 py-2 hover:bg-white hover:text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+          <Menu.Button className=" justify-center rounded-full p-2 hover:text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
             <FaEllipsisV />
           </Menu.Button>
         </div>
@@ -66,18 +66,20 @@ export const PartyHostMenu: FunctionComponent<{ party: PartyResponse }> = ({ par
                   </a>
                 )}
               </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    onClick={onStartPartyButton}
-                    className={`${
-                      active ? 'bg-slate-800 text-white' : 'text-gray-900'
-                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                  >
-                    Start
-                  </button>
-                )}
-              </Menu.Item>
+              {!party.done && (
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={onStartPartyButton}
+                      className={`${
+                        active ? 'bg-slate-800 text-white' : 'text-gray-900'
+                      } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    >
+                      Start
+                    </button>
+                  )}
+                </Menu.Item>
+              )}
               {party.done && (
                 <Menu.Item>
                   {({ active }) => (
