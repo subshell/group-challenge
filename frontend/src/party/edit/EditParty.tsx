@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { deleteParty, editParty, assignModerator, useParty } from '../../api/api';
+import { deleteParty, editParty, assignModerator, useParty, reopenParty } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
 import { useSession } from '../../user/session';
 import PartyForm, { PartyFormData } from '../PartyForm';
@@ -16,7 +16,9 @@ function EditParty() {
   const { data: party, isError, isLoading } = useParty(id as string);
   const { mutateAsync: mutatePartyAsync } = useMutation(editParty);
   const { mutateAsync: mutateNewModeratorAsync } = useMutation(assignModerator);
+  const { mutateAsync: reopenPartyMutateAsync } = useMutation(reopenParty);
   const deletePartyMutation = useMutation(deleteParty);
+  const isHost = party?.userId === session?.userId;
 
   const onDeleteBtn = async () => {
     const result = window.confirm(`Are you sure you want to delete ${party?.name}`);
@@ -25,6 +27,19 @@ function EditParty() {
       deletePartyMutation.mutate({ partyId: id as string, sessionToken: session!.token });
       navigate('/');
     }
+  };
+
+  const onReopenPartyButton = async () => {
+    if (!isHost || !party?.done) {
+      return;
+    }
+
+    const result = window.confirm('Are you sure you want to reopen the party? This will reset all votes!');
+    if (!result) {
+      return;
+    }
+
+    await reopenPartyMutateAsync({ partyId: party.id, sessionToken: session!.token });
   };
 
   const onSubmit = async (partyFormData: PartyFormData) => {
@@ -74,8 +89,16 @@ function EditParty() {
   return (
     <div className="space-y-4 pb-4">
       <div className="flex w-full place-content-between">
-        <h1 className="text-2xl mb-8">Edit Party</h1>
-        <div>
+        <h1 className="text-2xl">Edit Party</h1>
+        <div className="flex space-x-2">
+          {party?.done && (
+            <button
+              onClick={onReopenPartyButton}
+              className="bg-blue-800 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+            >
+              Reopen
+            </button>
+          )}
           <button className="bg-red-800 hover:bg-red-500 text-white font-bold py-2 px-4 rounded" onClick={onDeleteBtn}>
             Delete
           </button>

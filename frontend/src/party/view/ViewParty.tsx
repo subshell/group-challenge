@@ -115,7 +115,6 @@ const ViewPartyContent = ({
     return (
       <div>
         <ViewPartyReveal party={party} partyStatus={partyStatus} />
-
         {reactionPicker}
       </div>
     );
