@@ -15,7 +15,7 @@ export function Home() {
 
   const highlightedParty = visibleParties
     .filter((party) => !party.done)
-    .sort((a, b) => new Date(b.endDate).getDate() - new Date(a.endDate).getDate())[0];
+    .sort((a, b) => new Date(a.endDate).getDate() - new Date(b.endDate).getDate())[0];
 
   return (
     <div className="flex flex-col justify-between">

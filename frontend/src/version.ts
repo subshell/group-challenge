@@ -1,6 +1,6 @@
 interface ChangeItem {
   description: string;
-  type: 'feature' | 'fix' | 'note';
+  type: 'feature' | 'fix' | 'note' | 'beta';
 }
 
 interface Change {
@@ -10,10 +10,19 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.12.0',
+    changes: [
+      { description: 'Statistics', type: 'beta' },
+      { description: 'Picture composition tool', type: 'beta' },
+      { description: 'Homepage UI shows more relevant informations', type: 'feature' },
+    ],
+  },
+  {
     name: '0.11.1',
     changes: [
       { description: 'Even more dependency upadtes. go 1.20', type: 'note' },
-      { description: 'Dependency upadtes. Vite 4.0', type: 'note' }],
+      { description: 'Dependency upadtes. Vite 4.0', type: 'note' },
+    ],
   },
   {
     name: '0.11.0',

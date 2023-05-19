@@ -1,18 +1,29 @@
 import { formatRelative } from 'date-fns';
 import { FaCalendarDay, FaTv, FaUserAlt } from 'react-icons/fa';
-import { usePartyStatus, useUser } from '../api/api';
+import { startParty, usePartyStatus, useUser } from '../api/api';
 import { isPartyLive, PartyResponse } from '../api/api-models';
 import { useSession } from '../user/session';
-import { PartyHostMenu } from './PartyHostMenu';
+import Button from '../components/Button';
+import { useMutation } from '@tanstack/react-query';
 
 function HighlightedParty({ party }: { party: PartyResponse }) {
   const partyStatus = usePartyStatus(party.id);
   const [session] = useSession();
   const { data: host } = useUser(party.userId);
+  const { mutateAsync: startMutateAsync } = useMutation(startParty);
 
   const isLive = partyStatus.isSuccess && isPartyLive(partyStatus.data);
   const isHost = party?.userId === session?.userId;
   const numOwnSubmissions = party.submissions.filter((submission) => submission.userId === session?.userId).length;
+
+  const onStartPartyButton = async () => {
+    if (isLive) {
+      return;
+    }
+
+    if (window.confirm(`Do you want to start the party ${party.name}?`))
+      await startMutateAsync({ partyId: party.id, sessionToken: session!.token });
+  };
 
   return (
     <div>
@@ -69,7 +80,14 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
           </div>
 
           <div className="flex items-center space-x-4 w-full border-t border-white p-4 mt-4 dark:border-slate-500">
-            {isHost && <PartyHostMenu party={party} />}
+            {isHost && (
+              <>
+                {!isLive && <Button onClick={onStartPartyButton}>Start</Button>}
+                <a className="hover:underline font-bold" href={'/party/edit/' + party.id}>
+                  Edit
+                </a>
+              </>
+            )}
 
             <a className="hover:underline font-bold" href={'/party/my-submissions/' + party.id}>
               Upload

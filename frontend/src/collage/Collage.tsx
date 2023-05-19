@@ -3,7 +3,7 @@ import { getThumbnailUrl, useParties } from '../api/api';
 import { sortSubmissions } from '../party/view/util';
 
 const Collage: FC = () => {
-  const { data: parties, status, isLoading, fetchNextPage, hasNextPage } = useParties();
+  const { data: parties, isLoading, fetchNextPage, hasNextPage } = useParties();
   const element = useRef<HTMLDivElement>(null);
   const [imageHeight, setImageHeight] = useState(72);
   const [gap, setGap] = useState(0);

@@ -4,12 +4,21 @@ import { PartyResponse } from '../../api/api-models';
 import PartyPosition from './rewards/PartyPosition';
 
 import { totalRating, avgRatingTwoDecimals, sortSubmissions } from './util';
+import { useSession } from '../../user/session';
+import LinkButton from '../../components/LinkButton';
 
 function ViewPartyLeaderboard({ party }: { party: PartyResponse }) {
+  const [session] = useSession();
+  const isHost = party?.userId === session?.userId;
   const sortedSubmissions = sortSubmissions(party.submissions);
+
   return (
     <section className="body-font">
-      <h1 className="font-bold text-4xl dark:text-slate-300">{party.name}</h1>
+      <div className="flex justify-between">
+        <h1 className="font-bold text-4xl dark:text-slate-300 ">{party.name}</h1>
+        {isHost && <LinkButton to={`/party/edit/${party.id}`} text="Edit" />}
+      </div>
+
       <div className="space-y-4">
         {sortedSubmissions.map((submission, i) => (
           <div className="flex items-center justify-items-center space-x-4 space-y-4" key={submission.id}>
