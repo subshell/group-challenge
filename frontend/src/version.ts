@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.13.0',
+    changes: [{ description: 'Configurable max file upload size (default: 5MB)', type: 'feature' }],
+  },
+  {
     name: '0.12.0',
     changes: [
       { description: 'Statistics', type: 'beta' },

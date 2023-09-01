@@ -9,6 +9,7 @@ import {
   GCWebSocketEvent,
   PartyReaction,
   PaginationPartiesResponse,
+  ConfigResponse,
 } from './api-models';
 import { PartyFormData } from '../party/PartyForm';
 import { useSession } from '../user/session';
@@ -164,6 +165,21 @@ export const usePartyStatus = (id: string) =>
   useLiveApiHook<PartyStatusResponse>({ queryKey: ['parties', id, 'live', 'status'] });
 export const useUsers = () => useApiHook<UserResponse[]>({ queryKey: ['users'] });
 export const useUser = (id: string) => useApiHook<UserResponse>({ queryKey: ['users', id] });
+
+export const useConfig = () => {
+  const [session] = useSession();
+
+  return useQuery(['config'], () => config({ sessionToken: session?.token! }));
+};
+
+export async function config({ sessionToken }: { sessionToken: string }): Promise<ConfigResponse> {
+  return fetch(`${API_URLS.API}/config`, {
+    method: 'GET',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  }).then((res) => res.json());
+}
 
 export async function signIn(emailOrUsername: string, password: string): Promise<UserSession | undefined> {
   const response = await fetch(`${API_URLS.AUTH}/signin`, {

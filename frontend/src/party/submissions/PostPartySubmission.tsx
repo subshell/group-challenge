@@ -4,11 +4,9 @@ import { FaUpload } from 'react-icons/fa';
 import { useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { addSubmission } from '../../api/api';
+import { addSubmission, useConfig } from '../../api/api';
 import { PartyResponse, PartySubmissionFormData } from '../../api/api-models';
 import { useSession } from '../../user/session';
-
-const MAX_FILE_SIZE = 4 << 20;
 
 function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();
@@ -16,25 +14,32 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
   const [imgPrevSrc, setImgPrevSrc] = useState<string | undefined>();
   const form = useForm<PartySubmissionFormData>();
   const { mutateAsync } = useMutation(addSubmission);
+  const { data: appConfig } = useConfig();
 
   const file = form.watch('files')?.[0];
-  const fileTooLarge = file?.size > MAX_FILE_SIZE;
   const hasPreview = () => !!imgPrevSrc;
 
   useEffect(() => {
-    if (!file || fileTooLarge) {
+    if (!file || !appConfig) {
       return;
     }
+
+    if (file?.size > appConfig?.maxUploadSize) {
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = function (e: ProgressEvent<FileReader>) {
       setImgPrevSrc(e.target!.result as string);
     };
     reader.readAsDataURL(file);
-  }, [file, fileTooLarge]);
+  }, [file, appConfig]);
 
   if (!id) {
     return <div>No party id provided</div>;
   }
+
+  const fileTooLarge = appConfig?.maxUploadSize && file?.size > appConfig?.maxUploadSize;
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     const req = await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
@@ -68,7 +73,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
             >
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal uppercase">Select a file</span>
-              <span className="font-light">max {MAX_FILE_SIZE >> 20}MB</span>
+              <span className="font-light">max {(appConfig?.maxUploadSize ?? 0) >> 20}MB</span>
               <input
                 className="hidden"
                 type="file"

@@ -26,7 +26,12 @@ type DBConfig struct {
 }
 
 type ChallengesConfig struct {
-	LiveParty LivePartyConfig
+	LiveParty  LivePartyConfig
+	FileUpload FileUploadConfig
+}
+
+type FileUploadConfig struct {
+	MaxFileSizeMb int
 }
 
 type LivePartyConfig struct {

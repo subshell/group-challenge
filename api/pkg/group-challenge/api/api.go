@@ -25,7 +25,7 @@ var (
 	livePartyHub            *liveparty.LivePartyHub
 	imgCache                *ttlcache.Cache[string, models.Image]
 	wsHub                   *ws.Hub
-	maxImageFileSize        int64  = 4 << 20
+	maxImageFileSize        int64
 	imagesInMemoryCacheSize uint64 = 35
 	imgProxyConfig          config.ImgProxyConfig
 )
@@ -76,6 +76,10 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			user.GET("", usersHandler)
 			user.GET("/:id", userByIdHandler)
 		}
+		config := v1.Group("/config")
+		{
+			config.GET("", configHandler)
+		}
 
 		v1.GET("ws", createWsHandler())
 	}
@@ -106,6 +110,7 @@ func RunServer(serverConfig config.ServerConfig, challengesConfig config.Challen
 	con = _con
 	livePartyHub = liveparty.CreateLivePartyHub(challengesConfig.LiveParty, con)
 	imgProxyConfig = _imgProxyConfig
+	maxImageFileSize = int64(challengesConfig.FileUpload.MaxFileSizeMb) << 20
 
 	// in-memory image cache
 	loader := ttlcache.LoaderFunc[string, models.Image](
