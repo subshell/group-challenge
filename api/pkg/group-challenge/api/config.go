@@ -5,13 +5,12 @@ import (
 )
 
 type ConfigResponse struct {
-	FileSize int64 `json:"fileSize"`
+	MaxUploadSize int64 `json:"maxUploadSize"`
 }
 
 func configHandler(c *gin.Context) {
-
 	configResponse := ConfigResponse{
-		FileSize: maxImageFileSize,
+		MaxUploadSize: maxImageFileSize,
 	}
 	c.JSON(200, configResponse)
 }

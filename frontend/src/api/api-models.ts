@@ -1,7 +1,7 @@
 //response interfaces
 
 export interface ConfigResponse {
-  fileSize: number;
+  maxUploadSize: number;
 }
 
 export interface PaginationResponse<T> {

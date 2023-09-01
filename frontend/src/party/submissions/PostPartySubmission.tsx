@@ -24,7 +24,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
       return;
     }
 
-    if (file?.size > appConfig?.fileSize) {
+    if (file?.size > appConfig?.maxUploadSize) {
       return;
     }
 
@@ -39,7 +39,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
     return <div>No party id provided</div>;
   }
 
-  const fileTooLarge = appConfig?.fileSize && file?.size > appConfig?.fileSize;
+  const fileTooLarge = appConfig?.maxUploadSize && file?.size > appConfig?.maxUploadSize;
 
   const onSubmit = async (data: PartySubmissionFormData) => {
     const req = await mutateAsync({ partyId: id, submission: data, sessionToken: session!.token });
@@ -73,7 +73,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
             >
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal uppercase">Select a file</span>
-              <span className="font-light">max {(appConfig?.fileSize ?? 0) >> 20}MB</span>
+              <span className="font-light">max {(appConfig?.maxUploadSize ?? 0) >> 20}MB</span>
               <input
                 className="hidden"
                 type="file"
