@@ -1,5 +1,9 @@
 //response interfaces
 
+export interface ConfigResponse {
+  fileSize: number;
+}
+
 export interface PaginationResponse<T> {
   pageSize: number;
   page: number;

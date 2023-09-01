@@ -34,6 +34,7 @@ func init() {
 	viper.SetDefault("db.host", "localhost:5432")
 	viper.SetDefault("db.poolSize", 50)
 	viper.SetDefault("challenges.party.live.defaultTimePerSubmissionSeconds", 45)
+	viper.SetDefault("challenges.fileUpload.maxFileSizeMb", 5)
 	viper.SetDefault("imgProxy.enabled", false)
 	viper.SetDefault("imgProxy.url", "http://localhost:8081")
 	viper.SetDefault("imgProxy.sharedLocalCacheDir", "/tmp/group-challenge-cache")

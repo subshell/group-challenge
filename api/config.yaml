@@ -11,6 +11,8 @@ db:
 challenges:
   liveParty:
     defaultTimePerSubmissionSeconds: 45
+  fileUpload:
+    maxFileSizeMb: 5
 imgProxy:
   enabled: true
   url: "http://localhost:8081"
