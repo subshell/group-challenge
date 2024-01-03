@@ -14,7 +14,7 @@ challenges:
   fileUpload:
     maxFileSizeMb: 5
 imgProxy:
-  enabled: false
+  enabled: true
   url: "http://localhost:8081"
   sharedLocalCacheDir: "/tmp/group-challenge-cache"
   thumbnailQuality: 90
