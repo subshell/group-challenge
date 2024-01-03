@@ -9,7 +9,7 @@ export function Home() {
   const { data: parties, isError, isLoading, fetchNextPage, hasNextPage } = useParties();
 
   if (isError) return <p>ERROR!</p>;
-  if (isLoading) return <div></div>;
+  if (isLoading || !parties) return <div></div>;
 
   const visibleParties = parties.pages.reduce((a, b) => a.concat(b.data), [] as PartyResponse[]);
 

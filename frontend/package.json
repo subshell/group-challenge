@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "1.7.17",
-    "@tanstack/react-query": "4.29.7",
+    "@tanstack/react-query": "5.17.0",
     "date-fns": "3.0.6",
     "react": "18.2.0",
     "react-date-picker": "10.6.0",

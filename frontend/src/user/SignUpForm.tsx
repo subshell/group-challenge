@@ -8,16 +8,23 @@ interface FormData {
   username: string;
   password: string;
   email: string;
-  confirmpassword: string;
+  confirmpassword?: string;
 }
 
 function SignUpForm() {
   const [, setSession] = useSession();
-  const signUpMutation = useMutation(signUp);
+  const signUpMutation = useMutation({
+    mutationFn: signUp,
+  });
   const { watch, register, handleSubmit, formState, setError, setFocus } = useForm<FormData>();
 
   const onSubmit = async ({ username, password, email }: FormData) => {
     const userResponse = await signUpMutation.mutateAsync({ username, password, email });
+
+    if (!userResponse) {
+      return <></>;
+    }
+
     if (userResponse.status !== 200) {
       if (userResponse.status === 422) {
         toast(`Sorry, the user ${username} already exists`, { type: 'error' });
