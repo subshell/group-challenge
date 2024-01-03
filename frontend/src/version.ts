@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.13.1',
+    changes: [{ description: 'Dependency Updates. Vite 5, React Query 5.', type: 'note' }],
+  },
+  {
     name: '0.13.0',
     changes: [{ description: 'Configurable max file upload size (default: 5MB)', type: 'feature' }],
   },
