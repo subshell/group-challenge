@@ -14,10 +14,10 @@ function EditParty() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data: party, isError, isLoading } = useParty(id as string);
-  const { mutateAsync: mutatePartyAsync } = useMutation(editParty);
-  const { mutateAsync: mutateNewModeratorAsync } = useMutation(assignModerator);
-  const { mutateAsync: reopenPartyMutateAsync } = useMutation(reopenParty);
-  const deletePartyMutation = useMutation(deleteParty);
+  const { mutateAsync: mutatePartyAsync } = useMutation({ mutationFn: editParty });
+  const { mutateAsync: mutateNewModeratorAsync } = useMutation({ mutationFn: assignModerator });
+  const { mutateAsync: reopenPartyMutateAsync } = useMutation({ mutationFn: reopenParty });
+  const deletePartyMutation = useMutation({ mutationFn: deleteParty });
   const isHost = party?.userId === session?.userId;
 
   const onDeleteBtn = async () => {

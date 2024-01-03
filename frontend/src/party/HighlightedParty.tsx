@@ -10,7 +10,7 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
   const partyStatus = usePartyStatus(party.id);
   const [session] = useSession();
   const { data: host } = useUser(party.userId);
-  const { mutateAsync: startMutateAsync } = useMutation(startParty);
+  const { mutateAsync: startMutateAsync } = useMutation({ mutationFn: startParty });
 
   const isLive = partyStatus.isSuccess && isPartyLive(partyStatus.data);
   const isHost = party?.userId === session?.userId;

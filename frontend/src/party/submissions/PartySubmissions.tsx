@@ -7,7 +7,7 @@ import { useSession } from '../../user/session';
 
 function PartySubmission({ partyId, partySubmission }: { partyId: string; partySubmission: PartySubmissionResponse }) {
   const [session] = useSession();
-  const { mutateAsync } = useMutation(deleteSubmission);
+  const { mutateAsync } = useMutation({ mutationFn: deleteSubmission });
   const { data: party, refetch } = useParty(partyId);
   const { data: partyStatus } = usePartyStatus(partyId);
   const { data: user } = useUser(partySubmission.userId);

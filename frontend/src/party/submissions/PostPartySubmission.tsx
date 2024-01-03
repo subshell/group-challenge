@@ -13,7 +13,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
   const { id } = useParams<{ id: string }>();
   const [imgPrevSrc, setImgPrevSrc] = useState<string | undefined>();
   const form = useForm<PartySubmissionFormData>();
-  const { mutateAsync } = useMutation(addSubmission);
+  const { mutateAsync } = useMutation({ mutationFn: addSubmission });
   const { data: appConfig } = useConfig();
 
   const file = form.watch('files')?.[0];

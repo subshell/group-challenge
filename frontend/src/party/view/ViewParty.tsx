@@ -39,7 +39,7 @@ const ViewPartyContent = ({
 }) => {
   const partyId = party.id;
   const [session] = useSession();
-  const { mutateAsync: mutateReactionAsync } = useMutation(sendReaction);
+  const { mutateAsync: mutateReactionAsync } = useMutation({ mutationFn: sendReaction });
   const onReaction = useCallback(
     (reaction: string) => {
       mutateReactionAsync({ partyId, reaction, sessionToken: session!.token });
@@ -131,10 +131,10 @@ function ViewParty() {
   const party = useParty(id as string);
   const partyStatus = usePartyStatus(id as string);
 
-  const { mutate: mutateJoinParty } = useMutation(joinParty);
-  const { mutateAsync: mutateNextSubmission } = useMutation(nextPartySubmissions);
-  const { mutateAsync: mutatePreviousSubmission } = useMutation(previousPartySubmissions);
-  const { mutateAsync: mutateVote } = useMutation(votePartySubmissions);
+  const { mutate: mutateJoinParty } = useMutation({ mutationFn: joinParty });
+  const { mutateAsync: mutateNextSubmission } = useMutation({ mutationFn: nextPartySubmissions });
+  const { mutateAsync: mutatePreviousSubmission } = useMutation({ mutationFn: previousPartySubmissions });
+  const { mutateAsync: mutateVote } = useMutation({ mutationFn: votePartySubmissions });
 
   const partyUserId = party.data?.userId;
   const currentPartyStatus = party.data && partyStatus.data?.current;
@@ -171,7 +171,7 @@ function ViewParty() {
   };
 
   if (party.isError || partyStatus.isError) return <span>error</span>;
-  if (party.isLoading) return <span>Loading</span>;
+  if (party.isLoading || !partyStatus.data || !party.data) return <span>Loading</span>;
   if (partyStatus.isLoading) return <span>Loading party status</span>;
 
   const isHost = session!.userId === partyUserId;

@@ -1,5 +1,11 @@
 import { useCallback } from 'react';
-import { useInfiniteQuery, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import {
+  QueryFunctionContext,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   PartyResponse,
   PartyStatusResponse,
@@ -32,7 +38,7 @@ function useLiveApiHook<T>({
   queryKey: string[];
   matchesQueryKeyFn?: EventQueryKeyMatcher;
   url?: string;
-  useQueryOptions?: UseQueryOptions<T, unknown, T>;
+  useQueryOptions?: UseQueryOptions<T, unknown, T, string[]>;
 }) {
   const apiHook = useApiHook({ queryKey, url, useQueryOptions });
   useUpdateQueryDataFromEvents({ queryKey, matchesQueryKeyFn, refetch: apiHook.refetch });
@@ -47,11 +53,11 @@ function useApiHook<T>({
 }: {
   queryKey: string[];
   url?: string;
-  useQueryOptions?: UseQueryOptions<T, unknown, T>;
+  useQueryOptions?: UseQueryOptions<T, unknown, T, string[]>;
 }) {
   const [session, setSession] = useSession();
 
-  const fetchData = async (): Promise<T> => {
+  const fetchData = async (context: QueryFunctionContext): Promise<T> => {
     const res = await fetch(url, {
       headers: {
         'X-AuthToken': session?.token || '',
@@ -71,7 +77,7 @@ function useApiHook<T>({
     return res.json();
   };
 
-  return useQuery<T>(queryKey, fetchData, useQueryOptions);
+  return useQuery({ queryKey, queryFn: fetchData, ...useQueryOptions });
 }
 
 const useUpdateQueryDataFromEvents = ({
@@ -135,7 +141,10 @@ export const useParties = () => {
     return res.json();
   };
 
-  const query = useInfiniteQuery(queryKey, fetchParties, {
+  const query = useInfiniteQuery({
+    queryKey,
+    queryFn: fetchParties,
+    initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       if (lastPage.data.length !== lastPage.pageSize) {
         return undefined;
@@ -169,7 +178,7 @@ export const useUser = (id: string) => useApiHook<UserResponse>({ queryKey: ['us
 export const useConfig = () => {
   const [session] = useSession();
 
-  return useQuery(['config'], () => config({ sessionToken: session?.token! }));
+  return useQuery({ queryKey: ['config'], queryFn: () => config({ sessionToken: session?.token! }) });
 };
 
 export async function config({ sessionToken }: { sessionToken: string }): Promise<ConfigResponse> {

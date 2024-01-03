@@ -1,5 +1,5 @@
 # Go 
-FROM golang:1.20-alpine AS go-builder
+FROM golang:1.21-alpine AS go-builder
 RUN apk add --no-cache upx
 
 WORKDIR /app
@@ -11,7 +11,7 @@ RUN upx bin/group-challenge
 #########
 
 # React Frontend
-FROM node:18-alpine AS react-builder
+FROM node:20.10-alpine AS react-builder
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
@@ -24,7 +24,7 @@ RUN npm run build
 #########
 
 # Executable
-FROM alpine:3.16
+FROM alpine:3.19.0
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /app

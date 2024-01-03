@@ -7,7 +7,7 @@ import PartyForm, { PartyFormData } from '../PartyForm';
 
 function CreateParty() {
   const [session] = useSession();
-  const { mutateAsync } = useMutation(createParty);
+  const { mutateAsync } = useMutation({ mutationFn: createParty });
   const navigate = useNavigate();
   const onSubmit = async (data: PartyFormData) => {
     const party = await mutateAsync({ party: data, sessionToken: session!.token });
