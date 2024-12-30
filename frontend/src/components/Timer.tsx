@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import useSound from 'use-sound';
+import dingSound from '../assets/ding-sound.mp3';
 
 const Timer = ({
   forSeconds,
@@ -12,8 +14,9 @@ const Timer = ({
   const [startTime] = useState(startAt);
   const [endTime] = useState(new Date(startAt.getTime() + forSeconds * 1_000));
   const [remainingSeconds, setRemainingSeconds] = useState((endTime.getTime() - Date.now()) / 1000);
-  const timerInterval = useRef<any>();
+  const timerInterval = useRef<any>(undefined);
   const [timerDone, setTimerDone] = useState(false);
+  const [playDingSound] = useSound(dingSound);
 
   useEffect(() => {
     timerInterval.current = setInterval(() => {
@@ -33,6 +36,7 @@ const Timer = ({
   useEffect(() => {
     if (timerDone) {
       onFinish?.();
+      playDingSound();
       clearInterval(timerInterval.current);
     }
   }, [timerDone, onFinish]);

@@ -17,7 +17,6 @@ const OwnSubmissions = lazy(() => import('./party/submissions/OwnSubmissions'));
 const EditProfile = lazy(() => import('./user/EditProfile'));
 const Home = lazy(() => import('./home/Home'));
 const Collage = lazy(() => import('./collage/Collage'));
-const Statistics = lazy(() => import('./statistics/Statistics'));
 
 const WithUser: FC = () => {
   return (
@@ -32,7 +31,6 @@ const WithUser: FC = () => {
         </Route>
         <Route path="/collage" element={<Collage />} />
         <Route path="/profile" element={<EditProfile />} />
-        <Route path="/statistics" element={<Statistics />} />
         <Route path="/*" element={<Home />} />
       </Routes>
     </Suspense>
