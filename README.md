@@ -56,7 +56,7 @@ Alternatively you can start all services with the following commands:
 
 ```sh
   mkdir /tmp/group-challenge-cache
-  docker-compose up
+  docker compose up
 ```
 
 2. **API:** start the go api server at port `8080`.
