@@ -10,6 +10,10 @@ interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.14.1',
+    changes: [{ description: 'Dependency Updates. Vite 8, Go 1.26', type: 'note' }],
+  },
+  {
     name: '0.14.0',
     changes: [
       { description: 'Dependency Updates. Vite 6, React 19. Go 1.23', type: 'note' },
