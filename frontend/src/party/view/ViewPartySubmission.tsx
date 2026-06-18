@@ -48,7 +48,7 @@ function ViewPartySubmission({
           startAt={new Date(partyStatus.current!.startTime)}
           onFinish={onTimer}
         />
-        <div className="bg-gray-100 relative">
+        <div id="image" className="bg-gray-100 relative">
           <a href={getImageUrl(partySubmission.imageId)} target="_blank" rel="noopener noreferrer">
             <img
               className="object-contain w-full rounded"

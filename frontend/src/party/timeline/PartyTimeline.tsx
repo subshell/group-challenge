@@ -44,7 +44,7 @@ export const PartyTimeline: FunctionComponent<{ year: number; parties: PartyResp
     <div className="space-y-6">
       <h1 className="font-bold text-4xl dark:text-slate-300">{year}</h1>
       {monthsWithSumissions.map((month) => (
-        <div key={month} className="space-y-4 m-2">
+        <div key={month} id="challengesPerMonth" className="space-y-4 m-2">
           <h2 className="font-bold text-2xl dark:text-slate-300">{month}</h2>
           {timeline.get(month)!.map((party) => (
             <div key={party.id}>
