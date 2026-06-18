@@ -42,7 +42,7 @@ function ViewPartySubmission({
 
   return (
     <section className="body-font space-y-2">
-      <div className="container mx-auto flex px-5 flex-col space-y-2 lg:w-4/6 md:w-full w-5/6">
+      <div className="container mx-auto flex flex-col space-y-2 w-full">
         <Timer
           forSeconds={partyStatus.submissionTimeMs / 1_000}
           startAt={new Date(partyStatus.current!.startTime)}
