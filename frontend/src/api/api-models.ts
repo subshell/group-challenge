@@ -55,7 +55,14 @@ export interface PartySubmissionFormData {
   description: string;
 }
 
-export type PartyStatusState = 'open' | 'waitinglobby' | 'submissions' | 'prereveal' | 'reveal' | 'done';
+export enum PartyStatusState {
+  OPEN = 'open',
+  LOBBY = 'waitinglobby',
+  RUNNING = 'submissions',
+  PRE_REVEAL = 'prereveal',
+  REVEAL = 'reveal',
+  DONE = 'done',
+}
 
 export interface PartyStatusResponse {
   current?: {
@@ -72,7 +79,7 @@ export interface PartyStatusResponse {
 }
 
 export function isPartyLive(partyStatus?: PartyStatusResponse) {
-  return partyStatus?.state !== 'open' && partyStatus?.state !== 'done';
+  return partyStatus?.state !== PartyStatusState.OPEN && partyStatus?.state !== PartyStatusState.DONE;
 }
 
 // session

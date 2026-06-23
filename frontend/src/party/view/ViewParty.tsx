@@ -11,7 +11,7 @@ import {
 } from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyLeaderboard from './ViewPartyLeaderboard';
-import { PartyResponse, PartyStatusResponse } from '../../api/api-models';
+import { PartyResponse, PartyStatusResponse, PartyStatusState } from '../../api/api-models';
 import Button from '../../components/Button';
 import { useMutation } from '@tanstack/react-query';
 import { useSession } from '../../user/session';
@@ -176,7 +176,9 @@ function ViewParty() {
 
   const isHost = session!.userId === partyUserId;
   const showControlButtons =
-    isHost && (partyStatusState === 'submissions' || partyStatusState === 'reveal' || partyStatusState === 'prereveal');
+    isHost && (partyStatusState === PartyStatusState.RUNNING ||
+          partyStatusState === PartyStatusState.REVEAL ||
+          partyStatusState === <PartyStatusState className="PRE_REVEAL"></PartyStatusState>);
 
   return (
     <div>

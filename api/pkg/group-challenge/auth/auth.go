@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// CreateUser creates a user with and hashes the password
+// CreateUser creates a user with username and email and hashes the password
 func CreateUser(username, password, email string) *models.User {
 	userModel := &models.User{
 		Username: username,

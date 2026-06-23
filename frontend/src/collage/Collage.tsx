@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+  import { FC, useEffect, useRef, useState } from 'react';
 import { getThumbnailUrl, useParties } from '../api/api';
 import { sortSubmissions } from '../party/view/util';
 
