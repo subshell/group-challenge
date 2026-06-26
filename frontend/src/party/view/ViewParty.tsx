@@ -1,14 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import {
-  joinParty,
-  nextPartySubmissions,
-  previousPartySubmissions,
-  sendReaction,
-  useParty,
-  usePartyStatus,
-  votePartySubmissions,
-} from '../../api/api';
+import { joinParty, nextPartySubmissions, previousPartySubmissions, sendReaction, useParty, usePartyStatus, votePartySubmissions } from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyLeaderboard from './ViewPartyLeaderboard';
 import { PartyResponse, PartyStatusResponse, PartyStatusState } from '../../api/api-models';
@@ -23,13 +15,13 @@ import ReactionPicker from '../../components/ReactionPicker';
 import { usePreloadNextImage } from './util';
 
 const ViewPartyContent = ({
-  partyStatus,
-  isHost,
-  party,
-  onRating,
-  onNextButton,
-  onRedirect,
-}: {
+                            partyStatus,
+                            isHost,
+                            party,
+                            onRating,
+                            onNextButton,
+                            onRedirect
+                          }: {
   partyStatus: PartyStatusResponse;
   isHost: boolean;
   party: PartyResponse;
@@ -52,22 +44,19 @@ const ViewPartyContent = ({
     return <div>Unknown party or party status</div>;
   }
 
-  if (party.done || partyStatus.state === 'done') {
+  const reactionPicker = (
+    <ReactionPicker onReaction={onReaction} />
+  );
+
+  if (party.done || partyStatus.state === PartyStatusState.DONE) {
     return <ViewPartyLeaderboard party={party} />;
   }
-
-  if (partyStatus.state === 'open') {
+  if (partyStatus.state === PartyStatusState.OPEN) {
     onRedirect();
     return null;
   }
 
-  const reactionPicker = (
-    <div className="block md:fixed mt-8 z-10 bottom-4 left-4">
-      <ReactionPicker onReaction={onReaction} />
-    </div>
-  );
-
-  if (partyStatus.state === 'waitinglobby') {
+  if (partyStatus.state === PartyStatusState.LOBBY) {
     return (
       <ViewPartyStartPage
         isHost={isHost}
@@ -78,7 +67,7 @@ const ViewPartyContent = ({
     );
   }
 
-  if (partyStatus.state === 'submissions') {
+  if (partyStatus.state === PartyStatusState.RUNNING) {
     const partySubmission = party.submissions[partyStatus.current!.index];
     return (
       <div>
@@ -97,9 +86,9 @@ const ViewPartyContent = ({
     );
   }
 
-  if (partyStatus.state === 'prereveal') {
+  if (partyStatus.state === PartyStatusState.PRE_REVEAL) {
     return (
-      <div>
+      <div id="vp-pre-reveal">
         <div className="flex flex-col items-center space-y-4 mt-20">
           <p className="text-5xl">Thanks for voting!</p>
           <p className="text-3xl font-thin">Waiting for host...</p>
@@ -111,7 +100,7 @@ const ViewPartyContent = ({
     );
   }
 
-  if (partyStatus.state === 'reveal') {
+  if (partyStatus.state === PartyStatusState.REVEAL) {
     return (
       <div>
         <ViewPartyReveal party={party} partyStatus={partyStatus} />
@@ -177,8 +166,8 @@ function ViewParty() {
   const isHost = session!.userId === partyUserId;
   const showControlButtons =
     isHost && (partyStatusState === PartyStatusState.RUNNING ||
-          partyStatusState === PartyStatusState.REVEAL ||
-          partyStatusState === <PartyStatusState className="PRE_REVEAL"></PartyStatusState>);
+      partyStatusState === PartyStatusState.REVEAL ||
+      partyStatusState === PartyStatusState.PRE_REVEAL);
 
   return (
     <div>

@@ -57,8 +57,8 @@ export interface PartySubmissionFormData {
 
 export enum PartyStatusState {
   OPEN = 'open',
-  LOBBY = 'waitinglobby',
-  RUNNING = 'submissions',
+  LOBBY = 'lobby',
+  RUNNING = 'running',
   PRE_REVEAL = 'prereveal',
   REVEAL = 'reveal',
   DONE = 'done',

@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	MaxStars                   = 6
-	LivePartyStateOpen         = "open"
-	LivePartyStateWaitingLobby = "waitinglobby"
-	LivePartyStateSubmissions  = "submissions"
-	LivePartyStatePreReveal    = "prereveal"
-	LivePartyStateReveal       = "reveal"
-	LivePartyStateDone         = "done"
+	MaxStars                = 6
+	LivePartyStateOpen      = "open"
+	LivePartyStateLobby     = "lobby"
+	LivePartyStateRunning   = "running"
+	LivePartyStatePreReveal = "prereveal"
+	LivePartyStateReveal    = "reveal"
+	LivePartyStateDone      = "done"
 )
 
 type SubmissionStatus struct {
@@ -57,7 +57,7 @@ func createLiveParty(party *models.Party, con *pg.DB, livePartyConfig config.Liv
 			PartyStartTime:   time.Now(),
 			SubmissionTimeMs: livePartyConfig.DefaultTimePerSubmissionSeconds * 1000,
 			Participants:     1,
-			State:            LivePartyStateWaitingLobby,
+			State:            LivePartyStateLobby,
 			Votes:            []*models.Vote{},
 		},
 		ParticipantsUserIDs: []uuid.UUID{party.UserID},

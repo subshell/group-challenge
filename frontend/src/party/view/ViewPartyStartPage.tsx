@@ -13,7 +13,7 @@ function ViewPartyStartPage({
   onPartyStart: () => any;
 }) {
   return (
-    <div className="flex flex-col items-center justify-between align-middle space-y-10">
+    <div id="vp-lobby" className="flex flex-col items-center justify-between align-middle space-y-10">
       <h2 className="text-4xl font-bold">- {partyName} -</h2>
       <div className="flex space-x-8 items-center">
         <p className="font-bold">Share link:</p>

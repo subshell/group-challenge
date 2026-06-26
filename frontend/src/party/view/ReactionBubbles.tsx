@@ -36,7 +36,7 @@ const ReactionBubbles: FunctionComponent<{ partyId: string }> = ({ partyId }) =>
   }, [reactions]);
 
   return (
-    <div className="space-y-2 flex flex-col">
+    <div id="reaction" className="space-y-2 flex flex-col">
       {reactions.map((reaction, i) => (
         <div key={i} className="flex justify-end">
           <div className="bg-black opacity-90 rounded p-2 text-2xl text-white">{reaction.reaction}</div>
