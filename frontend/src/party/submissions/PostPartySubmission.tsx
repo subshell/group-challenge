@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUpload } from 'react-icons/fa';
 import { useMutation } from '@tanstack/react-query';
-import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { addSubmission, useConfig } from '../../api/api';
 import { PartyResponse, PartySubmissionFormData } from '../../api/api-models';
 import { useSession } from '../../user/session';
+import { useParams } from 'react-router-dom';
 
 function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();

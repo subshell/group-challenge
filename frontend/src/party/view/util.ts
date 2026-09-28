@@ -13,7 +13,7 @@ export const avgRating = (votes: Vote[]) => {
 };
 
 export const avgRatingTwoDecimals = (votes: Vote[]) => {
-  return avgRating(votes).toFixed(2);
+  return avgRating(votes);
 };
 
 export const sortSubmissions = (submissions: PartySubmissionResponse[]) => {
@@ -27,7 +27,7 @@ export const sortSubmissions = (submissions: PartySubmissionResponse[]) => {
 export const getSubmissionVotes = (
   partyStatus: PartyStatusResponse,
   submission: PartySubmissionResponse,
-  userId?: string
+  userId?: string,
 ) => {
   return partyStatus.votes.filter((vote) => vote.submissionId === submission.id && (!userId || vote.userId === userId));
 };
