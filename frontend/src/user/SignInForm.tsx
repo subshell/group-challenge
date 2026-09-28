@@ -34,7 +34,7 @@ function SignInForm() {
           Email or Username
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border rounded w-full py-2 px-3"
           type="text"
           {...register('emailOrUsername', { required: true })}
         />
@@ -45,7 +45,7 @@ function SignInForm() {
           Password
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black mb-3"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3  mb-3"
           type="password"
           autoComplete="currnet-password"
           {...register('password', { required: true })}

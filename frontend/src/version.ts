@@ -1,14 +1,23 @@
-interface ChangeItem {
+export interface ChangeItem {
   description: string;
   type: 'feature' | 'fix' | 'note' | 'beta';
 }
 
-interface Change {
+export interface Change {
   name: string;
   changes: ChangeItem[];
 }
 
 export const CHANGES: Change[] = [
+  {
+    name: '0.14.2',
+    changes: [
+      { description: 'More dependency updates', type: 'note' },
+      { description: 'New changelog ui', type: 'note' },
+      { description: 'New emojis on start screen', type: 'note' },
+      { description: 'Fixed theme switcher', type: 'fix' },
+    ],
+  },
   {
     name: '0.14.1',
     changes: [{ description: 'Dependency Updates. Vite 8, Go 1.26', type: 'note' }],
@@ -30,11 +39,7 @@ export const CHANGES: Change[] = [
   },
   {
     name: '0.12.0',
-    changes: [
-      { description: 'Statistics', type: 'beta' },
-      { description: 'Picture composition tool', type: 'beta' },
-      { description: 'Homepage UI shows more relevant informations', type: 'feature' },
-    ],
+    changes: [{ description: 'Homepage UI shows more relevant informations', type: 'feature' }],
   },
   {
     name: '0.11.1',

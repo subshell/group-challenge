@@ -35,7 +35,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
           Name
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border rounded w-full py-2 px-3"
           type="text"
           {...register('name', { required: true })}
         />
@@ -47,7 +47,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
         </label>
 
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border rounded w-full py-2 px-3"
           {...register('description', { required: true })}
         />
       </div>
@@ -57,10 +57,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
           Category
         </label>
 
-        <select
-          className="shadow border rounded w-full py-2 px-3 text-black"
-          {...register('category', { required: true })}
-        >
+        <select className="shadow border rounded w-full py-2 px-3" {...register('category', { required: true })}>
           <option value="photo">Photo Challenge</option>
         </select>
       </div>
@@ -103,7 +100,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
       </div>
 
       <input
-        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+        className="bg-blue-500 hover:bg-blue-400 font-bold py-2 px-4 rounded text-white"
         value={submitBtnText}
         disabled={formState.isSubmitting}
         type="submit"

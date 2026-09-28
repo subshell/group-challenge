@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import {
   joinParty,
   nextPartySubmissions,
@@ -21,6 +21,7 @@ import ViewPartyReveal from './ViewPartyReveal';
 import EmojiBar from '../../components/EmojiBar';
 import ReactionPicker from '../../components/ReactionPicker';
 import { usePreloadNextImage } from './util';
+import { useParams } from 'react-router-dom';
 
 const ViewPartyContent = ({
   partyStatus,
@@ -44,7 +45,7 @@ const ViewPartyContent = ({
     (reaction: string) => {
       mutateReactionAsync({ partyId, reaction, sessionToken: session!.token });
     },
-    [mutateReactionAsync, partyId, session]
+    [mutateReactionAsync, partyId, session],
   );
   usePreloadNextImage(party, partyStatus);
 
@@ -145,21 +146,15 @@ function ViewParty() {
     if (!id || !session?.token || partyDone) {
       return;
     }
-    console.trace('join party');
     mutateJoinParty({ partyId: id, sessionToken: session.token });
   }, [mutateJoinParty, id, session, partyDone]);
-
-  useEffect(() => {
-    console.trace(`Current party state: ${partyStatusState}`);
-  }, [partyStatusState]);
 
   const onSubmissionRating = useCallback(
     async (rating: number) => {
       if (!rating) return;
-      console.trace('onRating', rating);
       await mutateVote({ partyId: id as string, rating, sessionToken: session!.token });
     },
-    [session, id, mutateVote]
+    [session, id, mutateVote],
   );
 
   const onNextButton = async () => {

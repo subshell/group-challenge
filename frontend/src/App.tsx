@@ -16,7 +16,6 @@ const EditParty = lazy(() => import('./party/edit/EditParty'));
 const OwnSubmissions = lazy(() => import('./party/submissions/OwnSubmissions'));
 const EditProfile = lazy(() => import('./user/EditProfile'));
 const Home = lazy(() => import('./home/Home'));
-const Collage = lazy(() => import('./collage/Collage'));
 
 const WithUser: FC = () => {
   return (
@@ -29,7 +28,6 @@ const WithUser: FC = () => {
           <Route path="edit/:id" element={<EditParty />} />
           <Route path="my-submissions/:id" element={<OwnSubmissions />} />
         </Route>
-        <Route path="/collage" element={<Collage />} />
         <Route path="/profile" element={<EditProfile />} />
         <Route path="/*" element={<Home />} />
       </Routes>
