@@ -13,7 +13,7 @@ export const avgRating = (votes: Vote[]) => {
 };
 
 export const avgRatingTwoDecimals = (votes: Vote[]) => {
-  return avgRating(votes);
+  return avgRating(votes).toFixed(2);
 };
 
 export const sortSubmissions = (submissions: PartySubmissionResponse[]) => {
