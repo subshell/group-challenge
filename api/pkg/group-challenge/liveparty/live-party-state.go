@@ -30,7 +30,7 @@ func (liveParty *LiveParty) Previous() {
 		return
 	}
 
-	if liveParty.Status.State == LivePartyStateSubmissions {
+	if liveParty.Status.State == LivePartyStateRunning {
 		liveParty.prevSubmission()
 		return
 	}
@@ -68,8 +68,8 @@ func (liveParty *LiveParty) prevReveal() {
 }
 
 func (liveParty *LiveParty) Next() {
-	if liveParty.Status.State == LivePartyStateWaitingLobby {
-		liveParty.Status.State = LivePartyStateSubmissions
+	if liveParty.Status.State == LivePartyStateLobby {
+		liveParty.Status.State = LivePartyStateRunning
 	}
 
 	if liveParty.Status.State == LivePartyStatePreReveal {
@@ -77,7 +77,7 @@ func (liveParty *LiveParty) Next() {
 		liveParty.Status.State = LivePartyStateReveal
 	}
 
-	if liveParty.Status.State == LivePartyStateSubmissions {
+	if liveParty.Status.State == LivePartyStateRunning {
 		liveParty.nextSubmission()
 		return
 	}

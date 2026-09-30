@@ -10,6 +10,14 @@ export interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.15.0',
+    changes: [
+      { description: 'Added gallery to party view', type: 'feature' },
+      { description: 'Use more space for photo display in running party', type: 'note' },
+      { description: 'Fixed party overview on homepage for Firefox', type: 'fix' },
+    ],
+  },
+  {
     name: '0.14.2',
     changes: [
       { description: 'More dependency updates', type: 'note' },

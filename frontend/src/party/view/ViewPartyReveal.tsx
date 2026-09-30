@@ -14,9 +14,9 @@ function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partySt
   const votes = getSubmissionVotes(partyStatus, currentSumbission);
 
   return (
-    <div>
+    <div id="vp-reveal">
       <div className="relative">
-        <a href={getImageUrl(currentSumbission.imageId)} target="_blank" rel="noopener noreferrer">
+        <a id="vp-reveal-submission-image" href={getImageUrl(currentSumbission.imageId)} target="_blank" rel="noopener noreferrer">
           <img
             className="object-contain w-full rounded bg-gray-100 "
             style={{
@@ -30,14 +30,14 @@ function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partySt
           <ReactionBubbles partyId={party.id} />
         </div>
       </div>
-      <div className="flex flex-row justify-between mt-8">
+      <div id="vp-reveal-submission-info" className="flex flex-row justify-between mt-8">
         <div className="space-y-2">
           <p>
             <span className="text-xl mr-4">{currentSumbission.name}</span>
             <span className="text-slate-500">{currentSumbission.description}</span>
           </p>
         </div>
-        <div className="flex flex-row justify-center text-slate-500 text-xl items-center space-x-2">
+        <div id="vp-reveal-submission-rating" className="flex flex-row justify-center text-slate-500 text-xl items-center space-x-2">
           <span className="border border-slate-500 px-4 py-2 flex items-center space-x-2">
             <PartyPosition position={partyStatus.sequence.length - partyStatus.current.position - 1} />
           </span>

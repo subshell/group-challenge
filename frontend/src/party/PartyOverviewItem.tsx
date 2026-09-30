@@ -13,8 +13,8 @@ function PartyOverviewItem({ party }: { party: PartyResponse }) {
   const submissions = sortSubmissions(party.submissions);
 
   return (
-    <div className="relative">
-      <div className="flex space-x-8">
+    <div id="party-overview" className="relative">
+      <div id="party-headline" className="flex space-x-8">
         <div className="flex items-center space-x-2 mb-4">
           <Link
             to={'/party/view/' + party.id}
@@ -26,11 +26,9 @@ function PartyOverviewItem({ party }: { party: PartyResponse }) {
           </Link>
         </div>
       </div>
-      <div className="flex flex-row space-x-2 h-48 overflow-auto">
+      <div id="party-top-submissions" className="flex flex-row space-x-2 h-48 overflow-auto">
         {submissions.slice(0, 3).map((submission) => (
-          <div key={submission.id} className="shrink-0 shadow-md hover:shadow-lg">
-            <img src={getThumbnailUrl(submission?.imageId)} alt={submission?.name} className="h-full" />
-          </div>
+            <img src={getThumbnailUrl(submission?.imageId)} alt={submission?.name} key={submission.id} className="h-full" />
         ))}
       </div>
     </div>

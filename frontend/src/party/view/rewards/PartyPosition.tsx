@@ -3,12 +3,12 @@ import TrophyUrl from '/src/assets/trophy.svg';
 
 function PartyPosition({ position }: { position: number }) {
   return (
-    <>
+    <div id="vp-submission-position" style={{width: "48px"}}>
       {position === 0 && <img src={TrophyUrl} />}
       {position === 1 && <FaMedal size={48} color="silver" />}
       {position === 2 && <FaMedal size={48} color="brown" />}
       {position > 2 && <div className="text-4xl">{position + 1}.</div>}
-    </>
+    </div>
   );
 }
 

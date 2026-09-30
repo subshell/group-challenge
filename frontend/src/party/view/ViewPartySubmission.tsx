@@ -41,15 +41,15 @@ function ViewPartySubmission({
   }, [rating, onRating]);
 
   return (
-    <section className="body-font space-y-2">
-      <div className="container mx-auto flex px-5 flex-col space-y-2 lg:w-4/6 md:w-full w-5/6">
+    <section id="vp-running" className="body-font space-y-2">
+      <div className="container mx-auto flex flex-col space-y-2 w-full">
         <Timer
           forSeconds={partyStatus.submissionTimeMs / 1_000}
           startAt={new Date(partyStatus.current!.startTime)}
           onFinish={onTimer}
         />
-        <div className="bg-gray-100 relative">
-          <a href={getImageUrl(partySubmission.imageId)} target="_blank" rel="noopener noreferrer">
+        <div id="vp-running-submission" className="bg-gray-100 relative">
+          <a id="vp-running-submission-image" href={getImageUrl(partySubmission.imageId)} target="_blank" rel="noopener noreferrer">
             <img
               className="object-contain w-full rounded"
               style={{
@@ -63,7 +63,7 @@ function ViewPartySubmission({
             <ReactionBubbles partyId={partyId} />
           </div>
         </div>
-        <div className="flex flex-row justify-between mt-8">
+        <div id="vp-running-submission-info" className="flex flex-row justify-between mt-8">
           <div className="space-y-2">
             <h3 className="text-2xl font-medium">
               <span className="text-xl">{partyStatus.current!.position + 1}</span>
@@ -75,7 +75,7 @@ function ViewPartySubmission({
               <span className="text-slate-500">{partySubmission.description}</span>
             </p>
           </div>
-          <div className="flex justify-center flex-col items-start">
+          <div id="vp-running-submission-voting" className="flex justify-center flex-col items-start">
             <StarRating stars={6} onRating={setRating} initialStars={rating} disabled={done} />
             <div className="mt-4">
               <span className="text-slate-500 text-xl">{getSubmissionVotes(partyStatus, partySubmission).length}</span>

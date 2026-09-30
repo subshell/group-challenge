@@ -66,7 +66,7 @@ function App() {
             <div className="print:bg-white bg-slate-100 dark:bg-slate-800 dark:text-white min-h-screen">
               <Navigation />
               <ToastContainer position="bottom-right" className="text-black" />
-              <div className="container mx-auto px-4">{session ? <WithUser /> : <WithoutUser />}</div>
+              <div className="container mx-auto">{session ? <WithUser /> : <WithoutUser />}</div>
             </div>
           </div>
         </WebSocketContext.Provider>
