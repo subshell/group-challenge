@@ -54,7 +54,7 @@ function SubmissionGallery({ submissions }: { submissions: PartySubmissionRespon
       {submissions.map((submission, i) => {
         const currentDimensions = dimensions.get(submission.id);
         return (
-          <div id="vp-gallery-submission" className="flex items-center justify-items-center space-x-4 space-y-4" key={submission.id}>
+          <div id={"vp-gallery-submission-" + i} className="flex items-center justify-items-center space-x-4 space-y-4" key={submission.id}>
             <PartyPosition position={i} />
             <Item
               original={getImageUrl(submission.imageId)}
@@ -64,7 +64,6 @@ function SubmissionGallery({ submissions }: { submissions: PartySubmissionRespon
               caption={submission.name}>
               {({ ref, open }) => (
                 <img
-                  id="vp-gallery-submission-image"
                   style={{ cursor: 'pointer', maxHeight: '240px' }}
                   className="w-96 rounded object-contain"
                   ref={ref}
@@ -72,7 +71,7 @@ function SubmissionGallery({ submissions }: { submissions: PartySubmissionRespon
                   src={getThumbnailUrl(submission.imageId)} />
               )}
             </Item>
-            <div id="vp-gallery-submission-info" className="flex flex-col justify-between h-full">
+            <div className="flex flex-col justify-between h-full">
               <div>
                 <b>{submission.name}</b> {submission.description}
               </div>
