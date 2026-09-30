@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { useParty, usePartyStatus } from '../../api/api';
 import { isPartyLive } from '../../api/api-models';
 import { useSession } from '../../user/session';

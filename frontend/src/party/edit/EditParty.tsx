@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { deleteParty, editParty, assignModerator, useParty, reopenParty } from '../../api/api';
 import { PartyResponse } from '../../api/api-models';
@@ -8,6 +8,7 @@ import { useSession } from '../../user/session';
 import PartyForm, { PartyFormData } from '../PartyForm';
 import PartySubmissions from '../submissions/PartySubmissions';
 import ElectNewModeratorForm, { ElectNewModeratorFormData } from './ElectNewModeratorForm';
+import { useParams } from 'react-router-dom';
 
 function EditParty() {
   const [session] = useSession();

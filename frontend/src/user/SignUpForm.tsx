@@ -52,7 +52,7 @@ function SignUpForm() {
           Username *
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border rounded w-full py-2 px-3"
           type="text"
           {...register('username', { required: true, pattern: /^[a-zA-Z0-9]{2,}$/ })}
         />
@@ -72,7 +72,7 @@ function SignUpForm() {
           Email
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border rounded w-full py-2 px-3"
           type="email"
           {...register('email', { required: true })}
         />
@@ -83,7 +83,7 @@ function SignUpForm() {
           Password *
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3"
           type="password"
           {...register('password', { required: true, minLength: 2 })}
         />
@@ -94,7 +94,7 @@ function SignUpForm() {
           Repeat Password *
         </label>
         <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-black"
+          className="shadow appearance-none border border-red rounded w-full py-2 px-3"
           type="password"
           {...register('confirmpassword', { required: true, validate: (value) => watch('password') === value })}
         />

@@ -1,2 +1,4 @@
 @import 'react-toastify/dist/ReactToastify.css';
 @import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));

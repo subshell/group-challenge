@@ -20,12 +20,7 @@ export function Home() {
   return (
     <div className="flex flex-col justify-between">
       <div className="flex flex-col space-y-28">
-        {highlightedParty && (
-          <div>
-            <h2 className="font-bold text-2xl mb-4 dark:text-slate-300">Next up:</h2>
-            <HighlightedParty party={highlightedParty} />
-          </div>
-        )}
+        {highlightedParty && <HighlightedParty party={highlightedParty} />}
         {!highlightedParty && (
           <Link
             to={'/party/create'}

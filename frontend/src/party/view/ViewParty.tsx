@@ -1,6 +1,14 @@
 import { useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import { joinParty, nextPartySubmissions, previousPartySubmissions, sendReaction, useParty, usePartyStatus, votePartySubmissions } from '../../api/api';
+import { useNavigate } from 'react-router';
+import {
+  joinParty,
+  nextPartySubmissions,
+  previousPartySubmissions,
+  sendReaction,
+  useParty,
+  usePartyStatus,
+  votePartySubmissions,
+} from '../../api/api';
 import ViewPartySubmission from './ViewPartySubmission';
 import ViewPartyLeaderboard from './ViewPartyLeaderboard';
 import { PartyResponse, PartyStatusResponse, PartyStatusState } from '../../api/api-models';
@@ -13,15 +21,16 @@ import ViewPartyReveal from './ViewPartyReveal';
 import EmojiBar from '../../components/EmojiBar';
 import ReactionPicker from '../../components/ReactionPicker';
 import { usePreloadNextImage } from './util';
+import { useParams } from 'react-router-dom';
 
 const ViewPartyContent = ({
-                            partyStatus,
-                            isHost,
-                            party,
-                            onRating,
-                            onNextButton,
-                            onRedirect
-                          }: {
+  partyStatus,
+  isHost,
+  party,
+  onRating,
+  onNextButton,
+  onRedirect,
+}: {
   partyStatus: PartyStatusResponse;
   isHost: boolean;
   party: PartyResponse;
@@ -36,17 +45,13 @@ const ViewPartyContent = ({
     (reaction: string) => {
       mutateReactionAsync({ partyId, reaction, sessionToken: session!.token });
     },
-    [mutateReactionAsync, partyId, session]
+    [mutateReactionAsync, partyId, session],
   );
   usePreloadNextImage(party, partyStatus);
 
   if (!partyStatus || !party) {
     return <div>Unknown party or party status</div>;
   }
-
-  const reactionPicker = (
-    <ReactionPicker onReaction={onReaction} />
-  );
 
   if (party.done || partyStatus.state === PartyStatusState.DONE) {
     return <ViewPartyLeaderboard party={party} />;
@@ -55,6 +60,12 @@ const ViewPartyContent = ({
     onRedirect();
     return null;
   }
+
+  const reactionPicker = (
+    <div className="block md:fixed mt-8 z-10 bottom-4 left-4">
+      <ReactionPicker onReaction={onReaction} />
+    </div>
+  );
 
   if (partyStatus.state === PartyStatusState.LOBBY) {
     return (
@@ -134,21 +145,15 @@ function ViewParty() {
     if (!id || !session?.token || partyDone) {
       return;
     }
-    console.trace('join party');
     mutateJoinParty({ partyId: id, sessionToken: session.token });
   }, [mutateJoinParty, id, session, partyDone]);
-
-  useEffect(() => {
-    console.trace(`Current party state: ${partyStatusState}`);
-  }, [partyStatusState]);
 
   const onSubmissionRating = useCallback(
     async (rating: number) => {
       if (!rating) return;
-      console.trace('onRating', rating);
       await mutateVote({ partyId: id as string, rating, sessionToken: session!.token });
     },
-    [session, id, mutateVote]
+    [session, id, mutateVote],
   );
 
   const onNextButton = async () => {
