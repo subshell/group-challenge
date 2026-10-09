@@ -48,8 +48,10 @@ function SubmissionGallery({ submissions }: { submissions: PartySubmissionRespon
       <Gallery
           withCaption
           id="vp-submission-gallery"
-          onOpen={(pswp) => { pswpRef.current = pswp; }}
-          onClose={() => { pswpRef.current = null; }}
+          onOpen={(pswp) => {
+            pswpRef.current = pswp;
+            pswp.on('destroy', () => { pswpRef.current = null; });
+          }}
       >
         {submissions.map((submission, i) => {
           const currentDimensions = dimensions.get(submission.id);
