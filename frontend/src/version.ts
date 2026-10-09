@@ -10,6 +10,12 @@ export interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.15.1',
+    changes: [
+      { description: 'Fixed initial image display in gallery', type: 'fix' },
+    ],
+  },
+  {
     name: '0.15.0',
     changes: [
       { description: 'Added gallery to party view', type: 'feature' },
