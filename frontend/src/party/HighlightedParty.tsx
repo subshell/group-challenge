@@ -70,7 +70,8 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
               <div>
                 <a
                   href={'/party/my-submissions/' + party.id}
-                  className="flex flex-col items-center hover:bg-white hover:text-cyan-500 rounded-md p-2"
+                  id="my-submissions-link"
+                  className="flex flex-col items-center hover:text-cyan-500 rounded-md p-2"
                 >
                   <dt className="mb-2 text-3xl font-extrabold">{numOwnSubmissions}</dt>
                   <dd className="font-light">my submissions</dd>

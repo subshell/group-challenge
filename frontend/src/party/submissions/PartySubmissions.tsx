@@ -64,7 +64,7 @@ function PartySubmission({ partyId, partySubmission, editSubmissionsDisabled }: 
 
   return (
     <div className="p-4">
-      <div className="bg-white w-96 rounded-lg border dark:bg-slate-900">
+      <div className="bg-white w-96 rounded-lg border dark:border-slate-900 dark:bg-slate-900">
         <a
           href={getImageUrl(partySubmission.imageId)}
           target="_blank"

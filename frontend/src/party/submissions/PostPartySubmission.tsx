@@ -67,9 +67,9 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
         <div>
           <div className="flex items-center justify-center bg-grey-lighter">
             <label
-              className={`w-64 flex-col items-center px-4 py-6 bg-white rounded-lg shadow-lg tracking-wide border cursor-pointer hover:bg-blue-500 hover:text-white ${
+              className={`w-64 flex-col items-center px-4 py-6 bg-white rounded-lg shadow-lg tracking-wide border border-gray-300 dark:border-slate-900 cursor-pointer hover:bg-blue-500 hover:text-white ${
                 hasPreview() ? 'hidden' : 'flex'
-              } dark:bg-slate-900 dark:hover:bg-blue-500`}
+              } dark:bg-slate-900 dark:hover:bg-blue-800`}
             >
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal uppercase">Select a file</span>
