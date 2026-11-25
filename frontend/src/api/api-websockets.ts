@@ -55,7 +55,7 @@ export function useWebSocket({
     (event: GCWebSocketEvent) => {
       webSocket.send(JSON.stringify(event));
     },
-    [webSocket]
+    [webSocket],
   );
 
   useEffect(() => {

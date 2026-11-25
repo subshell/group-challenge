@@ -6,8 +6,6 @@ import { ThemeButton } from '../components/ThemeButton';
 import { useSession } from '../user/session';
 import { VERSION } from '../version';
 
-const enableBetaFeatures = false;
-
 function Navigation() {
   const [session, setSession] = useSession();
   const signOutAndRemoveSession = async () => {
@@ -29,23 +27,6 @@ function Navigation() {
           <Link to="/changelog" title="Changelog">
             <span className="text-sm font-bold pr-4 hover:text-gray-500 hover:underline">{VERSION}</span>
           </Link>
-
-          {session && enableBetaFeatures && (
-            <>
-              <Link
-                className="hover:text-white hover:bg-blue-500 hover:outline-cyan-500 focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
-                to="/collage"
-              >
-                Collage (beta)
-              </Link>
-              <Link
-                className="hover:text-white hover:bg-blue-500 hover:outline-cyan-500 focus:ring-cyan-500 font-medium rounded px-5 py-1 text-center"
-                to="/statistics"
-              >
-                Statistics
-              </Link>
-            </>
-          )}
         </div>
         <nav className="flex flex-wrap items-center space-x-10">
           <ThemeButton />

@@ -56,8 +56,8 @@ export interface PartySubmissionFormData {
 }
 
 export interface PartySubmissionEditFormData {
-  name: string;
-  description: string;
+	name: string;
+	description: string;
 }
 
 export enum PartyStatusState {

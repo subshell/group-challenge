@@ -52,7 +52,7 @@ function ViewPartyStartPage({
 
       {isHost && (
         <button
-          className="flex flex-grow items-center justify-center p-4 pr-32 pl-32 space-x-2 border bg-green-500 text-white cursor-pointer hover:opacity-70 rounded shadow-lg hover:shadow-xl"
+          className="flex grow items-center justify-center p-4 pr-32 pl-32 space-x-2 border bg-green-500 text-white cursor-pointer hover:opacity-70 rounded shadow-lg hover:shadow-xl"
           onClick={onPartyStart}
         >
           Start
