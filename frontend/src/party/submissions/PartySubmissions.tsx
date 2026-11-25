@@ -95,7 +95,7 @@ function PartySubmission({ partyId, partySubmission, editSubmissionsDisabled }: 
                 </label>
                 <input className="bg-white dark:bg-slate-600 shadow appearance-none border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3 focus:border-blue-400 focus:outline-hidden transition-colors"
                        placeholder="Enter a description" {...form.register('description')} />
-                <button data-element="save-submission" className="cursor-pointer ml-2 bg-gray-600 hover:bg-gray-400 text-white py-2 px-2 rounded" type="submit">
+                <button data-element="save-submission" className="cursor-pointer ml-2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-2 rounded" type="submit">
                   <FaSave />
                 </button>
               </form>
@@ -106,7 +106,7 @@ function PartySubmission({ partyId, partySubmission, editSubmissionsDisabled }: 
             </button>
           )}
           {!editDisabled && !editMode && (
-          <button data-element="edit-submission" className="cursor-pointer ml-2 bg-gray-600 hover:bg-gray-400 text-white py-2 px-2 rounded" onClick={onEditSubmission}>
+          <button data-element="edit-submission" className="cursor-pointer ml-2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-2 rounded" onClick={onEditSubmission}>
             <FaEdit />
           </button>
           )}

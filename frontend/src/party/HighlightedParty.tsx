@@ -43,7 +43,8 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
           </span>
         )}
         <div
-          className={isLive ? `border-4 border-t-0 border-blue-500 rounded-b-md` : 'border border-slate-500 rounded-md'}
+          className={`${isLive ? `border-4 border-t-0 border-blue-500 rounded-b-md` : 'border border-slate-500 rounded-md'}
+          bg-white dark:bg-slate-900`}
         >
           <div className="relative mx-6 py-6 flex justify-between flex-col md:flex-row">
             <div className="max-w-7xl space-y-2">
@@ -80,7 +81,7 @@ function HighlightedParty({ party }: { party: PartyResponse }) {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 w-full border-t border-white p-4 mt-4 dark:border-slate-500">
+          <div className="flex items-center space-x-4 w-full border-t border-gray-300 dark:border-white p-4 mt-4 dark:border-slate-500">
             {isHost && (
               <>
                 {!isLive && <Button onClick={onStartPartyButton}>Start</Button>}

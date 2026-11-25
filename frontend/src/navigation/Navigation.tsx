@@ -21,8 +21,8 @@ function Navigation() {
     <header className="body-font print:hidden">
       <div className="container mx-auto flex flex-wrap p-5 mb-8 flex-col md:flex-row items-center justify-between border-b-2 border-gray-600">
         <div className="flex title-font font-medium items-center mb-4 md:mb-0 space-x-2">
-          <Link to="/">
-            <span className="text-xl hover:text-gray-500 hover:underline">Group Challenge</span>
+          <Link id="home-link" to="/">
+            <span className="text-xl hover:text-gray-500 dark:hover:text-gray-400">Group Challenge</span>
           </Link>
           <Link to="/changelog" title="Changelog">
             <span className="text-sm font-bold pr-4 hover:text-gray-500 hover:underline">{VERSION}</span>
