@@ -351,7 +351,6 @@ export async function editSubmission({
   sessionToken: string;
   submission: PartySubmissionEditFormData;
 }): Promise<Response> {
-  console.log("send submission<<<<<<<<<<<<<< ", JSON.stringify(submission))
   return await fetch(`${API_URLS.API}/parties/${partyId}/submissions/${submissionId}`, {
     method: 'PUT',
     body: JSON.stringify(submission),

@@ -484,19 +484,3 @@ func readSubmissionFormData(c *gin.Context) (*multipart.FileHeader, multipart.Fi
 
 	return fileHeader, file, meta, nil
 }
-
-//func readSubmissionFormMetaData(c *gin.Context) (*partySubmissionMetaBody, error) {
-//	var err error
-//	var meta = &partySubmissionMetaBody{}
-//
-//	if err = c.Request.ParseForm(); err != nil {
-//		return nil, err
-//	}
-//
-//	// meta
-//	if err := json.Unmarshal([]byte(c.Request.FormValue("meta")), meta); err != nil {
-//		return nil, err
-//	}
-//
-//	return meta, nil
-//}
