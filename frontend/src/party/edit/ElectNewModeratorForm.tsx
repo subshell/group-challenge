@@ -29,7 +29,7 @@ const ElectNewModeratorForm: FunctionComponent<{ onSubmit: (data: ElectNewModera
           New Moderator
         </label>
 
-        <select className="shadow border rounded w-full py-2 px-3" {...register('new_moderator', { required: true })}>
+        <select className="bg-white shadow border border-gray-300 rounded w-full py-2 px-3 text-black" {...register('new_moderator', { required: true })}>
           {possibleModerators.map((user) => (
             <option key={user.id} value={user.id}>
               {user.username}
@@ -39,7 +39,7 @@ const ElectNewModeratorForm: FunctionComponent<{ onSubmit: (data: ElectNewModera
       </div>
 
       <input
-        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded cursor-pointer"
         value="Elect new moderator"
         disabled={formState.isSubmitting}
         type="submit"

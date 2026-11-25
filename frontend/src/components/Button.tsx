@@ -1,7 +1,7 @@
 function Button(props: any) {
   return (
     <button
-      className="bg-gray-800 hover:bg-gray-400 text-gray-200 font-bold py-2 px-4 rounded"
+      className="bg-gray-800 hover:bg-gray-400 text-gray-200 font-bold py-2 px-4 rounded cursor-pointer"
       type="button"
       {...props}
     >

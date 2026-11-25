@@ -63,7 +63,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
     <div>
       <h1 className="text-2xl mb-8">Submit a new entry to {party.name}</h1>
 
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form id="post-submission-form" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div>
           <div className="flex items-center justify-center bg-grey-lighter">
             <label
@@ -93,7 +93,7 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
             Image Title <span className="text-gray-500">(optional)</span>
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+              className="bg-white shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-black focus:border-blue-400 focus:outline-hidden transition-colors"
             type="text"
             {...form.register('name')}
           />
@@ -105,13 +105,13 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
           </label>
 
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+              className="bg-white shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-black focus:border-blue-400 focus:outline-hidden transition-colors"
             {...form.register('description')}
           />
         </div>
 
         <input
-          className="bg-blue-500 hover:opacity-75 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+          className="bg-blue-500 hover:opacity-75 text-white font-bold py-2 px-4 rounded disabled:opacity-50 cursor-pointer"
           value="Submit"
           disabled={form.formState.isSubmitting || !imgPrevSrc}
           type="submit"

@@ -46,6 +46,7 @@ func configureAPIRouter(router *gin.Engine, con *pg.DB) {
 			submissions := party.Group("/:id/submissions")
 			{
 				submissions.POST("", addPartySubmissionHandler)
+				submissions.PUT("/:submissionId", editPartySubmissionHandler)
 				submissions.DELETE("/:submissionId", deletePartySubmissionHandler)
 			}
 

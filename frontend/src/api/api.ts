@@ -15,7 +15,7 @@ import {
   GCWebSocketEvent,
   PartyReaction,
   PaginationPartiesResponse,
-  ConfigResponse,
+  ConfigResponse, PartySubmissionEditFormData,
 } from './api-models';
 import { PartyFormData } from '../party/PartyForm';
 import { useSession } from '../user/session';
@@ -334,6 +334,27 @@ export async function deleteSubmission({
 }): Promise<Response> {
   return await fetch(`${API_URLS.API}/parties/${partyId}/submissions/${submissionId}`, {
     method: 'DELETE',
+    headers: {
+      'X-AuthToken': sessionToken,
+    },
+  });
+}
+
+export async function editSubmission({
+                                         partyId,
+                                         submissionId,
+                                         sessionToken,
+                                         submission
+                                       }: {
+  partyId: string;
+  submissionId: string;
+  sessionToken: string;
+  submission: PartySubmissionEditFormData;
+}): Promise<Response> {
+  console.log("send submission<<<<<<<<<<<<<< ", JSON.stringify(submission))
+  return await fetch(`${API_URLS.API}/parties/${partyId}/submissions/${submissionId}`, {
+    method: 'PUT',
+    body: JSON.stringify(submission),
     headers: {
       'X-AuthToken': sessionToken,
     },

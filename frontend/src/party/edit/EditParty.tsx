@@ -114,7 +114,7 @@ function EditParty() {
       </div>
       <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
         <h3 className="text-xl mb-8">Submissions</h3>
-        <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
+        <PartySubmissions partyId={id} partySubmissions={party!.submissions} editSubmissionDisabled={true} />
       </div>
     </div>
   );

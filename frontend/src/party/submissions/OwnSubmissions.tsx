@@ -29,7 +29,7 @@ function OwnSubmissions() {
       <div>
         <h1 className="text-2xl mb-8">My Submissions</h1>
         {ownSubmissions.length !== 0 ? (
-          <PartySubmissions partyId={id} partySubmissions={ownSubmissions} />
+          <PartySubmissions partyId={id} partySubmissions={ownSubmissions} editSubmissionDisabled={false}/>
         ) : (
           <span>No submissions...</span>
         )}

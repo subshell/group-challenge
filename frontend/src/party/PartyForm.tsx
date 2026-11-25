@@ -29,13 +29,13 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
   });
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+    <form id="add-party-form" className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <label className="block text-sm font-bold mb-2" htmlFor="name">
           Name
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="bg-white shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-black focus:border-blue-400 focus:outline-hidden transition-colors"
           type="text"
           {...register('name', { required: true })}
         />
@@ -47,7 +47,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
         </label>
 
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
+          className="bg-white shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-black focus:border-blue-400 focus:outline-hidden transition-colors"
           {...register('description', { required: true })}
         />
       </div>
@@ -58,7 +58,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
         </label>
 
         <select
-          className="shadow border rounded w-full py-2 px-3 text-black"
+          className="bg-white shadow border border-gray-300 rounded w-full py-2 px-3 text-black"
           {...register('category', { required: true })}
         >
           <option value="photo">Photo Challenge</option>
@@ -77,7 +77,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
               render={({ field }) => (
                 <ReactDatePicker
                   value={new Date(field.value)}
-                  className="shadow rounded w-full text-black dark:bg-white"
+                  className="bg-white shadow rounded w-full text-black dark:bg-white"
                   onChange={field.onChange}
                 />
               )}
@@ -92,7 +92,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
               control={control}
               render={({ field }) => (
                 <ReactDatePicker
-                  className="shadow rounded w-full text-black dark:bg-white"
+                  className="bg-white shadow rounded w-full text-black dark:bg-white"
                   value={new Date(field.value)}
                   onChange={field.onChange}
                 />
@@ -103,7 +103,7 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
       </div>
 
       <input
-        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+        className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded mt-4 cursor-pointer"
         value={submitBtnText}
         disabled={formState.isSubmitting}
         type="submit"
