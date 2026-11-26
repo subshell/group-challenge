@@ -4,6 +4,9 @@ import { PartyResponse } from '../api/api-models';
 
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
+import Input from "../components/Input";
+import Select from "../components/Select";
+import DatePicker from "../components/DatePicker";
 
 export interface PartyFormData {
   name: string;
@@ -29,79 +32,14 @@ function PartyForm({ onSubmit, submitBtnText = 'Save', initialData = {} }: Party
   });
 
   return (
-    <form id="add-party-form" className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label className="block text-sm font-bold mb-2" htmlFor="name">
-          Name
-        </label>
-        <input
-          className="bg-white dark:bg-slate-600 shadow appearance-none border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3 focus:border-blue-400 focus:outline-hidden transition-colors"
-          type="text"
-          {...register('name', { required: true })}
-        />
+    <form id="party-form" className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <Input label="Name" name="name" type="text" optional={false} props={register('name', {required: true})} />
+      <Input label="Description" name="description" type="text" optional={false} props={register('description', {required: true})} />
+      <Select label="Category" name='category' options={new Map([["photo", "Photo Challenge"]])} props={register('category', { required: true })} />
+      <div className="flex space-x-8">
+        <DatePicker label="Submission Start Date" name="startDate" control={control} />
+        <DatePicker label="Submission End Date" name="endDate" control={control} />
       </div>
-
-      <div>
-        <label className="block text-sm font-bold mb-2" htmlFor="description">
-          Description
-        </label>
-
-        <input
-            className="bg-white dark:bg-slate-600 shadow appearance-none border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3 focus:border-blue-400 focus:outline-hidden transition-colors"
-          {...register('description', { required: true })}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-bold mb-2" htmlFor="category">
-          Category
-        </label>
-
-        <select
-          className="bg-white dark:bg-slate-600 shadow border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3"
-          {...register('category', { required: true })}
-        >
-          <option value="photo">Photo Challenge</option>
-        </select>
-      </div>
-
-      <div>
-        <div className="flex space-x-8">
-          <div>
-            <label className="block text-sm font-bold mb-2" htmlFor="startDate">
-              Submission Start Date
-            </label>
-            <Controller
-              name="startDate"
-              control={control}
-              render={({ field }) => (
-                <ReactDatePicker
-                  value={new Date(field.value)}
-                  className="bg-white shadow rounded w-full text-black"
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-bold mb-2" htmlFor="endDate">
-              Submission End Date
-            </label>
-            <Controller
-              name="endDate"
-              control={control}
-              render={({ field }) => (
-                <ReactDatePicker
-                  className="bg-white shadow rounded w-full text-black"
-                  value={new Date(field.value)}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-        </div>
-      </div>
-
       <input
         className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded mt-4 cursor-pointer"
         value={submitBtnText}

@@ -7,6 +7,7 @@ import { addSubmission, useConfig } from '../../api/api';
 import { PartyResponse, PartySubmissionFormData } from '../../api/api-models';
 import { useSession } from '../../user/session';
 import { useParams } from 'react-router-dom';
+import Input from "../../components/Input";
 
 function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();
@@ -87,29 +88,8 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
             </div>
           </div>
         </div>
-
-        <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="name">
-            Image Title <span className="text-gray-500">(optional)</span>
-          </label>
-          <input
-              className="bg-white dark:bg-slate-600 shadow appearance-none border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3 focus:border-blue-400 focus:outline-hidden transition-colors"
-            type="text"
-            {...form.register('name')}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="description">
-            Image Description <span className="text-gray-500">(optional)</span>
-          </label>
-
-          <input
-              className="bg-white dark:bg-slate-600 shadow appearance-none border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3 focus:border-blue-400 focus:outline-hidden transition-colors"
-            {...form.register('description')}
-          />
-        </div>
-
+        <Input label="Image Title" name="name" type="text" optional={true} props={form.register('name')} />
+        <Input label="Image Description" name="description" type="text" optional={true} props={form.register('description')} />
         <input
           className="bg-blue-500 hover:opacity-75 text-white font-bold py-2 px-4 rounded disabled:opacity-50 cursor-pointer"
           value="Submit"

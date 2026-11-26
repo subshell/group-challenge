@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 import { useForm } from 'react-hook-form';
 import { useUsers } from '../../api/api';
 import { useSession } from '../../user/session';
+import Select from "../../components/Select";
 
 export interface ElectNewModeratorFormData {
   new_moderator: string;
@@ -24,19 +25,8 @@ const ElectNewModeratorForm: FunctionComponent<{ onSubmit: (data: ElectNewModera
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label className="block text-sm font-bold mb-2" htmlFor="new_moderator">
-          New Moderator
-        </label>
-
-        <select className="bg-white dark:bg-slate-600 shadow border border-gray-300 dark:border-slate-900 rounded w-full py-2 px-3" {...register('new_moderator', { required: true })}>
-          {possibleModerators.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.username}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Select label="New Moderator" name="new_moderator" options={new Map(possibleModerators.map((user) => [user.id, user.username]))}
+              props={register('new_moderator', { required: true })} />
 
       <input
         className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded cursor-pointer"
