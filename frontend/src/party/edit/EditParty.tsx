@@ -105,17 +105,17 @@ function EditParty() {
           </button>
         </div>
       </div>
-      <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
+      <div className="border border-gray-300 rounded-mdsx p-4 bg-white dark:bg-slate-600 dark:border-slate-500">
         <h3 className="text-xl mb-8">Party Settings</h3>
         <PartyForm onSubmit={onSubmit} initialData={initialPartyFormData} />
       </div>
-      <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
+      <div className="border border-gray-300 rounded-md p-4 bg-white dark:bg-slate-600 dark:border-slate-500">
         <h3 className="text-xl mb-8">Advanced Settings</h3>
         <ElectNewModeratorForm onSubmit={onChangeModerator} />
       </div>
-      <div className="border p-4 bg-white rounded dark:bg-slate-600 dark:border-slate-500">
+      <div className="border p-4 border-gray-300 rounded-md bg-white dark:bg-slate-600 dark:border-slate-500">
         <h3 className="text-xl mb-8">Submissions</h3>
-        <PartySubmissions partyId={id} partySubmissions={party!.submissions} />
+        <PartySubmissions partyId={id} partySubmissions={party!.submissions} editSubmissionDisabled={true} />
       </div>
     </div>
   );

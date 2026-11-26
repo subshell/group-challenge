@@ -7,6 +7,7 @@ import { addSubmission, useConfig } from '../../api/api';
 import { PartyResponse, PartySubmissionFormData } from '../../api/api-models';
 import { useSession } from '../../user/session';
 import { useParams } from 'react-router-dom';
+import Input from "../../components/Input";
 
 function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; afterUpload?: () => any }) {
   const [session] = useSession();
@@ -63,13 +64,13 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
     <div>
       <h1 className="text-2xl mb-8">Submit a new entry to {party.name}</h1>
 
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form id="post-submission-form" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div>
           <div className="flex items-center justify-center bg-grey-lighter">
             <label
-              className={`w-64 flex-col items-center px-4 py-6 bg-white rounded-lg shadow-lg tracking-wide border cursor-pointer hover:bg-blue-500 hover:text-white ${
+              className={`w-64 flex-col items-center px-4 py-6 bg-white rounded-lg shadow-lg tracking-wide border border-gray-300 dark:border-slate-900 cursor-pointer hover:bg-blue-500 hover:text-white ${
                 hasPreview() ? 'hidden' : 'flex'
-              } dark:bg-slate-900 dark:hover:bg-blue-500`}
+              } dark:bg-slate-900 dark:hover:bg-blue-800`}
             >
               <FaUpload size={26} />
               <span className="mt-2 text-base leading-normal uppercase">Select a file</span>
@@ -87,31 +88,10 @@ function PostPartySubmission({ party, afterUpload }: { party: PartyResponse; aft
             </div>
           </div>
         </div>
-
-        <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="name">
-            Image Title <span className="text-gray-500">(optional)</span>
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
-            type="text"
-            {...form.register('name')}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="description">
-            Image Description <span className="text-gray-500">(optional)</span>
-          </label>
-
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black"
-            {...form.register('description')}
-          />
-        </div>
-
+        <Input label="Image Title" name="name" type="text" optional={true} props={form.register('name')} />
+        <Input label="Image Description" name="description" type="text" optional={true} props={form.register('description')} />
         <input
-          className="bg-blue-500 hover:opacity-75 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+          className="bg-blue-500 hover:opacity-75 text-white font-bold py-2 px-4 rounded disabled:opacity-50 cursor-pointer"
           value="Submit"
           disabled={form.formState.isSubmitting || !imgPrevSrc}
           type="submit"

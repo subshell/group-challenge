@@ -18,7 +18,7 @@ function ViewPartyReveal({ party, partyStatus }: { party: PartyResponse; partySt
       <div className="relative">
         <a id="vp-reveal-submission-image" href={getImageUrl(currentSumbission.imageId)} target="_blank" rel="noopener noreferrer">
           <img
-            className="object-contain w-full rounded bg-gray-100 "
+            className="object-contain w-full rounded"
             style={{
               maxHeight: '75vh',
             }}

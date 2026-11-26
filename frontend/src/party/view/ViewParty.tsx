@@ -24,13 +24,13 @@ import { usePreloadNextImage } from './util';
 import { useParams } from 'react-router-dom';
 
 const ViewPartyContent = ({
-  partyStatus,
-  isHost,
-  party,
-  onRating,
-  onNextButton,
-  onRedirect,
-}: {
+                            partyStatus,
+                            isHost,
+                            party,
+                            onRating,
+                            onNextButton,
+                            onRedirect
+                          }: {
   partyStatus: PartyStatusResponse;
   isHost: boolean;
   party: PartyResponse;

@@ -339,6 +339,44 @@ func addPartySubmissionHandler(c *gin.Context) {
 	c.JSON(200, party)
 }
 
+func editPartySubmissionHandler(c *gin.Context) {
+	party, err := parseParty(c)
+	if err != nil {
+		log.Println("[ERROR]", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	submissionID, err := parseFormId(c, "submissionId")
+	if err != nil {
+		log.Println("[ERROR]", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	meta := &partySubmissionMetaBody{}
+
+	if err := c.ShouldBindJSON(meta); err != nil {
+		log.Println("[ERROR]", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	partySubmission := &models.PartySubmission{
+		ID:          submissionID,
+		Name:        meta.Name,
+		Description: meta.Description,
+	}
+	if err = party.EditSubmission(partySubmission, con); err != nil {
+		log.Println("[ERROR]", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	party.Select(con)
+	broadcastParty("update", party)
+	c.JSON(200, party)
+}
+
 func partyByIDHandler(c *gin.Context) {
 	// TODO validation
 	partyID, ok := c.Params.Get("id")

@@ -77,6 +77,11 @@ func (party *Party) AddSubmission(submission *PartySubmission, con *pg.DB) (err 
 	return
 }
 
+func (party *Party) EditSubmission(submission *PartySubmission, con *pg.DB) (err error) {
+	err = submission.Update(con)
+	return
+}
+
 func (party *Party) DeleteSubmission(submission *PartySubmission, con *pg.DB) (err error) {
 	submissionRelation := &PartiesSubmissionsRelation{
 		PartyID:      party.ID,
@@ -127,7 +132,10 @@ func (party *Party) Update(con *pg.DB) error {
 
 // Update updates the submission
 func (submission *PartySubmission) Update(con *pg.DB) error {
-	_, err := con.Model(submission).Where("id = ?0", submission.ID).Update()
+	_, err := con.Model(submission).
+		Column("name", "description").
+		Where("id = ?0", submission.ID).
+		Update()
 	return err
 }
 

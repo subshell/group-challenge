@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { signIn } from '../api/api';
 import { useSession } from './session';
+import Input from '../components/Input';
 
 interface FormData {
   emailOrUsername: string;
@@ -28,34 +29,31 @@ function SignInForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2" htmlFor="emailOrUsername">
-          Email or Username
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3"
+        <Input
+          label="Email or Username"
+          name="emailOrUsername"
           type="text"
-          {...register('emailOrUsername', { required: true })}
+          optional={false}
+          props={register('emailOrUsername', { required: true })}
         />
-        <p>{formState.errors.emailOrUsername && <span>This field is required</span>}</p>
+        <p>{formState.errors.emailOrUsername && <span className="text-red-600">This field is required</span>}</p>
       </div>
       <div className="mb-6">
-        <label className="block text-sm font-bold mb-2" htmlFor="password">
-          Password
-        </label>
-        <input
-          className="shadow appearance-none border border-red rounded w-full py-2 px-3  mb-3"
+        <Input
+          label="Password"
+          name="password"
           type="password"
-          autoComplete="currnet-password"
-          {...register('password', { required: true })}
+          optional={false}
+          props={{ autoComplete: 'currnet-password', ...register('password', { required: true }) }}
         />
-        <p>{formState.errors.password && <span>This field is required</span>}</p>
+        <p>{formState.errors.password && <span className="text-red-600">This field is required</span>}</p>
       </div>
       <div className="flex items-center justify-between">
         <input
           type="submit"
-          className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded cursor-pointer"
           value="Sign In"
         />
       </div>
