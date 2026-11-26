@@ -10,6 +10,13 @@ export interface Change {
 
 export const CHANGES: Change[] = [
   {
+    name: '0.16.0',
+    changes: [
+      { description: 'Own submissions are editable', type: 'feature' },
+      { description: 'Form UI changes', type: 'note' },
+    ],
+  },
+  {
     name: '0.15.1',
     changes: [
       { description: 'Fixed initial image display in gallery', type: 'fix' },
